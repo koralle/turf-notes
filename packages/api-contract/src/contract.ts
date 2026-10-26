@@ -2,6 +2,8 @@ import { oc } from "@orpc/contract";
 import * as v from "valibot";
 
 import {
+  authMethodsSchema,
+  exportDataSchema,
   idSchema,
   memoCreateInputSchema,
   memoDetailSchema,
@@ -20,6 +22,8 @@ const authed = oc.errors({
   UNAUTHORIZED: { status: 401 },
   "memo-not-found": { status: 404 },
   "tag-not-found": { status: 404 },
+  // パスキーが1つも無い状態ではパスワードサインインを無効化できない（ADR-0002）。
+  "no-passkey": { status: 409 },
 });
 
 const okSchema = v.object({ ok: v.literal(true) });
@@ -50,6 +54,19 @@ export const contract = {
       .input(raceKeySchema)
       .output(v.object({ items: v.array(memoSummarySchema) })),
   },
+
+  auth: {
+    /** パスワードサインインが有効か、パスキーが登録済みか。サインイン画面が使う。 */
+    methods: oc.output(authMethodsSchema),
+  },
+
+  settings: {
+    setPasswordSignIn: authed
+      .input(v.object({ enabled: v.boolean() }))
+      .output(okSchema),
+  },
+
+  exportAll: authed.output(exportDataSchema),
 
   tags: {
     list: authed.output(v.array(tagWithCountSchema)),

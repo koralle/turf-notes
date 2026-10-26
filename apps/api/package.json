@@ -7,11 +7,13 @@
     "create-user": "tsx scripts/create-user.ts",
     "deploy": "vite build && wrangler deploy --keep-vars",
     "dev": "vite dev",
-    "typecheck": "tsc",
-    "test": "vitest run"
+    "enable-password": "tsx scripts/enable-password.ts",
+    "test": "vitest run",
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "catalog:",
+    "@better-auth/passkey": "catalog:",
     "@orpc/server": "catalog:",
     "@turf-notes/api-contract": "workspace:*",
     "@turf-notes/db": "workspace:*",

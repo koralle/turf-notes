@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  index,
   integer,
   sqliteTable,
   text,
@@ -26,6 +27,15 @@ export const users = sqliteTable("users", {
     .notNull()
     .default(false),
   image: text("image"),
+  /**
+   * パスワードサインインを許可するか。パスキーを主にするためのユーザー設定。
+   * 無効化はアプリ層で拒否する（ADR-0002）。
+   */
+  passwordSignInEnabled: integer("password_sign_in_enabled", {
+    mode: "boolean",
+  })
+    .notNull()
+    .default(true),
   ...timestamps,
 });
 
@@ -70,10 +80,36 @@ export const verifications = sqliteTable("verifications", {
   ...timestamps,
 });
 
+export const passkeys = sqliteTable(
+  "passkeys",
+  {
+    id: text("id").primaryKey(),
+    name: text("name"),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    publicKey: text("public_key").notNull(),
+    credentialId: text("credential_id").notNull(),
+    counter: integer("counter").notNull(),
+    deviceType: text("device_type").notNull(),
+    backedUp: integer("backed_up", { mode: "boolean" }).notNull(),
+    transports: text("transports"),
+    aaguid: text("aaguid"),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(nowMs),
+  },
+  (table) => [
+    uniqueIndex("passkeys_credential_id").on(table.credentialId),
+    index("passkeys_user_id").on(table.userId),
+  ]
+);
+
 export const authSchema = {
   user: users,
   session: sessions,
   account: accounts,
+  passkey: passkeys,
   verification: verifications,
 };
 

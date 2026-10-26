@@ -11,6 +11,7 @@ import type {
 import { useState } from "react";
 import { css } from "styled-system/css";
 
+import { EmptyState } from "../components/empty-state";
 import { MemoRow, memoListStyle } from "../components/memo-row";
 import { client } from "../rpc/client";
 
@@ -101,13 +102,6 @@ const timeline = css({
   pt: "6px",
 });
 
-const empty = css({
-  color: "muted",
-  fontSize: "13px",
-  py: "40px",
-  textAlign: "center",
-});
-
 function HomePage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -152,9 +146,9 @@ function HomePage() {
     }
     if (items.length === 0) {
       return (
-        <div className={empty}>
+        <EmptyState>
           まだメモがありません。上の欄に書くか「新規メモ」から始めてください。
-        </div>
+        </EmptyState>
       );
     }
     return (

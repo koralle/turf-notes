@@ -5,6 +5,7 @@ import { createApp } from "./app";
 import { createAuth } from "./auth/create-auth";
 import type { Auth } from "./auth/create-auth";
 import { cookieSessionAuthenticator } from "./auth/session";
+import { isPasswordSignInAllowed } from "./features/settings/queries";
 
 const dbCache = new Map<string, AppDb>();
 const authCache = new Map<string, Auth>();
@@ -31,9 +32,9 @@ const authFor = (env: Env, db: AppDb): Auth => {
   }
 
   const auth = createAuth({
+    baseURL: env.BETTER_AUTH_URL,
     db,
     secret: env.BETTER_AUTH_SECRET,
-    baseURL: env.BETTER_AUTH_URL,
   });
   authCache.set(key, auth);
   return auth;
@@ -47,6 +48,8 @@ export default {
       authenticate: cookieSessionAuthenticator(auth),
       auth,
       db: () => db,
+      isPasswordSignInAllowed: async (email) =>
+        await isPasswordSignInAllowed(db, email),
     });
 
     return await app.fetch(request, env);

@@ -127,3 +127,36 @@ export const tagCreateInputSchema = v.object({
   kind: tagKindSchema,
 });
 export type TagCreateInput = v.InferOutput<typeof tagCreateInputSchema>;
+
+/** サインイン画面が「パスワードを使えるか」を事前に知るための公開情報。 */
+export const authMethodsSchema = v.object({
+  hasPasskey: v.boolean(),
+  passwordSignInEnabled: v.boolean(),
+});
+export type AuthMethods = v.InferOutput<typeof authMethodsSchema>;
+
+/** JSON エクスポート。メモ・タグ・参照をすべて含む（要件 FR-S3）。 */
+export const exportDataSchema = v.object({
+  exportedAt: v.number(),
+  user: v.object({ id: v.string(), name: v.string(), email: v.string() }),
+  tags: v.array(
+    v.object({
+      id: v.number(),
+      kind: tagKindSchema,
+      name: v.string(),
+    })
+  ),
+  memos: v.array(
+    v.object({
+      id: idSchema,
+      title: v.nullable(v.string()),
+      body: v.string(),
+      race: v.nullable(raceSchema),
+      createdAt: v.number(),
+      updatedAt: v.number(),
+      tagIds: v.array(v.number()),
+      linkIds: v.array(idSchema),
+    })
+  ),
+});
+export type ExportData = v.InferOutput<typeof exportDataSchema>;

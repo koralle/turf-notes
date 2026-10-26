@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { css } from "styled-system/css";
 
+import { EmptyState } from "../components/empty-state";
 import { MemoRow, memoListStyle } from "../components/memo-row";
 import { fullDate } from "../lib/date";
 import { client } from "../rpc/client";
@@ -57,11 +58,7 @@ function RacePage() {
       </div>
       <div className={timeline}>
         {items.length === 0 ? (
-          <div
-            className={css({ color: "muted", fontSize: "13px", py: "40px" })}
-          >
-            このレースのメモはまだありません。
-          </div>
+          <EmptyState>このレースのメモはまだありません。</EmptyState>
         ) : (
           <div className={memoListStyle}>
             {items.map((memo) => (

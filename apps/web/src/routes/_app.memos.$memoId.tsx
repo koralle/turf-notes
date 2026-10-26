@@ -3,6 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { css } from "styled-system/css";
 
+import { Markdown } from "../components/markdown";
 import { TagChip } from "../components/tag-chip";
 import { fullDate } from "../lib/date";
 import { client } from "../rpc/client";
@@ -20,12 +21,7 @@ const meta = css({
   gap: "8px",
   mt: "12px",
 });
-const bodyText = css({
-  fontSize: "14.5px",
-  lineHeight: 2,
-  mt: "24px",
-  whiteSpace: "pre-wrap",
-});
+const bodyText = css({ mt: "24px" });
 const section = css({ mt: "28px" });
 const sectionLabel = css({
   color: "faint",
@@ -144,7 +140,9 @@ function MemoDetailPage() {
         ))}
       </div>
 
-      <div className={bodyText}>{item.body}</div>
+      <div className={bodyText}>
+        <Markdown source={item.body} />
+      </div>
 
       {item.links.length === 0 ? null : (
         <div className={section}>

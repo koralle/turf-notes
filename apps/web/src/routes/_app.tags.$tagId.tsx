@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { css } from "styled-system/css";
 
+import { EmptyState } from "../components/empty-state";
 import { MemoRow, memoListStyle } from "../components/memo-row";
 import { client } from "../rpc/client";
 
@@ -51,11 +52,15 @@ function TagPage() {
         </h1>
       </div>
       <div className={timeline}>
-        <div className={memoListStyle}>
-          {(memoList.data?.items ?? []).map((memo) => (
-            <MemoRow key={memo.id} memo={memo} />
-          ))}
-        </div>
+        {(memoList.data?.items ?? []).length === 0 ? (
+          <EmptyState>このタグのメモはまだありません。</EmptyState>
+        ) : (
+          <div className={memoListStyle}>
+            {(memoList.data?.items ?? []).map((memo) => (
+              <MemoRow key={memo.id} memo={memo} />
+            ))}
+          </div>
+        )}
       </div>
     </>
   );

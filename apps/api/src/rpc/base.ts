@@ -16,10 +16,13 @@ export interface RouterDeps {
 
 const createImplementer = () => implement(contract).$context<RpcContext>();
 
-type Implementer = ReturnType<typeof createImplementer>;
-
 export const createRouterKit = (deps: RouterDeps) => {
   const impl = createImplementer();
+
+  /** DB だけを載せる。認証が要らない手続き（`auth.methods`）向け。 */
+  const withDb = impl.middleware(
+    async ({ next }) => await next({ context: { db: deps.db() } })
+  );
 
   const requireAuth = impl.middleware(async ({ context, next }) => {
     const user: AuthenticatedUser | null = await deps.authenticate(
@@ -32,10 +35,7 @@ export const createRouterKit = (deps: RouterDeps) => {
     return await next({ context: { user, db: deps.db() } });
   });
 
-  return { impl, requireAuth } satisfies {
-    impl: Implementer;
-    requireAuth: unknown;
-  };
+  return { impl, requireAuth, withDb };
 };
 
 export type RouterKit = ReturnType<typeof createRouterKit>;

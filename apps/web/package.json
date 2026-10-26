@@ -4,13 +4,16 @@
   "type": "module",
   "scripts": {
     "build": "panda codegen && vite build",
+    "build-storybook": "panda codegen && storybook build",
     "deploy": "vite build && wrangler deploy",
     "dev": "panda codegen && vite dev",
     "panda:codegen": "panda codegen",
     "preview": "vite preview",
+    "storybook": "panda codegen && storybook dev -p 6006",
     "typecheck": "panda codegen && tsc"
   },
   "dependencies": {
+    "@better-auth/passkey": "catalog:",
     "@fontsource/noto-sans-jp": "catalog:",
     "@orpc/client": "catalog:",
     "@orpc/contract": "catalog:",
@@ -20,6 +23,7 @@
     "@tanstack/react-start": "catalog:",
     "@turf-notes/api-contract": "workspace:*",
     "better-auth": "catalog:",
+    "markdown-it": "catalog:",
     "react": "catalog:",
     "react-aria-components": "catalog:",
     "react-dom": "catalog:"
@@ -27,12 +31,17 @@
   "devDependencies": {
     "@cloudflare/vite-plugin": "catalog:",
     "@pandacss/dev": "catalog:",
+    "@storybook/addon-docs": "catalog:",
+    "@storybook/builder-vite": "catalog:",
+    "@storybook/react-vite": "catalog:",
     "@turf-notes/forge": "workspace:*",
+    "@types/markdown-it": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "postcss": "catalog:",
+    "storybook": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "wrangler": "catalog:"
