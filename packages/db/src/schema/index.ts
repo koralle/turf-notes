@@ -89,7 +89,8 @@ export const passkeys = sqliteTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     publicKey: text("public_key").notNull(),
-    credentialId: text("credential_id").notNull(),
+    // フィールド名は Better Auth の passkey プラグインが要求する `credentialID` に合わせる
+    credentialID: text("credential_id").notNull(),
     counter: integer("counter").notNull(),
     deviceType: text("device_type").notNull(),
     backedUp: integer("backed_up", { mode: "boolean" }).notNull(),
@@ -100,7 +101,7 @@ export const passkeys = sqliteTable(
       .default(nowMs),
   },
   (table) => [
-    uniqueIndex("passkeys_credential_id").on(table.credentialId),
+    uniqueIndex("passkeys_credential_id").on(table.credentialID),
     index("passkeys_user_id").on(table.userId),
   ]
 );
