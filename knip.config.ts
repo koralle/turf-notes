@@ -24,6 +24,8 @@ const config: KnipConfig = {
       vitest: { config: ["vitest.config.ts"] },
     },
     "apps/web": {
+      // Storybook 専用の Vite 設定は main.ts からパス文字列で参照している
+      entry: [".storybook/vite.config.ts", "src/**/*.stories.tsx"],
       ignoreDependencies: [
         // Workers の仮想モジュール（npm パッケージではない）
         "cloudflare",
