@@ -2,54 +2,525 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
+<title>Turf Notes — スマートフォン</title>
 <link rel="stylesheet" href="styles.css">
 </head>
+<!--
+  スマートフォン用デザイン（基準幅 400px）。
+  下部タブは「ホーム / タグ / 設定」の3つ。タグ一覧は今回追加する画面。
+  入力欄は 16px（iOS のフォーカス時ズームを避ける）、主要な操作は 44px 以上。
+  各画面は #home のようなフラグメントを付けると単体で開ける。
+-->
 <body class="theme-a mobile">
-<div class="canvas-label">モバイル ／ 常設の入力欄＋下部タブ＋新規メモの FAB</div>
-<div class="phone">
-  <div class="app">
-    <main>
-      <div class="topbar"><h1>メモ</h1><span class="count">128</span></div>
-      <div class="composer"><div class="placeholder">思いついたことを書く…</div><div class="btn-save">保存</div></div>
-      <div class="toolbar"><div class="search">検索</div></div>
-      <div class="timeline">
-        <div class="memo-row">
-          <div class="date"><span class="y">2026</span><span class="d">11/02</span><span class="w">日</span></div>
-          <div class="main-col">
-            <div class="title">ソダシは道中で力みが出た。折り合いを欠いた分、終いの伸びを欠いた。</div>
-            <div class="meta"><span class="race">東京 11R</span><span class="tag horse">ソダシ</span></div>
+<div class="gallery-head"><b>Turf Notes</b> スマートフォン（基準幅 400px ・ 下部タブは ホーム / タグ / 設定）</div>
+<div class="gallery">
+
+  <!-- 1. ホーム -->
+  <div class="shot" id="home">
+    <div class="shot-cap"><b>ホーム</b> <span>タイムライン</span></div>
+    <div class="phone">
+      <div class="m-app">
+        <header class="m-top"><h1>メモ</h1></header>
+        <div class="m-composer"><span class="ph">思いついたことを書く…</span><span class="m-save">保存</span></div>
+        <div class="m-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4.5 4.5"/></svg>
+          <span>検索</span>
+        </div>
+        <div class="m-timeline">
+          <div class="memo-row">
+            <div class="date"><span class="y">2026</span><span class="d">10/25</span><span class="w">日</span></div>
+            <div class="main-col">
+              <div class="title">武豊の騎乗。内枠からロスなく運び、直線でぴたりと抜け出した。</div>
+              <div class="meta"><span class="race">東京 11R</span><span class="tag person">武豊</span><span class="refs">参照 1</span></div>
+            </div>
+          </div>
+          <div class="memo-row">
+            <div class="date"><span class="y">2026</span><span class="d">10/25</span><span class="w">日</span></div>
+            <div class="main-col">
+              <div class="title">三連複の1点あたりの金額が多すぎる。的中率ではなく回収率で見るべき。点数を絞る勇気を持つ。</div>
+              <div class="meta"><span class="tag">買い方</span><span class="refs">参照 1</span></div>
+            </div>
+          </div>
+          <div class="memo-row">
+            <div class="date"><span class="y">2026</span><span class="d">10/24</span><span class="w">土</span></div>
+            <div class="main-col">
+              <div class="title">イクイノックスの坂路、終い1F 11.8。余力十分で、次走が楽しみ。</div>
+              <div class="meta"><span class="tag horse">イクイノックス</span><span class="tag">調教</span></div>
+            </div>
+          </div>
+          <div class="memo-row">
+            <div class="date"><span class="y">2026</span><span class="d">10/18</span><span class="w">日</span></div>
+            <div class="main-col">
+              <div class="title">3歳未勝利 芝1800。外差しが効かない一日だった。内を回した馬だけが伸びている。</div>
+              <div class="meta"><span class="race">東京 3R</span><span class="tag">馬場</span></div>
+            </div>
           </div>
         </div>
-        <div class="memo-row">
-          <div class="date"><span class="y">2026</span><span class="d">11/02</span><span class="w">日</span></div>
-          <div class="main-col">
-            <div class="title">3歳未勝利 芝1800。外差しが効かない一日だった。内を回した馬だけが伸びている。</div>
-            <div class="meta"><span class="race">東京 3R</span><span class="tag">馬場</span></div>
+        <div class="m-fab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <nav class="m-tabbar">
+          <span class="m-tab active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3.5 10.6 12 3.6l8.5 7V20a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>
+            ホーム
+          </span>
+          <span class="m-tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4z"/><circle cx="7.5" cy="7.5" r="0.7"/></svg>
+            タグ
+          </span>
+          <span class="m-tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2.1" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="2.1" fill="currentColor" stroke="none"/><circle cx="8" cy="18" r="2.1" fill="currentColor" stroke="none"/></svg>
+            設定
+          </span>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. ホーム（検索中） -->
+  <div class="shot" id="home-search">
+    <div class="shot-cap"><b>ホーム</b> <span>検索中</span></div>
+    <div class="phone">
+      <div class="m-app">
+        <header class="m-top"><h1>メモ</h1></header>
+        <div class="m-composer"><span class="ph">思いついたことを書く…</span><span class="m-save">保存</span></div>
+        <div class="m-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4.5 4.5"/></svg>
+          <span class="q">ソダシ</span>
+          <span class="clear">×</span>
+        </div>
+        <div class="m-result-note">「ソダシ」の検索結果 2件</div>
+        <div class="m-timeline">
+          <div class="memo-row">
+            <div class="date"><span class="y">2026</span><span class="d">10/25</span><span class="w">日</span></div>
+            <div class="main-col">
+              <div class="title">ソダシは道中で力みが出た。折り合いを欠いた分、終いの伸びを欠いた。</div>
+              <div class="meta"><span class="race">東京 11R</span><span class="tag horse">ソダシ</span><span class="tag">展開</span></div>
+            </div>
+          </div>
+          <div class="memo-row">
+            <div class="date"><span class="y">2026</span><span class="d">08/16</span><span class="w">日</span></div>
+            <div class="main-col">
+              <div class="title">ソダシの坂路、終い1F 12.1。動きは平凡だが、馬体は維持できている。</div>
+              <div class="meta"><span class="tag horse">ソダシ</span><span class="tag">調教</span></div>
+            </div>
           </div>
         </div>
-        <div class="memo-row">
-          <div class="date"><span class="y">2026</span><span class="d">11/02</span><span class="w">日</span></div>
-          <div class="main-col">
-            <div class="title">イクイノックスの坂路。終い1F 11.8。余力十分で、次走は楽しみ。</div>
-            <div class="meta"><span class="tag horse">イクイノックス</span><span class="tag">調教</span></div>
+        <div class="m-fab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <nav class="m-tabbar">
+          <span class="m-tab active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3.5 10.6 12 3.6l8.5 7V20a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>
+            ホーム
+          </span>
+          <span class="m-tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4z"/><circle cx="7.5" cy="7.5" r="0.7"/></svg>
+            タグ
+          </span>
+          <span class="m-tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2.1" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="2.1" fill="currentColor" stroke="none"/><circle cx="8" cy="18" r="2.1" fill="currentColor" stroke="none"/></svg>
+            設定
+          </span>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. ホーム（メモなし） -->
+  <div class="shot" id="home-empty">
+    <div class="shot-cap"><b>ホーム</b> <span>メモなし</span></div>
+    <div class="phone">
+      <div class="m-app">
+        <header class="m-top"><h1>メモ</h1></header>
+        <div class="m-composer"><span class="ph">思いついたことを書く…</span><span class="m-save">保存</span></div>
+        <div class="m-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4.5 4.5"/></svg>
+          <span>検索</span>
+        </div>
+        <div class="m-timeline">
+          <div class="m-empty">
+            <span class="lead">まだメモがありません</span>
+            上の欄に書くか、右下の＋から始めてください。
           </div>
         </div>
-        <div class="memo-row">
-          <div class="date"><span class="y">2026</span><span class="d">10/26</span><span class="w">日</span></div>
-          <div class="main-col">
-            <div class="title">三連複の1点あたりの金額が多すぎる。的中率ではなく回収率で見るべき。</div>
-            <div class="meta"><span class="tag">買い方</span></div>
+        <div class="m-fab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <nav class="m-tabbar">
+          <span class="m-tab active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3.5 10.6 12 3.6l8.5 7V20a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>
+            ホーム
+          </span>
+          <span class="m-tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4z"/><circle cx="7.5" cy="7.5" r="0.7"/></svg>
+            タグ
+          </span>
+          <span class="m-tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2.1" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="2.1" fill="currentColor" stroke="none"/><circle cx="8" cy="18" r="2.1" fill="currentColor" stroke="none"/></svg>
+            設定
+          </span>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. メモ詳細 -->
+  <div class="shot" id="detail">
+    <div class="shot-cap"><b>メモ詳細</b> <span>参照つき</span></div>
+    <div class="phone">
+      <div class="m-app">
+        <header class="m-top m-top-sub">
+          <span class="m-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg></span>
+          <span class="m-top-title">メモ</span>
+          <span class="m-top-action">編集</span>
+        </header>
+        <div class="m-scroll">
+          <div class="m-pad">
+            <h1 class="m-h1">天皇賞(秋) ソダシの折り合い</h1>
+            <div class="m-meta">
+              <span class="race">10/25 東京 11R <span class="chev">›</span></span>
+              <span class="tag horse">ソダシ</span>
+              <span class="tag">展開</span>
+            </div>
+            <div class="m-body-text">
+              <p>道中で力みが出て、折り合いを欠いた。向正面で一度抑えたものの、直線の伸びは最後まで戻らなかった。</p>
+              <p class="subhead">次走の見立て</p>
+              <p>東京 1600 のマイル戦なら、ペースが落ち着いて折り合いやすい。距離短縮が噛み合う可能性はある。</p>
+            </div>
+            <div class="m-refblock">
+              <div class="m-label">参照しているメモ</div>
+              <span class="m-ref"><span class="arrow">→</span><span class="grow">ソダシは道中で力みが出た</span></span>
+            </div>
+            <div class="m-refblock">
+              <div class="m-label">このメモを参照しているメモ</div>
+              <span class="m-ref"><span class="arrow">←</span><span class="grow">武豊の騎乗。内枠からロスなく運び…</span></span>
+              <span class="m-ref"><span class="arrow">←</span><span class="grow">天皇賞(秋)の馬場</span></span>
+            </div>
+            <div class="m-danger-zone"><button>このメモを削除</button></div>
           </div>
         </div>
       </div>
-    </main>
+    </div>
   </div>
-  <div class="tabbar">
-    <div class="tab active"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg>ホーム</div>
-    <div class="tab"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4.5 4.5"/></svg>検索</div>
-    <div class="tab"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 7h16M4 12h16M4 17h16"/></svg>設定</div>
+
+  <!-- 5. エディタ（本文） -->
+  <div class="shot" id="editor">
+    <div class="shot-cap"><b>エディタ</b> <span>本文</span></div>
+    <div class="phone">
+      <div class="m-app">
+        <header class="m-top m-top-sub">
+          <span class="m-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg></span>
+          <span class="m-top-title">新規メモ</span>
+        </header>
+        <div class="m-scroll">
+          <div class="m-pad m-editorfill">
+            <div class="m-title">天皇賞(秋) ソダシの折り合い</div>
+            <div class="m-hint">タイトルが空なら本文の1行目が見出しになる ・ 本文は Markdown</div>
+            <div class="m-textarea">道中で力みが出て、折り合いを欠いた。向正面で一度抑えたものの、直線の伸びは最後まで戻らなかった。
+
+**次走の見立て**
+
+東京 1600 のマイル戦なら、ペースが落ち着いて折り合いやすい。距離短縮が噛み合う可能性はある。</div>
+          </div>
+        </div>
+        <div class="m-actionbar"><span class="m-primary">保存</span></div>
+      </div>
+    </div>
   </div>
-  <div class="fab">+</div>
+
+  <!-- 6. エディタ（メタ情報） -->
+  <div class="shot" id="editor-meta">
+    <div class="shot-cap"><b>エディタ</b> <span>メタ情報（下へスクロール）</span></div>
+    <div class="phone">
+      <div class="m-app">
+        <header class="m-top m-top-sub">
+          <span class="m-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg></span>
+          <span class="m-top-title">新規メモ</span>
+        </header>
+        <div class="m-scroll">
+          <div class="m-pad">
+            <div class="m-section">
+              <div class="m-label">レース</div>
+              <div class="m-fields">
+                <div class="m-field">2026/10/25</div>
+                <div class="m-grid-2">
+                  <div class="m-field select">東京</div>
+                  <div class="m-field select">11R</div>
+                </div>
+                <div class="m-field">天皇賞(秋)</div>
+              </div>
+              <div class="m-hint">3つそろえるとレースページができます</div>
+            </div>
+            <div class="m-section">
+              <div class="m-label">タグ</div>
+              <div class="m-chips">
+                <span class="tag horse">ソダシ<i class="x">×</i></span>
+                <span class="tag">展開<i class="x">×</i></span>
+              </div>
+              <div class="m-chips">
+                <span class="m-chip-add">＋ イクイノックス</span>
+                <span class="m-chip-add">＋ 馬場</span>
+                <span class="m-chip-add">＋ 調教</span>
+              </div>
+              <div class="m-input-row">
+                <div class="m-field is-ph">新しいタグ</div>
+                <div class="m-field select kind">馬</div>
+                <span class="m-text-btn">追加</span>
+              </div>
+            </div>
+            <div class="m-section">
+              <div class="m-label">参照</div>
+              <div class="m-ref-item"><span class="arrow">→</span><span class="grow">ソダシは道中で力みが出た</span><span class="x">×</span></div>
+              <div class="m-field is-ph spaced">メモを検索して参照を追加</div>
+              <div class="m-candidate"><span class="plus">＋</span>天皇賞(秋)の馬場</div>
+              <div class="m-candidate"><span class="plus">＋</span>ソダシの血統</div>
+            </div>
+          </div>
+        </div>
+        <div class="m-actionbar"><span class="m-primary">保存</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. タグ一覧 -->
+  <div class="shot" id="tags">
+    <div class="shot-cap"><b>タグ一覧</b> <span>新規</span></div>
+    <div class="phone">
+      <div class="m-app">
+        <header class="m-top"><h1>タグ</h1></header>
+        <div class="m-scroll">
+          <div class="m-pad">
+            <div class="m-group">
+              <div class="m-group-label">馬</div>
+              <div class="m-tag-row"><span class="dot horse"></span>イクイノックス<span class="count">3</span></div>
+              <div class="m-tag-row"><span class="dot horse"></span>ソダシ<span class="count">2</span></div>
+              <div class="m-tag-row"><span class="dot horse"></span>ドウデュース<span class="count">1</span></div>
+            </div>
+            <div class="m-group">
+              <div class="m-group-label">人</div>
+              <div class="m-tag-row"><span class="dot person"></span>武豊<span class="count">4</span></div>
+              <div class="m-tag-row"><span class="dot person"></span>C.ルメール<span class="count">2</span></div>
+            </div>
+            <div class="m-group">
+              <div class="m-group-label">主題</div>
+              <div class="m-tag-row"><span class="dot theme"></span>展開<span class="count">6</span></div>
+              <div class="m-tag-row"><span class="dot theme"></span>馬場<span class="count">5</span></div>
+              <div class="m-tag-row"><span class="dot theme"></span>調教<span class="count">4</span></div>
+              <div class="m-tag-row"><span class="dot theme"></span>買い方<span class="count">3</span></div>
+            </div>
+          </div>
+        </div>
+        <nav class="m-tabbar">
+          <span class="m-tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3.5 10.6 12 3.6l8.5 7V20a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>
+            ホーム
+          </span>
+          <span class="m-tab active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4z"/><circle cx="7.5" cy="7.5" r="0.7"/></svg>
+            タグ
+          </span>
+          <span class="m-tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2.1" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="2.1" fill="currentColor" stroke="none"/><circle cx="8" cy="18" r="2.1" fill="currentColor" stroke="none"/></svg>
+            設定
+          </span>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. タグページ -->
+  <div class="shot" id="tag">
+    <div class="shot-cap"><b>タグページ</b> <span>馬</span></div>
+    <div class="phone">
+      <div class="m-app">
+        <header class="m-top m-top-sub">
+          <span class="m-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg></span>
+          <span class="m-top-title">タグ</span>
+          <span class="m-top-note">3件</span>
+        </header>
+        <div class="m-scroll">
+          <div class="m-pad">
+            <h1 class="m-h1">イクイノックス</h1>
+            <div class="m-meta">
+              <span class="m-kind"><span class="dot horse"></span>馬</span>
+            </div>
+            <div class="m-rows">
+              <div class="memo-row">
+                <div class="date"><span class="y">2026</span><span class="d">10/24</span><span class="w">土</span></div>
+                <div class="main-col">
+                  <div class="title">イクイノックスの坂路、終い1F 11.8。余力十分で、次走が楽しみ。</div>
+                  <div class="meta"><span class="tag">調教</span><span class="refs">参照 1</span></div>
+                </div>
+              </div>
+              <div class="memo-row">
+                <div class="date"><span class="y">2026</span><span class="d">09/13</span><span class="w">日</span></div>
+                <div class="main-col">
+                  <div class="title">イクイノックスの札幌記念。外を回して差し切った。強い内容。</div>
+                  <div class="meta"><span class="race">札幌 11R</span></div>
+                </div>
+              </div>
+              <div class="memo-row">
+                <div class="date"><span class="y">2026</span><span class="d">08/16</span><span class="w">日</span></div>
+                <div class="main-col">
+                  <div class="title">イクイノックスの体調。馬体重は維持。次走は秋天かJC。</div>
+                  <div class="meta"><span class="tag">調教</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. レースページ -->
+  <div class="shot" id="race">
+    <div class="shot-cap"><b>レースページ</b> <span>東京 11R</span></div>
+    <div class="phone">
+      <div class="m-app">
+        <header class="m-top m-top-sub">
+          <span class="m-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg></span>
+          <span class="m-top-title">レース</span>
+          <span class="m-top-note">2件</span>
+        </header>
+        <div class="m-scroll">
+          <div class="m-pad">
+            <h1 class="m-h1">10/25 東京 11R</h1>
+            <div class="m-meta">
+              <span class="refs">天皇賞(秋)</span>
+            </div>
+            <div class="m-rows">
+              <div class="memo-row">
+                <div class="date"><span class="y">2026</span><span class="d">10/25</span><span class="w">日</span></div>
+                <div class="main-col">
+                  <div class="title">武豊の騎乗。内枠からロスなく運び、直線でぴたりと抜け出した。</div>
+                  <div class="meta"><span class="tag person">武豊</span><span class="refs">参照 1</span></div>
+                </div>
+              </div>
+              <div class="memo-row">
+                <div class="date"><span class="y">2026</span><span class="d">10/25</span><span class="w">日</span></div>
+                <div class="main-col">
+                  <div class="title">ソダシは道中で力みが出た。折り合いを欠いた分、終いの伸びを欠いた。</div>
+                  <div class="meta"><span class="tag horse">ソダシ</span><span class="tag">展開</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. 設定 -->
+  <div class="shot" id="settings">
+    <div class="shot-cap"><b>設定</b></div>
+    <div class="phone">
+      <div class="m-app">
+        <header class="m-top"><h1>設定</h1></header>
+        <div class="m-scroll">
+          <div class="m-pad">
+            <div class="m-setting first">
+              <div class="m-setting-title">koralle</div>
+              <div class="m-setting-desc">me@example.com</div>
+              <span class="m-btn-outline danger m-btn-full">サインアウト</span>
+            </div>
+            <div class="m-section">
+              <div class="m-label">パスキー</div>
+              <div class="m-setting-desc">端末の生体認証やセキュリティキーでサインインします。</div>
+              <div class="m-passkey">
+                <div class="name">iPhone</div>
+                <div class="meta">2026/03/04 登録 ・ バックアップ済み</div>
+                <div class="actions"><button>名前を変更</button><button class="danger">削除</button></div>
+              </div>
+              <div class="m-passkey">
+                <div class="name">MacBook Air</div>
+                <div class="meta">2026/01/12 登録</div>
+                <div class="actions"><button>名前を変更</button><button class="danger">削除</button></div>
+              </div>
+              <div class="m-input-row"><div class="m-field is-ph">パスキーに付ける名前（任意）</div></div>
+              <span class="m-btn-weak m-btn-full">パスキーを追加</span>
+            </div>
+            <div class="m-section">
+              <div class="m-label">パスワードサインイン</div>
+              <div class="m-line">
+                <div class="grow">
+                  <div class="m-setting-title">無効</div>
+                  <div class="m-setting-desc">パスキーだけがサインイン手段になります。</div>
+                </div>
+                <span class="m-btn-weak">有効にする</span>
+              </div>
+              <div class="m-hint spaced">パスキーを全部失った場合は、サーバー上で <span class="m-code">enable-password</span> を実行すると戻せます。</div>
+            </div>
+            <div class="m-section">
+              <div class="m-label">データ</div>
+              <div class="m-line">
+                <div class="grow">
+                  <div class="m-setting-title">JSON エクスポート</div>
+                  <div class="m-setting-desc">メモ・タグ・参照をすべて1つのファイルに書き出します。</div>
+                </div>
+                <span class="m-btn-weak">エクスポート</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <nav class="m-tabbar">
+          <span class="m-tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3.5 10.6 12 3.6l8.5 7V20a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>
+            ホーム
+          </span>
+          <span class="m-tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4z"/><circle cx="7.5" cy="7.5" r="0.7"/></svg>
+            タグ
+          </span>
+          <span class="m-tab active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2.1" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="2.1" fill="currentColor" stroke="none"/><circle cx="8" cy="18" r="2.1" fill="currentColor" stroke="none"/></svg>
+            設定
+          </span>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. サインイン -->
+  <div class="shot" id="signin">
+    <div class="shot-cap"><b>サインイン</b> <span>パスキー</span></div>
+    <div class="phone">
+      <div class="m-app">
+        <div class="m-auth">
+          <div class="brandline"><span class="mark">T</span><span class="name">Turf Notes</span></div>
+          <h1>サインイン</h1>
+          <p class="sub">パスキーでサインインします。端末の生体認証かセキュリティキーを使います。</p>
+          <span class="m-primary">パスキーでサインイン</span>
+          <div class="alt">その他の方法でログインする <span class="chev">⌄</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12. サインイン（パスワード展開） -->
+  <div class="shot" id="signin-password">
+    <div class="shot-cap"><b>サインイン</b> <span>パスワード展開</span></div>
+    <div class="phone">
+      <div class="m-app">
+        <div class="m-auth">
+          <div class="brandline"><span class="mark">T</span><span class="name">Turf Notes</span></div>
+          <h1>サインイン</h1>
+          <p class="sub">パスキー、またはパスワードでサインインします。</p>
+          <span class="m-primary">パスキーでサインイン</span>
+          <div class="divider">パスワードでサインイン</div>
+          <div class="field-label">メールアドレス</div>
+          <div class="m-field">me@example.com</div>
+          <div class="field-label">パスワード</div>
+          <div class="m-field">••••••••</div>
+          <span class="m-outline-primary">パスワードでサインイン</span>
+          <div class="alt">パスキーでサインインに戻る <span class="chev">⌃</span></div>
+          <div class="m-note">パスワードサインインが無効のときは、この項目は表示されません。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 </body>
 </html>
