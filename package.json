@@ -5,6 +5,9 @@
   "scripts": {
     "build": "pnpm -r run build",
     "check": "ultracite check --type-aware",
+    "deploy": "pnpm --filter @turf-notes/api run deploy && pnpm --filter @turf-notes/web run deploy",
+    "deploy:api": "pnpm --filter @turf-notes/api run deploy",
+    "deploy:web": "pnpm --filter @turf-notes/web run deploy",
     "dev": "pnpm --filter @turf-notes/web run dev",
     "fix": "ultracite fix --type-aware --no-error-on-unmatched-pattern",
     "knip": "knip",

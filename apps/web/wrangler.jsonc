@@ -7,5 +7,12 @@
   "observability": {
     "enabled": true,
   },
+  "routes": [
+    {
+      "pattern": "turf-notes.koralle-mgmg.com",
+      "custom_domain": true,
+    },
+  ],
+  "workers_dev": false,
   "services": [{ "binding": "API", "service": "turf-notes-api" }],
 }

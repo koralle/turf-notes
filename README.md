@@ -78,6 +78,31 @@ pnpm dev
 - 一覧の無限スクロール（現状は「もっと見る」）
 - レート制限、監査ログ
 
+## 本番デプロイ
+
+ホスト名は `turf-notes.koralle-mgmg.com` 固定（パスキーの rpID がドメインに紐づくため、後から変えない）。
+
+```sh
+# 1) 本番 DB（Turso）にスキーマを適用
+TURSO_CONNECTION_URL='libsql://...' TURSO_AUTH_TOKEN='...' \
+  pnpm --filter @turf-notes/db migrate
+
+# 2) 本番ユーザーを作る（サインアップは無い）
+TURSO_CONNECTION_URL='libsql://...' TURSO_AUTH_TOKEN='...' \
+  pnpm --filter @turf-notes/api create-user <email> <name> <password>
+
+# 3) シークレットを登録
+pnpm --filter @turf-notes/api exec wrangler secret put TURSO_CONNECTION_URL
+pnpm --filter @turf-notes/api exec wrangler secret put TURSO_AUTH_TOKEN
+pnpm --filter @turf-notes/api exec wrangler secret put BETTER_AUTH_SECRET
+pnpm --filter @turf-notes/api exec wrangler secret put BETTER_AUTH_URL   # https://turf-notes.koralle-mgmg.com
+
+# 4) API → Web の順にデプロイ（Web の Service Binding が API を参照する）
+pnpm run deploy
+```
+
+初回サインイン後に**パスキーを登録し、パスワードサインインを無効化**するのが想定運用。パスキーを全失したときは `enable-password` を本番 DB に対して実行して復旧する。
+
 ## 補足
 
 - ローカル DB は libSQL の HTTP サーバー（`apps/api/compose.yaml`）。本番は Turso を想定している。
