@@ -56,5 +56,9 @@ export default defineConfig(({ command }) => ({
       "styled-system": path.resolve(import.meta.dirname, "styled-system"),
     },
   },
-  server: { port: 3000 },
+  server: {
+    port: 3000,
+    // 3000 が埋まっていたら別ポートへ黙って逃げない（BETTER_AUTH_URL とズレるため）。
+    strictPort: true,
+  },
 }));
