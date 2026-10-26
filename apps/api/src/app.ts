@@ -11,8 +11,6 @@ export interface AppDeps {
   /** isolate ごとに遅延生成するため関数で受ける。 */
   readonly db: () => AppDb;
   readonly auth: Auth;
-  /** パスワードサインインを許可してよいか（ADR-0002）。 */
-  readonly isPasswordSignInAllowed: (email: string) => Promise<boolean>;
 }
 
 export const createApp = (deps: AppDeps) => {
@@ -24,26 +22,8 @@ export const createApp = (deps: AppDeps) => {
   // サインアップは提供しない（CLI でユーザーを作る）。UI だけでなく HTTP 面でも塞ぐ。
   app.post("/api/auth/sign-up/*", (c) => c.text("Not Found", 404));
 
-  /**
-   * パスワードサインインが無効なユーザーはここで止める。
-   * Better Auth の `emailAndPassword.enabled` はデプロイ時の設定なので、
-   * ユーザー単位の可否はアプリ層で判定する（ADR-0002）。
-   */
-  app.post("/api/auth/sign-in/email", async (c) => {
-    const email = await readEmail(c.req.raw.clone());
-    if (email !== null && !(await deps.isPasswordSignInAllowed(email))) {
-      return c.json(
-        {
-          code: "PASSWORD_SIGN_IN_DISABLED",
-          message: "パスワードサインインは無効です",
-        },
-        403
-      );
-    }
-
-    return await deps.auth.handler(c.req.raw);
-  });
-
+  // パスワードサインインの可否は Better Auth の `hooks.before` で判定する（ADR-0002）。
+  // media type ごとの取りこぼしを避けるため、ここでは body を読まない。
   app.on(
     ["GET", "POST"],
     "/api/auth/*",
@@ -68,18 +48,4 @@ export const createApp = (deps: AppDeps) => {
   );
 
   return app;
-};
-
-const readEmail = async (request: Request): Promise<string | null> => {
-  try {
-    const body: unknown = await request.json();
-    if (typeof body === "object" && body !== null && "email" in body) {
-      const { email } = body;
-      return typeof email === "string" ? email.toLowerCase() : null;
-    }
-  } catch {
-    return null;
-  }
-
-  return null;
 };

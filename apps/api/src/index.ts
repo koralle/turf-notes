@@ -5,7 +5,6 @@ import { createApp } from "./app";
 import { createAuth } from "./auth/create-auth";
 import type { Auth } from "./auth/create-auth";
 import { cookieSessionAuthenticator } from "./auth/session";
-import { isPasswordSignInAllowed } from "./features/settings/queries";
 
 const dbCache = new Map<string, AppDb>();
 const authCache = new Map<string, Auth>();
@@ -48,8 +47,6 @@ export default {
       authenticate: cookieSessionAuthenticator(auth),
       auth,
       db: () => db,
-      isPasswordSignInAllowed: async (email) =>
-        await isPasswordSignInAllowed(db, email),
     });
 
     return await app.fetch(request, env);

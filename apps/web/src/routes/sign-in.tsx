@@ -114,11 +114,7 @@ function SignInPage() {
 
     setPending(false);
     if (result.error !== null && result.error !== undefined) {
-      setError(
-        result.error.status === 403
-          ? "このアカウントはパスワードサインインが無効です"
-          : "メールアドレスかパスワードが違います"
-      );
+      setError("メールアドレスかパスワードが違います");
       return;
     }
 
