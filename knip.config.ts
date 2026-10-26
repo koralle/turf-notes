@@ -2,8 +2,8 @@ import type { KnipConfig } from "knip";
 
 const config: KnipConfig = {
   tags: ["-lintignore"],
-  // .pi 配下のスキル用クローンはこのリポジトリのソースではない。
-  ignore: ["**/.pi/git/**"],
+  // .pi 配下のスキル用クローンと .agents のスキル用ツールはこのリポジトリのソースではない。
+  ignore: ["**/.pi/git/**", "**/.agents/**"],
   // lefthook.yaml / git hooks を entry として解析させない。
   lefthook: false,
   rules: {
