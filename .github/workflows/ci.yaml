@@ -3,44 +3,80 @@ name: CI
 on:
   pull_request:
     branches: [main]
-  push:
-    branches: [main]
+  workflow_call:
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
-  verify:
+  check:
+    name: Lint and format
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/composite-actions/cache-and-install
+      - run: pnpm run check
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/composite-actions/cache-and-install
+      - run: pnpm run typecheck
+
+  test:
+    name: Test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/composite-actions/cache-and-install
+      - run: pnpm run test
+
+  knip:
+    name: Unused dependencies and exports
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/composite-actions/cache-and-install
+      - run: pnpm run knip
+
+  migrations:
+    name: Migrations are append-only
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: 既存マイグレーションの変更を禁止する
+        env:
+          # PR ならターゲットブランチ、workflow_call（main へのデプロイ）なら main
+          BASE_REF: origin/${{ github.base_ref || 'main' }}
+        run: bash .github/scripts/forbid-existing-migration-changes.sh
+
+  build:
+    name: Build
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - uses: ./.github/composite-actions/cache-and-install
+      - run: pnpm run build
 
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - name: Install
-        run: pnpm install --frozen-lockfile
-
-      - name: Lint and format
-        run: pnpm run check
-
-      - name: Typecheck
-        run: pnpm run typecheck
-
-      - name: Test
-        run: pnpm run test
-
-      - name: Unused dependencies and exports
-        run: pnpm run knip
-
-      - name: Build
-        run: pnpm run build
-
-      - name: Build Storybook
-        run: pnpm --filter @turf-notes/web run build-storybook
+  storybook:
+    name: Build Storybook
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/composite-actions/cache-and-install
+      - run: pnpm --filter @turf-notes/web run build-storybook
