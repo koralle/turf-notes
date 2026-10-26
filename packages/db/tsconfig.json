@@ -1,0 +1,4 @@
+{
+  "extends": "@turf-notes/forge/tsconfig/node.json",
+  "include": ["src/**/*.ts", "scripts/**/*.ts", "drizzle.config.ts"]
+}
