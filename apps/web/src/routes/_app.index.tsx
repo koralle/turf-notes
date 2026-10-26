@@ -3,7 +3,7 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import type {
   MemoListInput,
   MemoListOutput,
@@ -12,6 +12,7 @@ import { useState } from "react";
 import { css } from "styled-system/css";
 
 import { EmptyState } from "../components/empty-state";
+import { CloseIcon, PlusIcon, SearchIcon } from "../components/icons";
 import { MemoRow, memoListStyle } from "../components/memo-row";
 import { client } from "../rpc/client";
 
@@ -23,14 +24,15 @@ const topbar = css({
   alignItems: "center",
   display: "flex",
   gap: "14px",
-  px: "32px",
-  pt: "20px",
+  px: { base: "18px", md: "32px" },
+  pt: { base: "16px", md: "20px" },
 });
 
 const newButton = css({
   bg: "accent",
   borderRadius: "9px",
   color: "#fff",
+  display: { base: "none", md: "block" },
   fontSize: "12.5px",
   fontWeight: 600,
   ml: "auto",
@@ -48,58 +50,136 @@ const composer = css({
   borderWidth: "1px",
   display: "flex",
   gap: "10px",
-  mx: "32px",
-  mt: "16px",
-  p: "10px 12px 10px 14px",
+  minH: { base: "54px", md: "auto" },
+  mx: { base: "18px", md: "32px" },
+  mt: { base: "10px", md: "16px" },
+  p: { base: "5px 5px 5px 14px", md: "10px 12px 10px 14px" },
+  _focusWithin: { borderColor: "accent" },
 });
 
 const composerInput = css({
   border: "none",
   flex: 1,
   fontFamily: "inherit",
-  fontSize: "13.5px",
+  fontSize: { base: "16px", md: "13.5px" },
+  minWidth: 0,
   outline: "none",
   _placeholder: { color: "faint" },
 });
 
 const saveButton = css({
+  alignItems: "center",
   bg: "accentWeak",
   border: "none",
   borderRadius: "6px",
   color: "accent",
   cursor: "pointer",
+  display: "flex",
+  flexShrink: 0,
   fontSize: "12px",
   fontWeight: 600,
+  h: { base: "44px", md: "auto" },
+  justifyContent: "center",
   px: "12px",
-  py: "6px",
+  py: { base: "0", md: "6px" },
 });
 
 const toolbar = css({
   alignItems: "center",
   display: "flex",
   gap: "8px",
-  px: "32px",
-  pt: "14px",
+  px: { base: "18px", md: "32px" },
+  pt: { base: "10px", md: "14px" },
 });
 
-const searchInput = css({
+const searchWrap = css({
+  alignItems: "center",
   bg: "panel",
   borderColor: "line",
   borderRadius: "999px",
   borderStyle: "solid",
   borderWidth: "1px",
+  display: "flex",
+  flex: 1,
+  gap: "8px",
+  h: { base: "44px", md: "auto" },
+  px: "14px",
+  py: { base: "0", md: "7px" },
+  _focusWithin: { borderColor: "accent" },
+});
+
+const searchIcon = css({
+  color: "faint",
+  display: { base: "flex", md: "none" },
+  flexShrink: 0,
+});
+
+const searchInput = css({
+  bg: "panel",
+  border: "none",
+  color: "ink",
   flex: 1,
   fontFamily: "inherit",
-  fontSize: "13px",
-  p: "7px 14px",
+  fontSize: { base: "16px", md: "13px" },
+  minWidth: 0,
+  outline: "none",
+  p: 0,
+  _placeholder: { color: "muted" },
+});
+
+const clearButton = css({
+  alignItems: "center",
+  color: "faint",
+  display: { base: "flex", md: "none" },
+  flexShrink: 0,
+  h: "100%",
+  justifyContent: "center",
+  w: "32px",
+});
+
+const resultNote = css({
+  color: "faint",
+  display: { base: "block", md: "none" },
+  fontSize: "11px",
+  mt: "10px",
+  px: { base: "18px", md: "32px" },
 });
 
 const timeline = css({
   flex: 1,
   overflow: "auto",
-  pb: "32px",
-  px: "32px",
+  pb: { base: "88px", md: "32px" },
+  px: { base: "18px", md: "32px" },
   pt: "6px",
+});
+
+const loadMore = css({
+  bg: "panel",
+  borderColor: "line",
+  borderRadius: "8px",
+  borderStyle: "solid",
+  borderWidth: "1px",
+  cursor: "pointer",
+  fontSize: "12px",
+  minH: { base: "44px", md: "auto" },
+  mt: "16px",
+  p: "8px 14px",
+  w: "100%",
+});
+
+const fab = css({
+  alignItems: "center",
+  bg: "accent",
+  borderRadius: "999px",
+  boxShadow: "0 6px 16px rgba(21, 128, 61, 0.28)",
+  color: "#fff",
+  display: { base: "flex", md: "none" },
+  h: "50px",
+  justifyContent: "center",
+  position: "fixed",
+  right: "18px",
+  w: "50px",
+  zIndex: 20,
 });
 
 function HomePage() {
@@ -147,7 +227,7 @@ function HomePage() {
     if (items.length === 0) {
       return (
         <EmptyState>
-          まだメモがありません。上の欄に書くか「新規メモ」から始めてください。
+          まだメモがありません。上の欄に書くか、新規メモから始めてください。
         </EmptyState>
       );
     }
@@ -160,10 +240,19 @@ function HomePage() {
     );
   };
 
+  const showResultCount =
+    query.trim() !== "" && list.isSuccess && !list.hasNextPage;
+
   return (
     <>
       <div className={topbar}>
-        <h1 className={css({ fontSize: "19px", fontWeight: 600, m: 0 })}>
+        <h1
+          className={css({
+            fontSize: { base: "17px", md: "19px" },
+            fontWeight: 600,
+            m: 0,
+          })}
+        >
           メモ
         </h1>
         <button
@@ -195,33 +284,45 @@ function HomePage() {
       </div>
 
       <div className={toolbar}>
-        <input
-          className={searchInput}
-          onChange={(event) => {
-            setQuery(event.target.value);
-          }}
-          placeholder="検索"
-          value={query}
-        />
+        <div className={searchWrap}>
+          <span className={searchIcon}>
+            <SearchIcon size={17} />
+          </span>
+          <input
+            className={searchInput}
+            onChange={(event) => {
+              setQuery(event.target.value);
+            }}
+            placeholder="検索"
+            value={query}
+          />
+          {query === "" ? null : (
+            <button
+              aria-label="検索をクリア"
+              className={clearButton}
+              onClick={() => {
+                setQuery("");
+              }}
+              type="button"
+            >
+              <CloseIcon size={15} />
+            </button>
+          )}
+        </div>
       </div>
+
+      {showResultCount ? (
+        <div className={resultNote}>
+          「{query.trim()}」の検索結果 {items.length}件
+        </div>
+      ) : null}
 
       <div className={timeline}>
         {renderList()}
 
         {list.hasNextPage ? (
           <button
-            className={css({
-              bg: "panel",
-              borderColor: "line",
-              borderRadius: "8px",
-              borderStyle: "solid",
-              borderWidth: "1px",
-              cursor: "pointer",
-              fontSize: "12px",
-              mt: "16px",
-              p: "8px 14px",
-              w: "100%",
-            })}
+            className={loadMore}
             onClick={() => void list.fetchNextPage()}
             type="button"
           >
@@ -229,6 +330,15 @@ function HomePage() {
           </button>
         ) : null}
       </div>
+
+      <Link
+        aria-label="新規メモ"
+        className={fab}
+        style={{ bottom: "calc(76px + env(safe-area-inset-bottom))" }}
+        to="/memos/new"
+      >
+        <PlusIcon size={22} />
+      </Link>
     </>
   );
 }

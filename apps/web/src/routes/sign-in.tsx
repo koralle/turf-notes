@@ -15,19 +15,33 @@ const page = css({
   alignItems: "center",
   display: "flex",
   justifyContent: "center",
-  minHeight: "100vh",
-  p: "20px",
+  minHeight: "100dvh",
+  p: { base: "24px", md: "20px" },
 });
 
 const card = css({
-  bg: "panel",
+  bg: { base: "bg", md: "panel" },
   borderColor: "line",
-  borderRadius: "14px",
+  borderRadius: { base: "0", md: "14px" },
   borderStyle: "solid",
-  borderWidth: "1px",
+  borderWidth: { base: "0", md: "1px" },
   maxWidth: "380px",
-  p: "28px",
+  p: { base: "0", md: "28px" },
   w: "100%",
+});
+
+const brandRow = css({
+  alignItems: "center",
+  display: "flex",
+  gap: "9px",
+  mb: { base: "22px", md: "10px" },
+});
+
+const title = css({
+  fontSize: "21px",
+  fontWeight: 600,
+  m: 0,
+  mb: "6px",
 });
 
 const field = css({
@@ -36,7 +50,8 @@ const field = css({
   borderStyle: "solid",
   borderWidth: "1px",
   fontFamily: "inherit",
-  fontSize: "13.5px",
+  fontSize: { base: "16px", md: "13.5px" },
+  minH: { base: "44px", md: "auto" },
   mt: "6px",
   p: "9px 11px",
   w: "100%",
@@ -50,29 +65,56 @@ const primary = css({
   color: "#fff",
   cursor: "pointer",
   display: "flex",
-  fontSize: "13px",
+  fontSize: { base: "15px", md: "13px" },
   fontWeight: 600,
   justifyContent: "center",
+  minH: { base: "48px", md: "auto" },
   mt: "18px",
   py: "10px",
   w: "100%",
 });
 
 const secondary = css({
+  alignItems: "center",
   bg: "accentWeak",
   border: "none",
   borderRadius: "9px",
   color: "accent",
   cursor: "pointer",
+  display: "flex",
   fontSize: "13px",
   fontWeight: 600,
+  justifyContent: "center",
+  minH: { base: "44px", md: "auto" },
   mt: "10px",
   py: "10px",
   w: "100%",
 });
 
 const errorText = css({ color: "danger", fontSize: "11.5px", mt: "10px" });
-const hint = css({ color: "muted", fontSize: "12px", mb: "16px" });
+const hint = css({
+  color: "muted",
+  fontSize: { base: "13px", md: "12px" },
+  lineHeight: 1.8,
+  mb: "16px",
+});
+const recoveryNote = css({
+  color: "faint",
+  fontSize: "11px",
+  lineHeight: 1.7,
+  mt: "12px",
+});
+const divider = css({
+  borderTopColor: "line",
+  borderTopStyle: "solid",
+  borderTopWidth: "1px",
+  color: "faint",
+  fontSize: "10.5px",
+  letterSpacing: "0.08em",
+  mt: "18px",
+  pt: "14px",
+  textAlign: "center",
+});
 
 function SignInPage() {
   const navigate = useNavigate();
@@ -128,14 +170,7 @@ function SignInPage() {
   return (
     <div className={page}>
       <div className={card}>
-        <div
-          className={css({
-            alignItems: "center",
-            display: "flex",
-            gap: "9px",
-            mb: "10px",
-          })}
-        >
+        <div className={brandRow}>
           <span
             className={css({
               alignItems: "center",
@@ -157,6 +192,8 @@ function SignInPage() {
           </span>
         </div>
 
+        <h1 className={title}>サインイン</h1>
+
         {hasPasskey ? (
           <>
             <div className={hint}>登録済みのパスキーでサインインします。</div>
@@ -166,7 +203,7 @@ function SignInPage() {
               onPress={() => void handlePasskey()}
               style={{ marginTop: 0 }}
             >
-              パスキーでログイン
+              パスキーでサインイン
             </RacButton>
             {passwordEnabled ? (
               <RacButton
@@ -178,13 +215,7 @@ function SignInPage() {
                 その他の方法でログインする
               </RacButton>
             ) : (
-              <div
-                className={css({
-                  color: "faint",
-                  fontSize: "11px",
-                  mt: "12px",
-                })}
-              >
+              <div className={recoveryNote}>
                 パスキーを全部失った場合は、サーバー上で
                 <code> pnpm --filter @turf-notes/api enable-password </code>
                 を実行してください。
@@ -199,6 +230,9 @@ function SignInPage() {
 
         {passwordEnabled && (showPassword || !hasPasskey) ? (
           <form onSubmit={(event) => void handlePassword(event)}>
+            {hasPasskey && showPassword ? (
+              <div className={divider}>パスワードでサインイン</div>
+            ) : null}
             <label
               className={css({
                 display: "block",
@@ -242,7 +276,7 @@ function SignInPage() {
               isDisabled={pending || password === ""}
               type="submit"
             >
-              サインイン
+              パスワードでサインイン
             </RacButton>
           </form>
         ) : null}

@@ -6,15 +6,21 @@ import type { ReactNode } from "react";
 import { css } from "styled-system/css";
 
 import { client } from "../rpc/client";
+import { HomeIcon, SettingsIcon, TagIcon } from "./icons";
 
-const shell = css({ display: "flex", height: "100vh", overflow: "hidden" });
+const shell = css({
+  display: "flex",
+  flexDirection: { base: "column", md: "row" },
+  height: "100dvh",
+  overflow: "hidden",
+});
 
 const sidebar = css({
   bg: "panel",
   borderRightColor: "line",
   borderRightStyle: "solid",
   borderRightWidth: "1px",
-  display: "flex",
+  display: { base: "none", md: "flex" },
   flex: "0 0 244px",
   flexDirection: "column",
   gap: "2px",
@@ -54,12 +60,6 @@ const navItem = css({
   px: "9px",
   py: "7px",
   textDecoration: "none",
-});
-
-const navItemActive = css({
-  bg: "accentWeak",
-  color: "accent",
-  fontWeight: 600,
 });
 
 const sideLabel = css({
@@ -102,13 +102,14 @@ const mainCol = css({
   display: "flex",
   flex: 1,
   flexDirection: "column",
+  minHeight: 0,
   minWidth: 0,
   overflow: "auto",
 });
 
 const kindLabel = { horse: "馬", person: "人", theme: "主題" } as const;
 
-const Sidebar = ({ active }: { active?: string | undefined }) => {
+const Sidebar = () => {
   const tags = useQuery({
     queryFn: async () => await client.tags.list(),
     queryKey: ["tags"],
@@ -133,10 +134,7 @@ const Sidebar = ({ active }: { active?: string | undefined }) => {
           Turf Notes
         </span>
       </Link>
-      <Link
-        className={`${navItem} ${active === "home" ? navItemActive : ""}`}
-        to="/"
-      >
+      <Link className={navItem} to="/">
         ホーム
       </Link>
       <Link className={navItem} to="/settings">
@@ -165,18 +163,83 @@ const Sidebar = ({ active }: { active?: string | undefined }) => {
   );
 };
 
-export const AppShell = ({
-  children,
-  active,
-}: {
-  children: ReactNode;
-  active?: string | undefined;
-}) => (
-  <div className={shell}>
-    <Sidebar active={active} />
-    <main className={mainCol}>{children}</main>
-  </div>
+const tabBar = css({
+  alignItems: "stretch",
+  bg: "panel",
+  borderTopColor: "line",
+  borderTopStyle: "solid",
+  borderTopWidth: "1px",
+  display: { base: "flex", md: "none" },
+  flex: "0 0 auto",
+  minH: "60px",
+});
+
+const tab = css({
+  alignItems: "center",
+  color: "muted",
+  display: "flex",
+  flex: 1,
+  flexDirection: "column",
+  fontSize: "10px",
+  gap: "3px",
+  justifyContent: "center",
+  letterSpacing: "0.02em",
+  textDecoration: "none",
+});
+
+const tabActive = css({ color: "accent", fontWeight: 600 });
+
+const MobileTabs = ({ pathname }: { pathname: string }) => (
+  <nav
+    aria-label="メインナビゲーション"
+    className={tabBar}
+    style={{
+      height: "calc(60px + env(safe-area-inset-bottom))",
+      paddingBottom: "env(safe-area-inset-bottom)",
+    }}
+  >
+    <Link
+      aria-current={pathname === "/" ? "page" : undefined}
+      className={`${tab} ${pathname === "/" ? tabActive : ""}`}
+      to="/"
+    >
+      <HomeIcon size={20} />
+      ホーム
+    </Link>
+    <Link
+      aria-current={pathname === "/tags" ? "page" : undefined}
+      className={`${tab} ${pathname === "/tags" ? tabActive : ""}`}
+      to="/tags"
+    >
+      <TagIcon size={20} />
+      タグ
+    </Link>
+    <Link
+      aria-current={pathname === "/settings" ? "page" : undefined}
+      className={`${tab} ${pathname === "/settings" ? tabActive : ""}`}
+      to="/settings"
+    >
+      <SettingsIcon size={20} />
+      設定
+    </Link>
+  </nav>
 );
+
+export const AppShell = ({ children }: { children: ReactNode }) => {
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
+  const isTopLevel =
+    pathname === "/" || pathname === "/tags" || pathname === "/settings";
+
+  return (
+    <div className={shell} style={{ paddingTop: "env(safe-area-inset-top)" }}>
+      <Sidebar />
+      <main className={mainCol}>{children}</main>
+      {isTopLevel ? <MobileTabs pathname={pathname} /> : null}
+    </div>
+  );
+};
 
 /**
  * サインイン必須の画面を包む。`/sign-in` は対象外。

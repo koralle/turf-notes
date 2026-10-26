@@ -17,7 +17,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="ja">
       <head>
         <meta charSet="utf-8" />
-        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        <meta
+          content="width=device-width, initial-scale=1, viewport-fit=cover"
+          name="viewport"
+        />
         <title>Turf Notes</title>
         <HeadContent />
       </head>

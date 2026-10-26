@@ -49,6 +49,26 @@ body {
   }
 }
 
+/* 一覧の見出し。スマートフォンでは2行で切る。
+   -webkit-box-orient は Panda の型にないため、ここでだけ素の CSS で書く。 */
+@layer base {
+  .memo-heading {
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    overflow: hidden;
+  }
+
+  @media (min-width: 768px) {
+    .memo-heading {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
 /* Markdown の表示（メモ詳細）。生 HTML は通していない。 */
 @layer base {
   .markdown > :first-child {
