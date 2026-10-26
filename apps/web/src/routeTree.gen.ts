@@ -15,6 +15,7 @@ import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppMemosMemoIdRouteImport } from './routes/_app.memos.$memoId'
 import { Route as AppMemosNewRouteImport } from './routes/_app.memos.new'
+import { Route as AppTagsIndexRouteImport } from './routes/_app.tags.index'
 import { Route as AppTagsTagIdRouteImport } from './routes/_app.tags.$tagId'
 import { Route as AppMemosMemoIdEditRouteImport } from './routes/_app.memos.$memoId_.edit'
 import { Route as AppRacesDateVenueRaceNumberRouteImport } from './routes/_app.races.$date.$venue.$raceNumber'
@@ -48,6 +49,11 @@ const AppMemosNewRoute = AppMemosNewRouteImport.update({
   path: '/memos/new',
   getParentRoute: () => AppRoute,
 } as any)
+const AppTagsIndexRoute = AppTagsIndexRouteImport.update({
+  id: '/tags/',
+  path: '/tags/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppTagsTagIdRoute = AppTagsTagIdRouteImport.update({
   id: '/tags/$tagId',
   path: '/tags/$tagId',
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/memos/$memoId': typeof AppMemosMemoIdRoute
   '/memos/new': typeof AppMemosNewRoute
   '/tags/$tagId': typeof AppTagsTagIdRoute
+  '/tags/': typeof AppTagsIndexRoute
   '/memos/$memoId/edit': typeof AppMemosMemoIdEditRoute
   '/races/$date/$venue/$raceNumber': typeof AppRacesDateVenueRaceNumberRoute
 }
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/memos/$memoId': typeof AppMemosMemoIdRoute
   '/memos/new': typeof AppMemosNewRoute
   '/tags/$tagId': typeof AppTagsTagIdRoute
+  '/tags': typeof AppTagsIndexRoute
   '/memos/$memoId/edit': typeof AppMemosMemoIdEditRoute
   '/races/$date/$venue/$raceNumber': typeof AppRacesDateVenueRaceNumberRoute
 }
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/_app/memos/$memoId': typeof AppMemosMemoIdRoute
   '/_app/memos/new': typeof AppMemosNewRoute
   '/_app/tags/$tagId': typeof AppTagsTagIdRoute
+  '/_app/tags/': typeof AppTagsIndexRoute
   '/_app/memos/$memoId_/edit': typeof AppMemosMemoIdEditRoute
   '/_app/races/$date/$venue/$raceNumber': typeof AppRacesDateVenueRaceNumberRoute
 }
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/memos/$memoId'
     | '/memos/new'
     | '/tags/$tagId'
+    | '/tags/'
     | '/memos/$memoId/edit'
     | '/races/$date/$venue/$raceNumber'
   fileRoutesByTo: FileRoutesByTo
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/memos/$memoId'
     | '/memos/new'
     | '/tags/$tagId'
+    | '/tags'
     | '/memos/$memoId/edit'
     | '/races/$date/$venue/$raceNumber'
   id:
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/_app/memos/$memoId'
     | '/_app/memos/new'
     | '/_app/tags/$tagId'
+    | '/_app/tags/'
     | '/_app/memos/$memoId_/edit'
     | '/_app/races/$date/$venue/$raceNumber'
   fileRoutesById: FileRoutesById
@@ -180,6 +192,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMemosNewRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/tags/': {
+      id: '/_app/tags/'
+      path: '/tags'
+      fullPath: '/tags/'
+      preLoaderRoute: typeof AppTagsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/tags/$tagId': {
       id: '/_app/tags/$tagId'
       path: '/tags/$tagId'
@@ -210,6 +229,7 @@ interface AppRouteChildren {
   AppMemosMemoIdRoute: typeof AppMemosMemoIdRoute
   AppMemosNewRoute: typeof AppMemosNewRoute
   AppTagsTagIdRoute: typeof AppTagsTagIdRoute
+  AppTagsIndexRoute: typeof AppTagsIndexRoute
   AppMemosMemoIdEditRoute: typeof AppMemosMemoIdEditRoute
   AppRacesDateVenueRaceNumberRoute: typeof AppRacesDateVenueRaceNumberRoute
 }
@@ -220,6 +240,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppMemosMemoIdRoute: AppMemosMemoIdRoute,
   AppMemosNewRoute: AppMemosNewRoute,
   AppTagsTagIdRoute: AppTagsTagIdRoute,
+  AppTagsIndexRoute: AppTagsIndexRoute,
   AppMemosMemoIdEditRoute: AppMemosMemoIdEditRoute,
   AppRacesDateVenueRaceNumberRoute: AppRacesDateVenueRaceNumberRoute,
 }

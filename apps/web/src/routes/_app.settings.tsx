@@ -11,13 +11,17 @@ export const Route = createFileRoute("/_app/settings")({
   component: SettingsPage,
 });
 
-const wrap = css({ maxWidth: "640px", px: "40px", py: "30px" });
+const wrap = css({
+  maxWidth: "640px",
+  px: { base: "18px", md: "40px" },
+  py: { base: "20px", md: "30px" },
+});
 const section = css({
   borderTopColor: "line",
   borderTopStyle: "solid",
   borderTopWidth: "1px",
-  mt: "26px",
-  pt: "20px",
+  mt: { base: "22px", md: "26px" },
+  pt: { base: "16px", md: "20px" },
 });
 const label = css({
   color: "faint",
@@ -31,32 +35,71 @@ const field = css({
   borderStyle: "solid",
   borderWidth: "1px",
   fontFamily: "inherit",
-  fontSize: "13px",
+  fontSize: { base: "16px", md: "13px" },
+  minH: { base: "44px", md: "auto" },
   p: "7px 9px",
 });
 const smallButton = css({
+  alignItems: "center",
   bg: "accentWeak",
   border: "none",
   borderRadius: "7px",
   color: "accent",
   cursor: "pointer",
+  display: "inline-flex",
   fontSize: "12px",
   fontWeight: 600,
+  justifyContent: "center",
+  minH: { base: "40px", md: "auto" },
   px: "11px",
   py: "6px",
   whiteSpace: "nowrap",
 });
 const row = css({
-  alignItems: "center",
+  alignItems: { base: "stretch", md: "center" },
   borderBottomColor: "line",
   borderBottomStyle: "solid",
   borderBottomWidth: "1px",
   display: "flex",
-  gap: "10px",
+  flexDirection: { base: "column", md: "row" },
+  gap: { base: "4px", md: "10px" },
   py: "10px",
 });
 const muted = css({ color: "muted", fontSize: "12px" });
 const errorText = css({ color: "danger", fontSize: "11.5px", mt: "8px" });
+const accountRow = css({
+  alignItems: { base: "stretch", md: "center" },
+  display: "flex",
+  flexDirection: { base: "column", md: "row" },
+  gap: "12px",
+  mt: "8px",
+});
+const passkeyActions = css({
+  alignItems: "center",
+  display: "flex",
+  gap: { base: "12px", md: "10px" },
+});
+const renameInput = css({ flex: 1, minWidth: 0 });
+const mutedButton = css({
+  alignItems: "center",
+  color: "muted",
+  display: "flex",
+  fontSize: "12px",
+  minH: { base: "40px", md: "auto" },
+});
+const passkeyAdd = css({
+  display: "flex",
+  flexDirection: { base: "column", md: "row" },
+  gap: "6px",
+  mt: "14px",
+});
+const dangerButton = css({
+  alignItems: "center",
+  color: "danger",
+  display: "flex",
+  fontSize: "12px",
+  minH: { base: "40px", md: "auto" },
+});
 
 const formatDate = (value: unknown): string => {
   const ms = typeof value === "number" ? value : Date.parse(String(value));
@@ -177,18 +220,19 @@ function SettingsPage() {
 
   return (
     <div className={wrap}>
-      <h1 className={css({ fontSize: "19px", fontWeight: 600, m: 0 })}>設定</h1>
+      <h1
+        className={css({
+          fontSize: { base: "17px", md: "19px" },
+          fontWeight: 600,
+          m: 0,
+        })}
+      >
+        設定
+      </h1>
 
       <div className={section}>
         <div className={label}>アカウント</div>
-        <div
-          className={css({
-            alignItems: "center",
-            display: "flex",
-            gap: "12px",
-            mt: "8px",
-          })}
-        >
+        <div className={accountRow}>
           <div className={css({ flex: 1, minWidth: 0 })}>
             <div className={css({ fontSize: "13px" })}>
               {me.data?.name ?? "…"}
@@ -197,17 +241,22 @@ function SettingsPage() {
           </div>
           <RacButton
             className={css({
+              alignItems: "center",
               borderColor: "line",
               borderRadius: "7px",
               borderStyle: "solid",
               borderWidth: "1px",
               color: "danger",
               cursor: "pointer",
+              display: "inline-flex",
               flexShrink: 0,
               fontSize: "12px",
               fontWeight: 600,
+              justifyContent: "center",
+              minH: { base: "44px", md: "auto" },
               px: "11px",
               py: "6px",
+              w: { base: "100%", md: "auto" },
             })}
             isDisabled={signOut.isPending}
             onPress={() => {
@@ -237,33 +286,35 @@ function SettingsPage() {
               {renamingId === passkey.id ? (
                 <>
                   <input
-                    className={field}
+                    className={`${field} ${renameInput}`}
                     onChange={(event) => {
                       setRenameValue(event.target.value);
                     }}
                     value={renameValue}
                   />
-                  <button
-                    className={smallButton}
-                    onClick={() => {
-                      renamePasskey.mutate({
-                        id: passkey.id,
-                        name: renameValue,
-                      });
-                    }}
-                    type="button"
-                  >
-                    保存
-                  </button>
-                  <button
-                    className={muted}
-                    onClick={() => {
-                      setRenamingId(null);
-                    }}
-                    type="button"
-                  >
-                    やめる
-                  </button>
+                  <div className={passkeyActions}>
+                    <button
+                      className={smallButton}
+                      onClick={() => {
+                        renamePasskey.mutate({
+                          id: passkey.id,
+                          name: renameValue,
+                        });
+                      }}
+                      type="button"
+                    >
+                      保存
+                    </button>
+                    <button
+                      className={mutedButton}
+                      onClick={() => {
+                        setRenamingId(null);
+                      }}
+                      type="button"
+                    >
+                      やめる
+                    </button>
+                  </div>
                 </>
               ) : (
                 <>
@@ -276,32 +327,34 @@ function SettingsPage() {
                       {passkey.backedUp ? " ・ バックアップ済み" : ""}
                     </div>
                   </div>
-                  <button
-                    className={smallButton}
-                    onClick={() => {
-                      setRenamingId(passkey.id);
-                      setRenameValue(passkey.name ?? "");
-                    }}
-                    type="button"
-                  >
-                    名前を変更
-                  </button>
-                  <button
-                    className={css({ color: "danger", fontSize: "12px" })}
-                    onClick={() => {
-                      deletePasskey.mutate(passkey.id);
-                    }}
-                    type="button"
-                  >
-                    削除
-                  </button>
+                  <div className={passkeyActions}>
+                    <button
+                      className={smallButton}
+                      onClick={() => {
+                        setRenamingId(passkey.id);
+                        setRenameValue(passkey.name ?? "");
+                      }}
+                      type="button"
+                    >
+                      名前を変更
+                    </button>
+                    <button
+                      className={dangerButton}
+                      onClick={() => {
+                        deletePasskey.mutate(passkey.id);
+                      }}
+                      type="button"
+                    >
+                      削除
+                    </button>
+                  </div>
                 </>
               )}
             </div>
           ))
         )}
 
-        <div className={css({ display: "flex", gap: "6px", mt: "14px" })}>
+        <div className={passkeyAdd}>
           <input
             className={field}
             onChange={(event) => {
