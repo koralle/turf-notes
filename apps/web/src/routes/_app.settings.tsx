@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button as RacButton } from "react-aria-components";
 import { css } from "styled-system/css";
@@ -67,6 +67,7 @@ const formatDate = (value: unknown): string => {
 };
 
 function SettingsPage() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [newPasskeyName, setNewPasskeyName] = useState("");
   const [renamingId, setRenamingId] = useState<string | null>(null);
@@ -146,6 +147,15 @@ function SettingsPage() {
     },
   });
 
+  const signOut = useMutation({
+    mutationFn: async () => await authClient.signOut(),
+    onSuccess: async () => {
+      // サインアウト後に前のユーザーのキャッシュが残らないようにする
+      queryClient.clear();
+      await navigate({ to: "/sign-in" });
+    },
+  });
+
   const exportAll = useMutation({
     mutationFn: async () => await client.exportAll(),
     onSuccess: (data) => {
@@ -171,10 +181,42 @@ function SettingsPage() {
 
       <div className={section}>
         <div className={label}>アカウント</div>
-        <div className={css({ fontSize: "13px", mt: "8px" })}>
-          {me.data?.name ?? "…"}
+        <div
+          className={css({
+            alignItems: "center",
+            display: "flex",
+            gap: "12px",
+            mt: "8px",
+          })}
+        >
+          <div className={css({ flex: 1, minWidth: 0 })}>
+            <div className={css({ fontSize: "13px" })}>
+              {me.data?.name ?? "…"}
+            </div>
+            <div className={muted}>{me.data?.email ?? ""}</div>
+          </div>
+          <RacButton
+            className={css({
+              borderColor: "line",
+              borderRadius: "7px",
+              borderStyle: "solid",
+              borderWidth: "1px",
+              color: "danger",
+              cursor: "pointer",
+              flexShrink: 0,
+              fontSize: "12px",
+              fontWeight: 600,
+              px: "11px",
+              py: "6px",
+            })}
+            isDisabled={signOut.isPending}
+            onPress={() => {
+              signOut.mutate();
+            }}
+          >
+            サインアウト
+          </RacButton>
         </div>
-        <div className={muted}>{me.data?.email ?? ""}</div>
       </div>
 
       <div className={section}>
