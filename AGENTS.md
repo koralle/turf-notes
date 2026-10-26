@@ -31,6 +31,10 @@
 
 コードを変更したら、完了前に `pnpm check && pnpm typecheck && pnpm test && pnpm knip && pnpm build` を通す。CI はこれに Storybook のビルドとマイグレーションの追記チェックを足したものを回す。
 
+## 認証の復旧
+
+本番はパスキーのみで運用している（`users.password_sign_in_enabled = false`）。復旧はサーバー上でのみ可能: `enable-password` で戻し、必要なら `set-password` で差し替える。
+
 ## ローカル DB
 
 `docker compose -f apps/api/compose.yaml up -d` で libSQL サーバーを起動し、 `pnpm --filter @turf-notes/db migrate` でスキーマを適用する。接続先は `apps/api/.dev.vars`。

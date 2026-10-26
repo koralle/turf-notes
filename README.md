@@ -60,6 +60,7 @@ pnpm dev
 | `pnpm --filter @turf-notes/db migrate` | マイグレーション適用 |
 | `pnpm --filter @turf-notes/api create-user <email> <name> <password>` | ユーザー作成 |
 | `pnpm --filter @turf-notes/api enable-password` | パスワードサインインを再有効化（復旧用） |
+| `pnpm --filter @turf-notes/api set-password <email> <password>` | パスワードを差し替える（セッション不要） |
 | `pnpm --filter @turf-notes/web storybook` | Storybook（http://localhost:6006） |
 | `pnpm --filter @turf-notes/web build-storybook` | Storybook の静的ビルド |
 

@@ -8,6 +8,7 @@
     "deploy": "vite build && wrangler deploy --keep-vars",
     "dev": "vite dev",
     "enable-password": "tsx scripts/enable-password.ts",
+    "set-password": "tsx scripts/set-password.ts",
     "test": "vitest run",
     "typecheck": "tsc"
   },
