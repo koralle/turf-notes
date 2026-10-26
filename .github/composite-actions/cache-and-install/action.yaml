@@ -1,0 +1,19 @@
+name: Cache and install
+description: pnpm と Node を用意し、ロックファイルどおりに依存をインストールする
+
+runs:
+  using: composite
+  steps:
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: "24"
+        cache: pnpm
+
+    - name: Install dependencies
+      shell: bash
+      # `--no-runtime` で devEngines の Node ダウンロードを止める（CI の Node を使う）。
+      run: pnpm install --frozen-lockfile --no-runtime

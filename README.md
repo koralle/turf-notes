@@ -78,6 +78,37 @@ pnpm dev
 - 一覧の無限スクロール（現状は「もっと見る」）
 - レート制限、監査ログ
 
+## CI / CD
+
+| ワークフロー | トリガー | 内容 |
+| --- | --- | --- |
+| `ci.yaml` | PR / デプロイからの呼び出し | lint+format / typecheck / test / knip / build / build-storybook / マイグレーションが追記のみか |
+| `deploy.yaml` | `main` への push・手動 | CI を全部通してから、マイグレーション → API → Web の順でデプロイ |
+
+`main` にマージすると CI が通り次第そのまま本番へ出ます。デプロイは concurrency（`production`）で直列化し、途中で失敗したらそこで止まります（マイグレーションが失敗したらデプロイしない）。
+
+### リポジトリに設定するもの
+
+Secrets（`production` 環境に置くのがおすすめ）:
+
+| 名前                    | 用途                                          |
+| ----------------------- | --------------------------------------------- |
+| `CLOUDFLARE_API_TOKEN`  | Workers のデプロイ（Edit Cloudflare Workers） |
+| `CLOUDFLARE_ACCOUNT_ID` | アカウント ID                                 |
+| `TURSO_CONNECTION_URL`  | 本番 DB                                       |
+| `TURSO_AUTH_TOKEN`      | 本番 DB のトークン                            |
+| `BETTER_AUTH_SECRET`    | セッション署名（32文字以上）                  |
+
+Variables:
+
+| 名前              | 値                                    |
+| ----------------- | ------------------------------------- |
+| `BETTER_AUTH_URL` | `https://turf-notes.koralle-mgmg.com` |
+
+### マイグレーションは追記のみ
+
+適用済みのマイグレーションを書き換えると既存 DB と食い違うため、`ci.yaml` の `migrations` ジョブが「base にすでに存在したフォルダへの変更」を失敗させます。スキーマ変更は必ず新しいマイグレーションを足す。
+
 ## 本番デプロイ
 
 ホスト名は `turf-notes.koralle-mgmg.com` 固定（パスキーの rpID がドメインに紐づくため、後から変えない）。
