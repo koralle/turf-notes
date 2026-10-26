@@ -47,6 +47,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/composite-actions/cache-and-install
+      # styled-system は Panda の生成物（git 管理外）。無いと knip が解決できない。
+      - run: pnpm --filter @turf-notes/web run panda:codegen
       - run: pnpm run knip
 
   migrations:
