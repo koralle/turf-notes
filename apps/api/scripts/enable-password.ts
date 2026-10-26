@@ -9,7 +9,8 @@ import { eq } from "drizzle-orm";
 const url = process.env["TURSO_CONNECTION_URL"] ?? "http://127.0.0.1:8080";
 const email = process.argv[2] ?? "me@example.com";
 
-const db = createDb({ url });
+const authToken = process.env["TURSO_AUTH_TOKEN"];
+const db = createDb({ url, ...(authToken ? { authToken } : {}) });
 
 const updated = await db
   .update(users)

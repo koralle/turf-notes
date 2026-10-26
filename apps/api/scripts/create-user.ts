@@ -14,7 +14,8 @@ const [
   password = "dev-password-1234",
 ] = process.argv.slice(2);
 
-const db = createDb({ url });
+const authToken = process.env["TURSO_AUTH_TOKEN"];
+const db = createDb({ url, ...(authToken ? { authToken } : {}) });
 const auth = createAuth({ db, secret, baseURL });
 
 const result = await auth.api.signUpEmail({ body: { email, name, password } });
