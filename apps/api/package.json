@@ -1,0 +1,34 @@
+{
+  "name": "@turf-notes/api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "create-user": "tsx scripts/create-user.ts",
+    "deploy": "vite build && wrangler deploy --keep-vars",
+    "dev": "vite dev",
+    "typecheck": "tsc",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@better-auth/drizzle-adapter": "catalog:",
+    "@orpc/server": "catalog:",
+    "@turf-notes/api-contract": "workspace:*",
+    "@turf-notes/db": "workspace:*",
+    "better-auth": "catalog:",
+    "drizzle-orm": "catalog:",
+    "hono": "catalog:",
+    "uuidv7": "catalog:",
+    "valibot": "catalog:"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "catalog:",
+    "@turf-notes/forge": "workspace:*",
+    "@types/node": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "wrangler": "catalog:"
+  }
+}
