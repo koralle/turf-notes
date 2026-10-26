@@ -1,0 +1,32 @@
+{
+  "name": "@turf-notes/monorepo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "check": "ultracite check --type-aware",
+    "dev": "pnpm --filter @turf-notes/web run dev",
+    "fix": "ultracite fix --type-aware --no-error-on-unmatched-pattern",
+    "knip": "knip",
+    "test": "pnpm -r run test",
+    "typecheck": "tsc && pnpm -r run typecheck"
+  },
+  "devDependencies": {
+    "@turf-notes/forge": "workspace:*",
+    "knip": "catalog:",
+    "lefthook": "catalog:",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
+    "typescript": "catalog:",
+    "ultracite": "catalog:"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=24.0.0",
+      "onFail": "download"
+    }
+  },
+  "packageManager": "pnpm@12.14.0"
+}

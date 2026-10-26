@@ -1,0 +1,44 @@
+node_modules
+.DS_Store
+dist
+dist-ssr
+*.local
+.env
+.env.development
+.env.development.local
+.env.production
+.env.production.local
+.env.local
+.nitro
+.tanstack
+.wrangler
+.output
+.vinxi
+__unconfig*
+.dev.vars*
+out
+*.tgz
+coverage
+*.lcov
+logs
+.eslintcache
+.cache
+.vitest
+*.tsbuildinfo
+.idea
+.vscode/*
+!.vscode/settings.json
+.envrc
+
+# スクリーンショット用の一時ディレクトリ（モックアップの PNG はコミットする）
+.tmp/
+
+# Panda
+styled-system
+
+# git worktrees
+.worktrees/
+
+# ローカル libSQL のファイル DB
+.data/
+!.dev.vars.example

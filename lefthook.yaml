@@ -1,0 +1,40 @@
+pre-commit:
+  piped: true
+  jobs:
+    - name: Fix with Ultracite
+      glob:
+        - "**/*.js"
+        - "**/*.cjs"
+        - "**/*.mjs"
+        - "**/*.jsx"
+        - "**/*.ts"
+        - "**/*.cts"
+        - "**/*.mts"
+        - "**/*.tsx"
+        - "**/*.json"
+        - "**/*.jsonc"
+        - "**/*.css"
+        - "**/*.md"
+        - "**/*.yaml"
+        - "**/*.yml"
+        - "**/*.html"
+      exclude:
+        - ".agents/**"
+        # Wrangler の生成物。単独で stage されたときに `ultracite fix` が
+        # 無視対象だけを受け取って失敗するのを避ける。
+        - "apps/api/worker-configuration.d.ts"
+        - "apps/web/worker-configuration.d.ts"
+      run: |
+        pnpm run fix -- {staged_files}
+      stage_fixed: true
+
+    - name: Typecheck
+      glob:
+        - "**/*.{ts,tsx}"
+      run: |
+        pnpm run typecheck
+
+pre-push:
+  commands:
+    knip:
+      run: pnpm run knip
