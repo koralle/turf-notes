@@ -1,0 +1,17 @@
+{
+  "extends": "@turf-notes/forge/tsconfig/base.json",
+  "compilerOptions": {
+    "lib": ["es2024", "dom", "dom.iterable"],
+    "jsx": "react-jsx",
+    "types": ["vite/client"],
+    "paths": {
+      "styled-system/*": ["./styled-system/*"]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "vite.config.ts",
+    "panda.config.ts"
+  ]
+}
