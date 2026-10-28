@@ -155,7 +155,7 @@ pantry とほぼ同じ構成を踏襲する。
 | DB | Drizzle ORM + libSQL/Turso。スキーマとマイグレーションは `packages/db` |
 | 認証 | Better Auth（メール+パスワード、パスキー）＋ admin プラグイン |
 | ID | Memo は UUID v7。Tag は整数の自動採番 |
-| ツール | TypeScript、oxlint/oxfmt（Ultracite）、knip、lefthook |
+| ツール | tsrs（TypeScript 7 互換のコンパイラ）、oxlint/oxfmt（Ultracite）、knip、lefthook |
 
 pantry から**持ち込まない**もの: web 側の未使用な DB 依存、`DynamicLink` の過渡期コード、サインアップを UI でしか止めていない状態。
 

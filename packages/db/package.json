@@ -9,7 +9,7 @@
   "scripts": {
     "generate": "drizzle-kit generate",
     "migrate": "tsx scripts/migrate.ts",
-    "typecheck": "tsc"
+    "typecheck": "tsrs"
   },
   "dependencies": {
     "@libsql/client": "catalog:db",
@@ -19,7 +19,7 @@
     "@turf-notes/forge": "workspace:*",
     "@types/node": "catalog:typescript",
     "drizzle-kit": "catalog:db",
-    "tsx": "catalog:tooling",
-    "typescript": "catalog:typescript"
+    "tsrs": "catalog:typescript",
+    "tsx": "catalog:tooling"
   }
 }

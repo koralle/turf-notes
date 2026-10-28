@@ -6,6 +6,10 @@ const config: KnipConfig = {
   ignore: ["**/.pi/git/**", "**/.agents/**"],
   // lefthook.yaml / git hooks を entry として解析させない。
   lefthook: false,
+  // knip 6.32 の TypeScript プラグインは typescript 系の依存を検出すると有効になるが、
+  // このリポジトリは tsrs を使うため無効のままになる。tsconfig の extends / types を
+  // 未使用依存として誤検出しないよう、ここで明示的に有効化する。
+  typescript: true,
   rules: {
     exports: "warn",
     types: "warn",

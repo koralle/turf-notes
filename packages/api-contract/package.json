@@ -7,7 +7,7 @@
     "./schemas": "./src/schemas.ts"
   },
   "scripts": {
-    "typecheck": "tsc"
+    "typecheck": "tsrs"
   },
   "dependencies": {
     "@orpc/contract": "catalog:rpc",
@@ -16,6 +16,6 @@
   "devDependencies": {
     "@turf-notes/forge": "workspace:*",
     "@types/node": "catalog:typescript",
-    "typescript": "catalog:typescript"
+    "tsrs": "catalog:typescript"
   }
 }

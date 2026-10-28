@@ -9,7 +9,7 @@
     "./tsconfig/*.json": "./tsconfig/*.json"
   },
   "scripts": {
-    "typecheck": "tsc"
+    "typecheck": "tsrs"
   },
   "dependencies": {
     "@tsconfig/strictest": "catalog:typescript",
@@ -19,6 +19,6 @@
   },
   "devDependencies": {
     "@types/node": "catalog:typescript",
-    "typescript": "catalog:typescript"
+    "tsrs": "catalog:typescript"
   }
 }
