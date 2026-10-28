@@ -5,6 +5,8 @@ import { defineConfig } from "@pandacss/dev";
  * 色は「無彩色＋深緑1色」に絞り、タグの種類だけ色で区別する。
  */
 export default defineConfig({
+  // v2 は preset を自動で追加しない。v1 の既定（base + panda）を明示する。
+  presets: ["@pandacss/preset-base", "@pandacss/preset-panda"],
   preflight: false,
   include: ["./src/**/*.{ts,tsx}"],
   exclude: [],
