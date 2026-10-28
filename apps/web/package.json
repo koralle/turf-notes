@@ -31,6 +31,8 @@
   "devDependencies": {
     "@cloudflare/vite-plugin": "catalog:cloudflare",
     "@pandacss/dev": "catalog:ui",
+    "@pandacss/preset-base": "catalog:ui",
+    "@pandacss/preset-panda": "catalog:ui",
     "@storybook/addon-docs": "catalog:storybook",
     "@storybook/builder-vite": "catalog:storybook",
     "@storybook/react-vite": "catalog:storybook",
