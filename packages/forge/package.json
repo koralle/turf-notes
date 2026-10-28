@@ -12,13 +12,13 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@tsconfig/strictest": "catalog:",
-    "oxfmt": "catalog:",
-    "oxlint": "catalog:",
-    "ultracite": "catalog:"
+    "@tsconfig/strictest": "catalog:typescript",
+    "oxfmt": "catalog:lint",
+    "oxlint": "catalog:lint",
+    "ultracite": "catalog:lint"
   },
   "devDependencies": {
-    "@types/node": "catalog:",
-    "typescript": "catalog:"
+    "@types/node": "catalog:typescript",
+    "typescript": "catalog:typescript"
   }
 }

@@ -11,49 +11,74 @@ allowBuilds:
   lefthook: true
   workerd: true
 
-catalog:
-  "@better-auth/drizzle-adapter": 1.6.27
-  "@better-auth/passkey": 1.6.27
-  "@cloudflare/vite-plugin": 1.52.1
-  "@fontsource/noto-sans-jp": 5.3.0
-  "@libsql/client": 0.17.4
-  "@orpc/client": 1.15.0
-  "@orpc/contract": 1.15.0
-  "@orpc/server": 1.15.0
-  "@pandacss/dev": 1.12.0
-  "@tanstack/react-query": 5.101.4
-  "@tanstack/react-router": 1.170.27
-  "@tanstack/react-router-ssr-query": 1.167.1
-  "@tanstack/react-start": 1.168.44
-  "@tsconfig/strictest": 2.0.8
-  "@types/node": 25.9.5
-  "@types/react": 19.3.0
-  "@types/react-dom": 19.3.0
-  "@vitejs/plugin-react": 6.0.5
-  better-auth: 1.6.27
-  drizzle-kit: 1.0.0-rc.5-ab785fc
-  drizzle-orm: 1.0.0-rc.5-169397b
-  hono: 4.13.13
-  knip: 6.32.2
-  lefthook: 2.1.10
-  oxfmt: 0.66.0
-  oxlint: 1.81.0
-  oxlint-tsgolint: 7.0.2001
-  "@storybook/addon-docs": 10.6.2
-  "@storybook/builder-vite": 10.6.2
-  "@storybook/react-vite": 10.6.2
-  "@types/markdown-it": 14.1.2
-  markdown-it: 14.1.0
-  postcss: 8.5.26
-  react: 19.3.0
-  react-aria-components: 1.20.0
-  react-dom: 19.3.0
-  storybook: 10.6.2
-  tsx: 4.23.12
-  typescript: 7.0.2
-  ultracite: 7.11.0
-  uuidv7: 1.2.1
-  valibot: 1.4.2
-  vite: 8.2.1
-  vitest: 5.0.5
-  wrangler: 4.123.0
+catalogs:
+  auth:
+    "@better-auth/drizzle-adapter": 1.6.27
+    "@better-auth/passkey": 1.6.27
+    better-auth: 1.6.27
+
+  cloudflare:
+    "@cloudflare/vite-plugin": 1.52.1
+    wrangler: 4.123.0
+
+  db:
+    "@libsql/client": 0.17.4
+    drizzle-kit: 1.0.0-rc.5-ab785fc
+    drizzle-orm: 1.0.0-rc.5-169397b
+    uuidv7: 1.2.1
+
+  lint:
+    oxfmt: 0.66.0
+    oxlint: 1.81.0
+    oxlint-tsgolint: 7.0.2001
+    ultracite: 7.11.0
+
+  react:
+    "@types/react": 19.3.0
+    "@types/react-dom": 19.3.0
+    react: 19.3.0
+    react-dom: 19.3.0
+
+  rpc:
+    "@orpc/client": 1.15.0
+    "@orpc/contract": 1.15.0
+    "@orpc/server": 1.15.0
+    hono: 4.13.13
+    valibot: 1.4.2
+
+  storybook:
+    "@storybook/addon-docs": 10.6.2
+    "@storybook/builder-vite": 10.6.2
+    "@storybook/react-vite": 10.6.2
+    storybook: 10.6.2
+
+  tanstack:
+    "@tanstack/react-query": 5.101.4
+    "@tanstack/react-router": 1.170.27
+    "@tanstack/react-router-ssr-query": 1.167.1
+    "@tanstack/react-start": 1.168.44
+
+  test:
+    vitest: 5.0.5
+
+  tooling:
+    knip: 6.32.2
+    lefthook: 2.1.10
+    tsx: 4.23.12
+
+  typescript:
+    "@tsconfig/strictest": 2.0.8
+    "@types/node": 25.9.5
+    typescript: 7.0.2
+
+  ui:
+    "@fontsource/noto-sans-jp": 5.3.0
+    "@pandacss/dev": 1.12.0
+    "@types/markdown-it": 14.1.2
+    markdown-it: 14.1.0
+    postcss: 8.5.26
+    react-aria-components: 1.20.0
+
+  vite:
+    "@vitejs/plugin-react": 6.0.5
+    vite: 8.2.1

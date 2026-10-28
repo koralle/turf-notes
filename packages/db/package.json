@@ -12,14 +12,14 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@libsql/client": "catalog:",
-    "drizzle-orm": "catalog:"
+    "@libsql/client": "catalog:db",
+    "drizzle-orm": "catalog:db"
   },
   "devDependencies": {
     "@turf-notes/forge": "workspace:*",
-    "@types/node": "catalog:",
-    "drizzle-kit": "catalog:",
-    "tsx": "catalog:",
-    "typescript": "catalog:"
+    "@types/node": "catalog:typescript",
+    "drizzle-kit": "catalog:db",
+    "tsx": "catalog:tooling",
+    "typescript": "catalog:typescript"
   }
 }
