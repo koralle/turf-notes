@@ -13,25 +13,25 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@better-auth/drizzle-adapter": "catalog:",
-    "@better-auth/passkey": "catalog:",
-    "@orpc/server": "catalog:",
+    "@better-auth/drizzle-adapter": "catalog:auth",
+    "@better-auth/passkey": "catalog:auth",
+    "@orpc/server": "catalog:rpc",
     "@turf-notes/api-contract": "workspace:*",
     "@turf-notes/db": "workspace:*",
-    "better-auth": "catalog:",
-    "drizzle-orm": "catalog:",
-    "hono": "catalog:",
-    "uuidv7": "catalog:",
-    "valibot": "catalog:"
+    "better-auth": "catalog:auth",
+    "drizzle-orm": "catalog:db",
+    "hono": "catalog:rpc",
+    "uuidv7": "catalog:db",
+    "valibot": "catalog:rpc"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "catalog:",
+    "@cloudflare/vite-plugin": "catalog:cloudflare",
     "@turf-notes/forge": "workspace:*",
-    "@types/node": "catalog:",
-    "tsx": "catalog:",
-    "typescript": "catalog:",
-    "vite": "catalog:",
-    "vitest": "catalog:",
-    "wrangler": "catalog:"
+    "@types/node": "catalog:typescript",
+    "tsx": "catalog:tooling",
+    "typescript": "catalog:typescript",
+    "vite": "catalog:vite",
+    "vitest": "catalog:test",
+    "wrangler": "catalog:cloudflare"
   }
 }

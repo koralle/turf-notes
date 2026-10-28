@@ -16,13 +16,13 @@
   },
   "devDependencies": {
     "@turf-notes/forge": "workspace:*",
-    "knip": "catalog:",
-    "lefthook": "catalog:",
-    "oxfmt": "catalog:",
-    "oxlint": "catalog:",
-    "oxlint-tsgolint": "catalog:",
-    "typescript": "catalog:",
-    "ultracite": "catalog:"
+    "knip": "catalog:tooling",
+    "lefthook": "catalog:tooling",
+    "oxfmt": "catalog:lint",
+    "oxlint": "catalog:lint",
+    "oxlint-tsgolint": "catalog:lint",
+    "typescript": "catalog:typescript",
+    "ultracite": "catalog:lint"
   },
   "devEngines": {
     "runtime": {

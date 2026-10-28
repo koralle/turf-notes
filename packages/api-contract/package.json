@@ -10,12 +10,12 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@orpc/contract": "catalog:",
-    "valibot": "catalog:"
+    "@orpc/contract": "catalog:rpc",
+    "valibot": "catalog:rpc"
   },
   "devDependencies": {
     "@turf-notes/forge": "workspace:*",
-    "@types/node": "catalog:",
-    "typescript": "catalog:"
+    "@types/node": "catalog:typescript",
+    "typescript": "catalog:typescript"
   }
 }
