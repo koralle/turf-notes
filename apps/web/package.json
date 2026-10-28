@@ -10,7 +10,7 @@
     "panda:codegen": "panda codegen",
     "preview": "vite preview",
     "storybook": "panda codegen && storybook dev -p 6006",
-    "typecheck": "panda codegen && tsc"
+    "typecheck": "panda codegen && tsrs"
   },
   "dependencies": {
     "@better-auth/passkey": "catalog:auth",
@@ -42,7 +42,7 @@
     "@vitejs/plugin-react": "catalog:vite",
     "postcss": "catalog:ui",
     "storybook": "catalog:storybook",
-    "typescript": "catalog:typescript",
+    "tsrs": "catalog:typescript",
     "vite": "catalog:vite",
     "wrangler": "catalog:cloudflare"
   }

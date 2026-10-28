@@ -10,7 +10,7 @@
     "enable-password": "tsx scripts/enable-password.ts",
     "set-password": "tsx scripts/set-password.ts",
     "test": "vitest run",
-    "typecheck": "tsc"
+    "typecheck": "tsrs"
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "catalog:auth",
@@ -28,8 +28,8 @@
     "@cloudflare/vite-plugin": "catalog:cloudflare",
     "@turf-notes/forge": "workspace:*",
     "@types/node": "catalog:typescript",
+    "tsrs": "catalog:typescript",
     "tsx": "catalog:tooling",
-    "typescript": "catalog:typescript",
     "vite": "catalog:vite",
     "vitest": "catalog:test",
     "wrangler": "catalog:cloudflare"
