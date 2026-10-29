@@ -62,7 +62,7 @@ catalogs:
     "@tanstack/react-query": 5.101.4
     "@tanstack/react-router": 1.170.46
     "@tanstack/react-router-ssr-query": 1.167.1
-    "@tanstack/react-start": 1.168.44
+    "@tanstack/react-start": 1.169.4
 
   test:
     vitest: 5.0.5
