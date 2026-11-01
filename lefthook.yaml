@@ -20,6 +20,7 @@ pre-commit:
         - "**/*.html"
       exclude:
         - ".agents/**"
+        - ".pi/**"
         # Wrangler の生成物。単独で stage されたときに `ultracite fix` が
         # 無視対象だけを受け取って失敗するのを避ける。
         - "apps/api/worker-configuration.d.ts"

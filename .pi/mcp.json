@@ -10,6 +10,10 @@
     "cloudflare": {
       "url": "https://mcp.cloudflare.com/mcp",
       "protocolVersion": "auto"
+    },
+    "valibot": {
+      "url": "https://valibot.dev/mcp",
+      "protocolVersion": "auto"
     }
   }
 }
