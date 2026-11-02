@@ -8,6 +8,9 @@
   "scripts": {
     "typecheck": "tsrs"
   },
+  "dependencies": {
+    "valibot": "catalog:validation"
+  },
   "devDependencies": {
     "@turf-notes/forge": "workspace:*",
     "@types/node": "catalog:typescript",

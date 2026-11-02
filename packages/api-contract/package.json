@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@orpc/contract": "catalog:rpc",
-    "valibot": "catalog:rpc"
+    "valibot": "catalog:validation"
   },
   "devDependencies": {
     "@turf-notes/forge": "workspace:*",

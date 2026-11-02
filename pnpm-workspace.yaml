@@ -50,7 +50,6 @@ catalogs:
     "@orpc/contract": 1.15.0
     "@orpc/server": 1.15.0
     hono: 4.13.13
-    valibot: 1.4.2
 
   storybook:
     "@storybook/addon-docs": 10.6.2
@@ -87,6 +86,9 @@ catalogs:
     markdown-it: 14.1.0
     postcss: 8.5.26
     react-aria-components: 1.20.0
+
+  validation:
+    valibot: 1.4.2
 
   vite:
     "@vitejs/plugin-react": 6.0.5

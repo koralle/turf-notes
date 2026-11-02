@@ -232,9 +232,6 @@ catalogs:
     hono:
       specifier: 4.13.13
       version: 4.13.13
-    valibot:
-      specifier: 1.4.2
-      version: 1.4.2
   storybook:
     '@storybook/addon-docs':
       specifier: 10.6.2
@@ -313,6 +310,10 @@ catalogs:
     react-aria-components:
       specifier: 1.20.0
       version: 1.20.0
+  validation:
+    valibot:
+      specifier: 1.4.2
+      version: 1.4.2
   vite:
     '@vitejs/plugin-react':
       specifier: 6.0.5
@@ -386,7 +387,7 @@ importers:
         specifier: catalog:db
         version: 1.2.1
       valibot:
-        specifier: catalog:rpc
+        specifier: catalog:validation
         version: 1.4.2(typescript@6.0.2)
     devDependencies:
       '@cloudflare/vite-plugin':
@@ -520,7 +521,7 @@ importers:
         specifier: catalog:rpc
         version: 1.15.0
       valibot:
-        specifier: catalog:rpc
+        specifier: catalog:validation
         version: 1.4.2(typescript@6.0.2)
     devDependencies:
       '@turf-notes/forge':
@@ -559,6 +560,10 @@ importers:
         version: 4.23.12
 
   packages/domain:
+    dependencies:
+      valibot:
+        specifier: catalog:validation
+        version: 1.4.2(typescript@6.0.2)
     devDependencies:
       '@turf-notes/forge':
         specifier: workspace:*
