@@ -558,6 +558,18 @@ importers:
         specifier: catalog:tooling
         version: 4.23.12
 
+  packages/domain:
+    devDependencies:
+      '@turf-notes/forge':
+        specifier: workspace:*
+        version: link:../forge
+      '@types/node':
+        specifier: catalog:typescript
+        version: 25.9.5
+      tsrs:
+        specifier: catalog:typescript
+        version: 0.20.1-ts7.1.0-beta
+
   packages/forge:
     dependencies:
       '@tsconfig/strictest':

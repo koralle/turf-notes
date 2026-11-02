@@ -1,0 +1,4 @@
+{
+  "extends": "@turf-notes/forge/tsconfig/base.json",
+  "include": ["src/**/*.ts"]
+}

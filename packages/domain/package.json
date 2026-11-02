@@ -1,0 +1,16 @@
+{
+  "name": "@turf-notes/domain",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsrs"
+  },
+  "devDependencies": {
+    "@turf-notes/forge": "workspace:*",
+    "@types/node": "catalog:typescript",
+    "tsrs": "catalog:typescript"
+  }
+}
