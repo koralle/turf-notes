@@ -4,7 +4,7 @@
   "type": "module",
   "exports": {
     ".": "./src/contract.ts",
-    "./schemas": "./src/schemas.ts"
+    "./schemas": "./src/schemas/index.ts"
   },
   "scripts": {
     "typecheck": "tsrs"
