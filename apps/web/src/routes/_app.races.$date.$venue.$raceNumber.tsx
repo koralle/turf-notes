@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { venues } from "@turf-notes/api-contract/schemas";
 import { css } from "styled-system/css";
 
 import { EmptyState } from "../components/empty-state";
@@ -25,15 +26,20 @@ const timeline = css({
 function RacePage() {
   const { date, venue, raceNumber } = Route.useParams();
   const number = Number(raceNumber);
+  const venueParam = venues.find((item) => item === venue);
   const navigate = useNavigate();
 
   const memoList = useQuery({
-    queryFn: async () => await client.memos.forRace({ date, number, venue }),
+    queryFn: async () =>
+      venueParam === undefined
+        ? { items: [] }
+        : await client.memos.forRace({ date, number, venue: venueParam }),
     queryKey: ["memos", "race", date, venue, number],
   });
 
   const items = memoList.data?.items ?? [];
-  const raceName = items.find((item) => item.race?.name !== null)?.race?.name;
+  const raceName = items.find((item) => item.race?.name !== undefined)?.race
+    ?.name;
 
   return (
     <>

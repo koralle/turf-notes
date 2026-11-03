@@ -18,6 +18,7 @@
     "@orpc/server": "catalog:rpc",
     "@turf-notes/api-contract": "workspace:*",
     "@turf-notes/db": "workspace:*",
+    "@turf-notes/domain": "workspace:*",
     "better-auth": "catalog:auth",
     "drizzle-orm": "catalog:db",
     "hono": "catalog:rpc",

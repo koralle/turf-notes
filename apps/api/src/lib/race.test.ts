@@ -13,7 +13,22 @@ describe("toRace", () => {
       })
     ).toStrictEqual({
       date: "2026-11-02",
-      name: null,
+      number: 11,
+      venue: "東京",
+    });
+  });
+
+  test("レース名は前後の空白を落として持つ", () => {
+    expect(
+      toRace({
+        raceDate: "2026-11-02",
+        raceName: "  天皇賞（秋） ",
+        raceNumber: 11,
+        venue: "東京",
+      })
+    ).toStrictEqual({
+      date: "2026-11-02",
+      name: "天皇賞（秋）",
       number: 11,
       venue: "東京",
     });

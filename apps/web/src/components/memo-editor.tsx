@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { venues } from "@turf-notes/api-contract/schemas";
 import type {
   MemoDetail,
   MemoRef,
@@ -284,7 +285,9 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
 
   const save = useMutation({
     mutationFn: async () => {
-      const hasRace = raceDate !== "" && venue !== "" && raceNumber !== "";
+      const venueParam = venues.find((item) => item === venue);
+      const hasRace =
+        raceDate !== "" && venueParam !== undefined && raceNumber !== "";
       const payload = {
         body: text,
         linkIds: links.map((link) => link.id),
@@ -292,7 +295,7 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
           ? {
               date: raceDate,
               number: Number(raceNumber),
-              venue,
+              venue: venueParam,
               ...(raceName.trim() === "" ? {} : { name: raceName.trim() }),
             }
           : null,

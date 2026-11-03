@@ -33,7 +33,12 @@ const withRace: MemoSummary = {
   heading: "ソダシは道中で力みが出た",
   id: "01a175cd-b61e-7992-8d03-54303f56c654",
   linkCount: 2,
-  race: { date: "2026-11-02", name: "天皇賞(秋)", number: 11, venue: "東京" },
+  race: {
+    date: "2026-11-02",
+    name: "天皇賞(秋)",
+    number: 11,
+    venue: "東京",
+  } as MemoSummary["race"],
   tags: [
     { id: 1, kind: "horse", name: "ソダシ" },
     { id: 5, kind: "theme", name: "展開" },

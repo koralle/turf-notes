@@ -1,11 +1,12 @@
-import type { Race } from "@turf-notes/api-contract/schemas";
+import type { memos } from "@turf-notes/db/schema";
+import { raceSchema } from "@turf-notes/domain";
+import type { Race } from "@turf-notes/domain";
+import * as v from "valibot";
 
-interface RaceColumns {
-  raceDate: string | null;
-  venue: string | null;
-  raceNumber: number | null;
-  raceName: string | null;
-}
+type RaceColumns = Pick<
+  typeof memos.$inferSelect,
+  "raceDate" | "raceName" | "raceNumber" | "venue"
+>;
 
 /** 3つ組がそろっているときだけレースとして扱う（ADR-0001）。 */
 export const toRace = (row: RaceColumns): Race | null => {
@@ -13,10 +14,10 @@ export const toRace = (row: RaceColumns): Race | null => {
     return null;
   }
 
-  return {
+  return v.parse(raceSchema, {
     date: row.raceDate,
     venue: row.venue,
     number: row.raceNumber,
-    name: row.raceName,
-  };
+    ...(row.raceName === null ? {} : { name: row.raceName }),
+  });
 };

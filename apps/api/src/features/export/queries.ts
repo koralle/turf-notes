@@ -4,6 +4,7 @@ import { memoLinks, memos, memoTags, tags } from "@turf-notes/db/schema";
 import { and, asc, eq, isNull } from "drizzle-orm";
 
 import type { AuthenticatedUser } from "../../auth/session";
+import { toRace } from "../../lib/race";
 
 /** 全メモ・タグ・参照を1つの JSON にまとめる（要件 FR-S3）。 */
 export const exportAll = async (
@@ -67,15 +68,7 @@ export const exportAll = async (
       createdAt: row.createdAt.getTime(),
       id: row.id,
       linkIds: linkIdsOf.get(row.id) ?? [],
-      race:
-        row.raceDate === null || row.venue === null || row.raceNumber === null
-          ? null
-          : {
-              date: row.raceDate,
-              name: row.raceName,
-              number: row.raceNumber,
-              venue: row.venue,
-            },
+      race: toRace(row),
       tagIds: tagIdsOf.get(row.id) ?? [],
       title: row.title,
       updatedAt: row.updatedAt.getTime(),
