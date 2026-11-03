@@ -1,16 +1,10 @@
 import * as v from "valibot";
 import { describe, expect, expectTypeOf, test } from "vitest";
 
-import {
-  excerptOf,
-  headingOf,
-  linkTargets,
-  memoIdSchema,
-  memoSchema,
-  tagTargets,
-} from ".";
+import { excerptOf, headingOf, memoIdSchema, memoSchema } from ".";
 
 const memoId = "0192f0aa-0000-7000-8000-000000000000";
+const otherMemoId = "0192f0aa-0000-7000-8000-000000000001";
 
 const memo = { body: "道中で力みが出た。", id: memoId };
 
@@ -19,7 +13,7 @@ const accepted = (input: unknown) => v.safeParse(memoSchema, input).success;
 const linkIds = (n: number) =>
   Array.from(
     { length: n },
-    (_, i) => `0192f0aa-0000-7000-8000-${String(i).padStart(12, "0")}`
+    (_, i) => `0192f0aa-0000-7000-8000-${String(i + 1).padStart(12, "0")}`
   );
 
 describe("memoIdSchema", () => {
@@ -96,12 +90,20 @@ describe("excerptOf", () => {
   });
 });
 
-describe("tagTargets / linkTargets", () => {
-  test("タグの重複を落とす", () => {
-    expect(tagTargets([3, 1, 3])).toStrictEqual([3, 1]);
+describe("Memo の不変条件", () => {
+  test("同じタグを重複して持たない", () => {
+    expect(accepted({ ...memo, tagIds: [1, 2] })).toBe(true);
+    expect(accepted({ ...memo, tagIds: [1, 1] })).toBe(false);
   });
 
-  test("参照の重複と自己参照を落とす", () => {
-    expect(linkTargets("a", ["b", "a", "b", "c"])).toStrictEqual(["b", "c"]);
+  test("同じメモを重複して参照しない", () => {
+    expect(accepted({ ...memo, linkIds: [otherMemoId] })).toBe(true);
+    expect(accepted({ ...memo, linkIds: [otherMemoId, otherMemoId] })).toBe(
+      false
+    );
+  });
+
+  test("自分自身は参照しない", () => {
+    expect(accepted({ ...memo, linkIds: [memoId] })).toBe(false);
   });
 });

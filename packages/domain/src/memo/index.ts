@@ -12,9 +12,23 @@ const titleSchema = v.nullable(v.pipe(v.string(), v.maxLength(200)));
 /** 本文は1文字以上必須（要件 FR-M1）。 */
 const bodySchema = v.pipe(v.string(), v.minLength(1), v.maxLength(65_536));
 
-/** 1つのメモが持てるタグ・参照の上限。 */
-const tagIdsSchema = v.pipe(v.array(v.number()), v.maxLength(20));
-const linkIdsSchema = v.pipe(v.array(memoIdSchema), v.maxLength(50));
+/** 1つのメモが持てるタグ・参照の上限。同じタグ・同じ参照先を二度持つことはない。 */
+const tagIdsSchema = v.pipe(
+  v.array(v.number()),
+  v.maxLength(20),
+  v.check(
+    (ids) => new Set(ids).size === ids.length,
+    "同じタグを重複して指定できません"
+  )
+);
+const linkIdsSchema = v.pipe(
+  v.array(memoIdSchema),
+  v.maxLength(50),
+  v.check(
+    (ids) => new Set(ids).size === ids.length,
+    "同じメモを重複して参照できません"
+  )
+);
 
 /**
  * Memo の内容。id を持たない。
@@ -33,9 +47,16 @@ export const memoWriteSchema = readonlyValue(v.object(memoWriteEntries));
 
 export type MemoWrite = v.InferOutput<typeof memoWriteSchema>;
 
-/** メモ。同一性は MemoId で、内容は丸ごと差し替えられる。 */
+/**
+ * メモ。同一性は MemoId で、内容は丸ごと差し替えられる。
+ * 自分自身への参照は持てない（MemoLink は別の Memo への参照）。
+ */
 export const memoSchema = v.pipe(
   readonlyValue(v.object({ id: memoIdSchema, ...memoWriteEntries })),
+  v.check(
+    (memo) => !(memo.linkIds ?? []).includes(memo.id),
+    "自分自身は参照できません"
+  ),
   v.brand("Memo")
 );
 
@@ -56,14 +77,3 @@ export const headingOf = (title: string | null, body: string): string => {
 /** 一覧に出す本文の抜粋。改行は畳む。 */
 export const excerptOf = (body: string): string =>
   body.replaceAll(/\s+/g, " ").trim().slice(0, 120);
-
-/** 同じタグを二度持つことはない。 */
-export const tagTargets = (tagIds: readonly number[]): number[] => [
-  ...new Set(tagIds),
-];
-
-/** 参照先は重複せず、自分自身を指さない（MemoLink は別の Memo への参照）。 */
-export const linkTargets = (
-  selfId: string,
-  linkIds: readonly string[]
-): string[] => [...new Set(linkIds)].filter((id) => id !== selfId);

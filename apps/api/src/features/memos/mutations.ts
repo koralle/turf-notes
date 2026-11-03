@@ -5,7 +5,6 @@ import type {
 } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memoLinks, memos, memoTags } from "@turf-notes/db/schema";
-import { linkTargets, tagTargets } from "@turf-notes/domain";
 import { and, eq } from "drizzle-orm";
 import { uuidv7 } from "uuidv7";
 
@@ -22,8 +21,9 @@ export const createMemo = async (
   input: MemoCreateInput
 ): Promise<{ id: string }> => {
   const id = uuidv7();
-  const tagIds = tagTargets(input.tagIds ?? []);
-  const linkIds = linkTargets(id, input.linkIds ?? []);
+  // id はサーバーで採番するので、自分自身を参照する入力は作れない。
+  const tagIds = input.tagIds ?? [];
+  const linkIds = input.linkIds ?? [];
 
   await db.transaction(async (tx) => {
     await tx.insert(memos).values({
@@ -72,7 +72,7 @@ export const updateMemo = async (
     }
 
     await tx.delete(memoTags).where(eq(memoTags.memoId, input.id));
-    const tagIds = tagTargets(input.tagIds ?? []);
+    const tagIds = input.tagIds ?? [];
     if (tagIds.length > 0) {
       await tx
         .insert(memoTags)
@@ -80,7 +80,7 @@ export const updateMemo = async (
     }
 
     await tx.delete(memoLinks).where(eq(memoLinks.fromMemoId, input.id));
-    const linkIds = linkTargets(input.id, input.linkIds ?? []);
+    const linkIds = input.linkIds ?? [];
     if (linkIds.length > 0) {
       await tx
         .insert(memoLinks)
