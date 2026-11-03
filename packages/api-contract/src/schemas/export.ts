@@ -1,6 +1,6 @@
+import { memoIdSchema } from "@turf-notes/domain";
 import * as v from "valibot";
 
-import { idSchema } from "./common";
 import { raceSchema } from "./race";
 import { tagKindSchema } from "./tag";
 
@@ -17,14 +17,14 @@ export const exportDataSchema = v.object({
   ),
   memos: v.array(
     v.object({
-      id: idSchema,
+      id: memoIdSchema,
       title: v.nullable(v.string()),
       body: v.string(),
       race: v.nullable(raceSchema),
       createdAt: v.number(),
       updatedAt: v.number(),
       tagIds: v.array(v.number()),
-      linkIds: v.array(idSchema),
+      linkIds: v.array(memoIdSchema),
     })
   ),
 });

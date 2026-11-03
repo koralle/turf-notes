@@ -8,11 +8,11 @@ import type {
 } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memoLinks, memos, memoTags, tags } from "@turf-notes/db/schema";
+import { excerptOf, headingOf } from "@turf-notes/domain";
 import { and, desc, eq, inArray, isNull, like, lt, or } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 
 import { toRace } from "../../lib/race";
-import { excerptOf, headingOf } from "../../lib/text";
 
 const MEMO_PAGE_SIZE = 20;
 

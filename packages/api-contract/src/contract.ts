@@ -1,10 +1,10 @@
 import { oc } from "@orpc/contract";
+import { memoIdSchema } from "@turf-notes/domain";
 import * as v from "valibot";
 
 import {
   authMethodsSchema,
   exportDataSchema,
-  idSchema,
   memoCreateInputSchema,
   memoDetailSchema,
   memoListInputSchema,
@@ -41,14 +41,16 @@ export const contract = {
 
   memos: {
     list: authed.input(memoListInputSchema).output(memoListOutputSchema),
-    detail: authed.input(v.object({ id: idSchema })).output(memoDetailSchema),
+    detail: authed
+      .input(v.object({ id: memoIdSchema }))
+      .output(memoDetailSchema),
     create: authed
       .input(memoCreateInputSchema)
-      .output(v.object({ id: idSchema })),
+      .output(v.object({ id: memoIdSchema })),
     update: authed
       .input(memoUpdateInputSchema)
-      .output(v.object({ id: idSchema })),
-    delete: authed.input(v.object({ id: idSchema })).output(okSchema),
+      .output(v.object({ id: memoIdSchema })),
+    delete: authed.input(v.object({ id: memoIdSchema })).output(okSchema),
     /** 同じ開催日・競馬場・レース番号のメモ（レースページ）。 */
     forRace: authed
       .input(raceKeySchema)

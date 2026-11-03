@@ -1,11 +1,20 @@
+import { memoIdSchema } from "@turf-notes/domain";
 import * as v from "valibot";
 
-import { idSchema } from "./common";
-import { raceInputSchema, raceKeySchema, raceSchema } from "./race";
+import { raceKeySchema, raceSchema } from "./race";
 import { tagSummarySchema } from "./tag";
 
+export type {
+  Memo as MemoUpdateInput,
+  MemoWrite as MemoCreateInput,
+} from "@turf-notes/domain";
+export {
+  memoSchema as memoUpdateInputSchema,
+  memoWriteSchema as memoCreateInputSchema,
+} from "@turf-notes/domain";
+
 export const memoSummarySchema = v.object({
-  id: idSchema,
+  id: memoIdSchema,
   title: v.nullable(v.string()),
   /** 一覧・参照で見出しとして使う文字列。タイトル、無ければ本文の1行目。 */
   heading: v.string(),
@@ -20,7 +29,7 @@ export const memoSummarySchema = v.object({
 export type MemoSummary = v.InferOutput<typeof memoSummarySchema>;
 
 export const memoRefSchema = v.object({
-  id: idSchema,
+  id: memoIdSchema,
   heading: v.string(),
 });
 export type MemoRef = v.InferOutput<typeof memoRefSchema>;
@@ -48,20 +57,3 @@ export const memoListOutputSchema = v.object({
   nextCursor: v.nullable(v.string()),
 });
 export type MemoListOutput = v.InferOutput<typeof memoListOutputSchema>;
-
-/** メモの書き込み内容。本文は1文字以上必須（要件 FR-M1）。 */
-const memoWriteSchema = v.object({
-  body: v.pipe(v.string(), v.minLength(1), v.maxLength(65_536)),
-  title: v.optional(v.nullable(v.pipe(v.string(), v.maxLength(200)))),
-  race: v.optional(v.nullable(raceInputSchema)),
-  tagIds: v.optional(v.pipe(v.array(v.number()), v.maxLength(20))),
-  linkIds: v.optional(v.pipe(v.array(idSchema), v.maxLength(50))),
-});
-export const memoCreateInputSchema = memoWriteSchema;
-export type MemoCreateInput = v.InferOutput<typeof memoCreateInputSchema>;
-
-export const memoUpdateInputSchema = v.object({
-  id: idSchema,
-  ...memoWriteSchema.entries,
-});
-export type MemoUpdateInput = v.InferOutput<typeof memoUpdateInputSchema>;

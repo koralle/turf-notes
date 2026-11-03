@@ -5,11 +5,9 @@ import type {
 } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memoLinks, memos, memoTags } from "@turf-notes/db/schema";
+import { linkTargets, tagTargets } from "@turf-notes/domain";
 import { and, eq } from "drizzle-orm";
 import { uuidv7 } from "uuidv7";
-
-const uniqueIds = (ids: readonly string[]): string[] =>
-  ids.filter((id, index) => ids.indexOf(id) === index);
 
 const raceColumns = (race: RaceInput | null | undefined) => ({
   raceDate: race?.date ?? null,
@@ -24,6 +22,8 @@ export const createMemo = async (
   input: MemoCreateInput
 ): Promise<{ id: string }> => {
   const id = uuidv7();
+  const tagIds = tagTargets(input.tagIds ?? []);
+  const linkIds = linkTargets(id, input.linkIds ?? []);
 
   await db.transaction(async (tx) => {
     await tx.insert(memos).values({
@@ -34,18 +34,16 @@ export const createMemo = async (
       ...raceColumns(input.race),
     });
 
-    if (input.tagIds !== undefined && input.tagIds.length > 0) {
+    if (tagIds.length > 0) {
       await tx
         .insert(memoTags)
-        .values(input.tagIds.map((tagId) => ({ memoId: id, tagId })));
+        .values(tagIds.map((tagId) => ({ memoId: id, tagId })));
     }
 
-    if (input.linkIds !== undefined && input.linkIds.length > 0) {
-      await tx.insert(memoLinks).values(
-        uniqueIds(input.linkIds)
-          .filter((toMemoId) => toMemoId !== id)
-          .map((toMemoId) => ({ fromMemoId: id, toMemoId }))
-      );
+    if (linkIds.length > 0) {
+      await tx
+        .insert(memoLinks)
+        .values(linkIds.map((toMemoId) => ({ fromMemoId: id, toMemoId })));
     }
   });
 
@@ -74,16 +72,15 @@ export const updateMemo = async (
     }
 
     await tx.delete(memoTags).where(eq(memoTags.memoId, input.id));
-    if (input.tagIds !== undefined && input.tagIds.length > 0) {
+    const tagIds = tagTargets(input.tagIds ?? []);
+    if (tagIds.length > 0) {
       await tx
         .insert(memoTags)
-        .values(input.tagIds.map((tagId) => ({ memoId: input.id, tagId })));
+        .values(tagIds.map((tagId) => ({ memoId: input.id, tagId })));
     }
 
     await tx.delete(memoLinks).where(eq(memoLinks.fromMemoId, input.id));
-    const linkIds = uniqueIds(input.linkIds ?? []).filter(
-      (toMemoId) => toMemoId !== input.id
-    );
+    const linkIds = linkTargets(input.id, input.linkIds ?? []);
     if (linkIds.length > 0) {
       await tx
         .insert(memoLinks)
