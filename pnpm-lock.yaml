@@ -180,6 +180,10 @@ catalogs:
     wrangler:
       specifier: 4.123.0
       version: 4.123.0
+  date:
+    '@internationalized/date':
+      specifier: 3.12.4
+      version: 3.12.4
   db:
     '@libsql/client':
       specifier: 0.17.4
@@ -561,6 +565,9 @@ importers:
 
   packages/domain:
     dependencies:
+      '@internationalized/date':
+        specifier: catalog:date
+        version: 3.12.4
       valibot:
         specifier: catalog:validation
         version: 1.4.2(typescript@6.0.2)
@@ -574,6 +581,9 @@ importers:
       tsrs:
         specifier: catalog:typescript
         version: 0.20.1-ts7.1.0-beta
+      vitest:
+        specifier: catalog:test
+        version: 5.0.5(@types/node@25.9.5)(vite@8.2.1(@types/node@25.9.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.1))
 
   packages/forge:
     dependencies:

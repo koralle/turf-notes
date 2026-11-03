@@ -6,14 +6,17 @@
     ".": "./src/index.ts"
   },
   "scripts": {
+    "test": "vitest run",
     "typecheck": "tsrs"
   },
   "dependencies": {
+    "@internationalized/date": "catalog:date",
     "valibot": "catalog:validation"
   },
   "devDependencies": {
     "@turf-notes/forge": "workspace:*",
     "@types/node": "catalog:typescript",
-    "tsrs": "catalog:typescript"
+    "tsrs": "catalog:typescript",
+    "vitest": "catalog:test"
   }
 }

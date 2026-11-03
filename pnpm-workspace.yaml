@@ -27,6 +27,9 @@ catalogs:
     "@cloudflare/vite-plugin": 1.52.1
     wrangler: 4.123.0
 
+  date:
+    "@internationalized/date": 3.12.4
+
   db:
     "@libsql/client": 0.17.4
     drizzle-kit: 1.0.0-rc.5-ab785fc
