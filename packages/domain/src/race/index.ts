@@ -1,6 +1,8 @@
 import { parseDate } from "@internationalized/date";
 import * as v from "valibot";
 
+import { readonlyValue } from "../readonly";
+
 export const venues = [
   "札幌",
   "函館",
@@ -76,11 +78,14 @@ export const raceKeySchema = v.object({
 
 export type RaceKey = v.InferOutput<typeof raceKeySchema>;
 
+/** パース結果は入れ子まで readonly（型だけの制約で、実行時には凍結しない）。 */
 export const raceSchema = v.pipe(
-  v.object({
-    ...raceKeySchema.entries,
-    name: v.optional(raceNameSchema),
-  }),
+  readonlyValue(
+    v.object({
+      ...raceKeySchema.entries,
+      name: v.optional(raceNameSchema),
+    })
+  ),
   v.brand("Race")
 );
 

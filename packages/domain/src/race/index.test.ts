@@ -65,6 +65,18 @@ describe("raceSchema", () => {
   });
 });
 
+describe("readonlyValue", () => {
+  test("入れ子の値も型レベルで readonly にする", () => {
+    const race = v.parse(raceSchema, { ...tokyo11, name: "天皇賞（秋）" });
+
+    // @ts-expect-error readonly なので属性を書き換えられない
+    race.venue = "京都";
+
+    // readonly は型だけの制約なので、実行時には書き換わる
+    expect(race.venue).toBe("京都");
+  });
+});
+
 describe("raceKey / sameRace", () => {
   test("キーは開催日・競馬場・レース番号の3つ組", () => {
     expect(raceKey(tokyo11)).toBe("2026-11-02/東京/11");

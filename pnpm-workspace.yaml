@@ -79,6 +79,7 @@ catalogs:
     "@tsconfig/strictest": 2.0.8
     "@types/node": 25.9.5
     tsrs: 0.20.1-ts7.1.0-beta
+    type-fest: 5.10.0
 
   ui:
     "@fontsource/noto-sans-jp": 5.3.0
