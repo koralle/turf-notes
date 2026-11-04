@@ -1,5 +1,13 @@
 /** ドメインロジックのエントリ。用語集（GLOSSARY.md）の概念だけをここに置く。 */
 export {
+  authMethodsSchema,
+  canSetPasswordSignIn,
+  userId,
+  userIdSchema,
+  userSchema,
+} from "./auth";
+export type { AuthMethods, User, UserId } from "./auth";
+export {
   excerptOf,
   headingOf,
   memoBodySchema,
@@ -10,7 +18,14 @@ export {
   memoWriteSchema,
 } from "./memo";
 export type { Memo, MemoId, MemoWrite } from "./memo";
-export { raceKey, raceKeySchema, raceSchema, sameRace, venues } from "./race";
+export {
+  raceKey,
+  raceKeySchema,
+  raceOf,
+  raceSchema,
+  sameRace,
+  venues,
+} from "./race";
 export type { Race, RaceKey } from "./race";
 export {
   normalizeTagName,

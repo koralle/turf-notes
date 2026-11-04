@@ -5,6 +5,7 @@ import type {
 } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memoLinks, memos, memoTags } from "@turf-notes/db/schema";
+import type { UserId } from "@turf-notes/domain";
 import { and, eq } from "drizzle-orm";
 import { uuidv7 } from "uuidv7";
 
@@ -17,7 +18,7 @@ const raceColumns = (race: RaceInput | null | undefined) => ({
 
 export const createMemo = async (
   db: AppDb,
-  userId: string,
+  userId: UserId,
   input: MemoCreateInput
 ): Promise<{ id: string }> => {
   const id = uuidv7();
@@ -52,7 +53,7 @@ export const createMemo = async (
 
 export const updateMemo = async (
   db: AppDb,
-  userId: string,
+  userId: UserId,
   input: MemoUpdateInput
 ): Promise<boolean> =>
   await db.transaction(async (tx) => {
@@ -95,7 +96,7 @@ export const updateMemo = async (
 /** 論理削除。関連するタグ紐付けと参照は残すが、読み出しでは除外する。 */
 export const softDeleteMemo = async (
   db: AppDb,
-  userId: string,
+  userId: UserId,
   id: string
 ): Promise<boolean> => {
   const deleted = await db

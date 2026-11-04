@@ -6,12 +6,12 @@ import type {
 import type { AppDb } from "@turf-notes/db";
 import { memos, memoTags, tags } from "@turf-notes/db/schema";
 import { normalizeTagName, tagDisplayName, tagId } from "@turf-notes/domain";
-import type { TagId } from "@turf-notes/domain";
+import type { TagId, UserId } from "@turf-notes/domain";
 import { and, count, eq, isNull } from "drizzle-orm";
 
 export const listTags = async (
   db: AppDb,
-  userId: string
+  userId: UserId
 ): Promise<TagWithCount[]> => {
   const rows = await db
     .select({
@@ -43,7 +43,7 @@ export const listTags = async (
  */
 export const createTag = async (
   db: AppDb,
-  userId: string,
+  userId: UserId,
   name: string,
   kind: TagKind
 ): Promise<TagSummary> => {
@@ -73,7 +73,7 @@ export const createTag = async (
 
 export const removeTag = async (
   db: AppDb,
-  userId: string,
+  userId: UserId,
   id: TagId
 ): Promise<boolean> => {
   const deleted = await db

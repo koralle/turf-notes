@@ -1,6 +1,8 @@
 import type { AuthMethods } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { passkeys, users } from "@turf-notes/db/schema";
+import { canSetPasswordSignIn } from "@turf-notes/domain";
+import type { UserId } from "@turf-notes/domain";
 import { count, eq } from "drizzle-orm";
 
 /**
@@ -29,7 +31,7 @@ export type SetPasswordSignInResult = { kind: "ok" } | { kind: "no-passkey" };
  */
 export const setPasswordSignIn = async (
   db: AppDb,
-  userId: string,
+  userId: UserId,
   enabled: boolean
 ): Promise<SetPasswordSignInResult> => {
   if (!enabled) {
@@ -37,8 +39,9 @@ export const setPasswordSignIn = async (
       .select({ total: count() })
       .from(passkeys)
       .where(eq(passkeys.userId, userId));
+    const hasPasskey = (rows[0]?.total ?? 0) > 0;
 
-    if ((rows[0]?.total ?? 0) === 0) {
+    if (!canSetPasswordSignIn({ enabled, hasPasskey })) {
       return { kind: "no-passkey" };
     }
   }

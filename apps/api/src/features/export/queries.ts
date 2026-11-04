@@ -2,17 +2,13 @@ import type { ExportData } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memoLinks, memos, memoTags, tags } from "@turf-notes/db/schema";
 import { memoId, tagId } from "@turf-notes/domain";
-import type { TagId } from "@turf-notes/domain";
+import type { TagId, User } from "@turf-notes/domain";
 import { and, asc, eq, isNull } from "drizzle-orm";
 
-import type { AuthenticatedUser } from "../../auth/session";
 import { toRace } from "../../lib/race";
 
 /** 全メモ・タグ・参照を1つの JSON にまとめる（要件 FR-S3）。 */
-export const exportAll = async (
-  db: AppDb,
-  user: AuthenticatedUser
-): Promise<ExportData> => {
+export const exportAll = async (db: AppDb, user: User): Promise<ExportData> => {
   const [tagRows, memoRows, memoTagRows, linkRows] = await Promise.all([
     db
       .select({ id: tags.id, kind: tags.kind, name: tags.name })

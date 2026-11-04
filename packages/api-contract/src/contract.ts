@@ -15,6 +15,7 @@ import {
   tagCreateInputSchema,
   tagSummarySchema,
   tagWithCountSchema,
+  userSchema,
 } from "./schemas";
 
 /** 認証済みの手続き。未認証は UNAUTHORIZED を返す。 */
@@ -31,13 +32,7 @@ const okSchema = v.object({ ok: v.literal(true) });
 export const contract = {
   health: oc.output(okSchema),
 
-  me: authed.output(
-    v.object({
-      id: v.string(),
-      name: v.string(),
-      email: v.string(),
-    })
-  ),
+  me: authed.output(userSchema),
 
   memos: {
     list: authed.input(memoListInputSchema).output(memoListOutputSchema),

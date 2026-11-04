@@ -9,6 +9,7 @@ import type {
 import type { AppDb } from "@turf-notes/db";
 import { memoLinks, memos, memoTags, tags } from "@turf-notes/db/schema";
 import { excerptOf, headingOf, memoId, tagId } from "@turf-notes/domain";
+import type { UserId } from "@turf-notes/domain";
 import { and, desc, eq, inArray, isNull, like, lt, or } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 
@@ -113,14 +114,14 @@ const decorate = async (db: AppDb, rows: MemoRow[]): Promise<MemoSummary[]> => {
   }));
 };
 
-const baseConditions = (userId: string): SQL[] => [
+const baseConditions = (userId: UserId): SQL[] => [
   eq(memos.userId, userId),
   isNull(memos.deletedAt),
 ];
 
 export const listMemos = async (
   db: AppDb,
-  userId: string,
+  userId: UserId,
   input: MemoListInput
 ): Promise<{ items: MemoSummary[]; nextCursor: string | null }> => {
   const conditions = baseConditions(userId);
@@ -187,7 +188,7 @@ export const listMemos = async (
 
 const findMemo = async (
   db: AppDb,
-  userId: string,
+  userId: UserId,
   id: string
 ): Promise<MemoRow | null> => {
   const rows = await db
@@ -209,7 +210,7 @@ const toRefs = (
 
 export const getMemoDetail = async (
   db: AppDb,
-  userId: string,
+  userId: UserId,
   id: string
 ): Promise<MemoDetail | null> => {
   const row = await findMemo(db, userId, id);
@@ -252,7 +253,7 @@ export const getMemoDetail = async (
 
 export const listMemosForRace = async (
   db: AppDb,
-  userId: string,
+  userId: UserId,
   key: RaceKey
 ): Promise<MemoSummary[]> => {
   const rows = await db

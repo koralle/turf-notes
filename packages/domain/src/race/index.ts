@@ -91,6 +91,30 @@ export const raceSchema = v.pipe(
 
 export type Race = v.InferOutput<typeof raceSchema>;
 
+/**
+ * 3つ組がそろっているときだけレースにする（ADR-0001）。
+ * DB の4列のように、どれかが欠けうる値から Race を取り出すための入口。
+ */
+export const raceOf = (fields: {
+  date: string | null;
+  name?: string | null;
+  number: number | null;
+  venue: string | null;
+}): Race | null => {
+  if (fields.date === null || fields.venue === null || fields.number === null) {
+    return null;
+  }
+
+  return v.parse(raceSchema, {
+    date: fields.date,
+    venue: fields.venue,
+    number: fields.number,
+    ...(fields.name === null || fields.name === undefined
+      ? {}
+      : { name: fields.name }),
+  });
+};
+
 export const raceKey = ({ date, venue, number }: RaceKey) =>
   `${date}/${venue}/${number}`;
 

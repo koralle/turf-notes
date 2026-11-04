@@ -4,7 +4,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./tag": "./src/tag/index.ts"
+    "./tag": "./src/tag/index.ts",
+    "./auth": "./src/auth/index.ts"
   },
   "scripts": {
     "test": "vitest run",

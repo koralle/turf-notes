@@ -1,7 +1,7 @@
 import * as v from "valibot";
 import { describe, expect, test } from "vitest";
 
-import { raceKey, raceKeySchema, raceSchema, sameRace } from ".";
+import { raceKey, raceKeySchema, raceOf, raceSchema, sameRace } from ".";
 
 const accepted = (input: unknown) => v.safeParse(raceSchema, input).success;
 
@@ -91,5 +91,44 @@ describe("raceKey / sameRace", () => {
     expect(sameRace(tokyo11, other({ number: 12 }))).toBe(false);
     expect(sameRace(tokyo11, other({ venue: "京都" }))).toBe(false);
     expect(sameRace(tokyo11, other({ date: "2026-11-08" }))).toBe(false);
+  });
+});
+
+describe("raceOf", () => {
+  test("3つ組がそろえばレースとして返す", () => {
+    expect(
+      raceOf({
+        date: "2026-11-02",
+        name: null,
+        number: 11,
+        venue: "東京",
+      })
+    ).toStrictEqual({ date: "2026-11-02", number: 11, venue: "東京" });
+  });
+
+  test("レース名は前後の空白を落として持つ", () => {
+    expect(
+      raceOf({
+        date: "2026-11-02",
+        name: "  天皇賞（秋） ",
+        number: 11,
+        venue: "東京",
+      })
+    ).toStrictEqual({
+      date: "2026-11-02",
+      name: "天皇賞（秋）",
+      number: 11,
+      venue: "東京",
+    });
+  });
+
+  test.each([
+    { number: null, venue: "東京" },
+    { date: null, number: 11 },
+    { date: null, venue: "東京" },
+  ])("どれか1つでも欠けたらレースにしない %o", (partial) => {
+    expect(
+      raceOf({ date: "2026-11-02", number: 11, venue: "東京", ...partial })
+    ).toBeNull();
   });
 });
