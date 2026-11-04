@@ -400,8 +400,8 @@ function SettingsPage() {
             className={smallButton}
             isDisabled={
               !canSetPasswordSignIn({
-                enabled: !passwordEnabled,
                 hasPasskey,
+                nextEnabled: !passwordEnabled,
               }) || togglePassword.isPending
             }
             onPress={() => {

@@ -41,7 +41,7 @@ export const setPasswordSignIn = async (
       .where(eq(passkeys.userId, userId));
     const hasPasskey = (rows[0]?.total ?? 0) > 0;
 
-    if (!canSetPasswordSignIn({ enabled, hasPasskey })) {
+    if (!canSetPasswordSignIn({ hasPasskey, nextEnabled: enabled })) {
       return { kind: "no-passkey" };
     }
   }

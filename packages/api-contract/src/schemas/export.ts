@@ -1,14 +1,15 @@
-import { memoIdSchema, tagIdSchema, tagSchema } from "@turf-notes/domain";
+import { memoIdSchema, tagIdSchema } from "@turf-notes/domain";
 import * as v from "valibot";
 
 import { userSchema } from "./auth";
 import { raceSchema } from "./race";
+import { tagSummarySchema } from "./tag";
 
 /** JSON エクスポート。メモ・タグ・参照をすべて含む（要件 FR-S3）。 */
 export const exportDataSchema = v.object({
   exportedAt: v.number(),
   user: userSchema,
-  tags: v.array(tagSchema),
+  tags: v.array(tagSummarySchema),
   memos: v.array(
     v.object({
       id: memoIdSchema,

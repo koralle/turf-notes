@@ -6,7 +6,7 @@ import {
   RouterProvider,
 } from "@tanstack/react-router";
 import type { MemoSummary } from "@turf-notes/api-contract/schemas";
-import { memoId, tagId } from "@turf-notes/domain";
+import { memoId, raceOf, tagId } from "@turf-notes/domain";
 import { css } from "styled-system/css";
 
 import { MemoRow, memoListStyle } from "./memo-row";
@@ -34,12 +34,12 @@ const withRace: MemoSummary = {
   heading: "ソダシは道中で力みが出た",
   id: memoId("01a175cd-b61e-7992-8d03-54303f56c654"),
   linkCount: 2,
-  race: {
+  race: raceOf({
     date: "2026-11-02",
     name: "天皇賞(秋)",
     number: 11,
     venue: "東京",
-  } as MemoSummary["race"],
+  }),
   tags: [
     { id: tagId(1), kind: "horse", name: "ソダシ" },
     { id: tagId(5), kind: "theme", name: "展開" },

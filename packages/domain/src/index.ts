@@ -20,10 +20,10 @@ export {
 export type { Memo, MemoId, MemoWrite } from "./memo";
 export {
   raceKey,
+  raceKeyOf,
   raceKeySchema,
   raceOf,
   raceSchema,
-  sameRace,
   venues,
 } from "./race";
 export type { Race, RaceKey } from "./race";

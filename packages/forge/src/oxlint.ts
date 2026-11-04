@@ -82,6 +82,9 @@ const oxlintConfig = defineConfig({
     },
   ],
   rules: {
+    // 契約スキーマのバレルは意図して持つ（domain の再エクスポートを含むため既定の100では足りない）。
+    // サブパス export で回避すると公開面が概念ごとに非対称になるので、閾値側で受ける。
+    "oxc/no-barrel-file": ["error", { threshold: 150 }],
     // 関数宣言（function XxxPage()）を許す。コンポーネントは arrow に統一しない。
     "func-style": "off",
     "react/function-component-definition": "off",

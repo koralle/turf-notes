@@ -73,22 +73,22 @@ describe("authMethodsSchema", () => {
 
 describe("canSetPasswordSignIn", () => {
   test("パスキーが1つも無ければ無効化できない（FR-A4）", () => {
-    expect(canSetPasswordSignIn({ enabled: false, hasPasskey: false })).toBe(
-      false
-    );
+    expect(
+      canSetPasswordSignIn({ nextEnabled: false, hasPasskey: false })
+    ).toBe(false);
   });
 
   test("パスキーがあれば無効化できる", () => {
-    expect(canSetPasswordSignIn({ enabled: false, hasPasskey: true })).toBe(
+    expect(canSetPasswordSignIn({ nextEnabled: false, hasPasskey: true })).toBe(
       true
     );
   });
 
   test("有効化はパスキーの有無に関わらずできる", () => {
-    expect(canSetPasswordSignIn({ enabled: true, hasPasskey: false })).toBe(
+    expect(canSetPasswordSignIn({ nextEnabled: true, hasPasskey: false })).toBe(
       true
     );
-    expect(canSetPasswordSignIn({ enabled: true, hasPasskey: true })).toBe(
+    expect(canSetPasswordSignIn({ nextEnabled: true, hasPasskey: true })).toBe(
       true
     );
   });

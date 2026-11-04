@@ -1,7 +1,7 @@
 import * as v from "valibot";
 import { describe, expect, test } from "vitest";
 
-import { raceKey, raceKeySchema, raceOf, raceSchema, sameRace } from ".";
+import { raceKey, raceKeyOf, raceKeySchema, raceOf, raceSchema } from ".";
 
 const accepted = (input: unknown) => v.safeParse(raceSchema, input).success;
 
@@ -77,20 +77,49 @@ describe("readonlyValue", () => {
   });
 });
 
-describe("raceKey / sameRace", () => {
+describe("raceKey", () => {
   test("キーは開催日・競馬場・レース番号の3つ組", () => {
     expect(raceKey(tokyo11)).toBe("2026-11-02/東京/11");
   });
 
-  test("レース名は同一性に関与しない", () => {
+  test("レース名はキーに現れない", () => {
     const named = v.parse(raceSchema, { ...tokyo11, name: "天皇賞（秋）" });
-    expect(sameRace(tokyo11, named)).toBe(true);
+    expect(raceKey(named)).toBe(raceKey(tokyo11));
+  });
+});
+
+describe("raceKeyOf", () => {
+  test("文字列の3つ組からキーを作る", () => {
+    expect(
+      raceKeyOf({ date: "2026-11-02", number: "11", venue: "東京" })
+    ).toStrictEqual(tokyo11);
+    expect(
+      raceKeyOf({ date: "2026-11-02", number: "09", venue: "東京" })
+    ).toStrictEqual(other({ number: 9 }));
   });
 
-  test("3つ組のどれかが違えば別のレース", () => {
-    expect(sameRace(tokyo11, other({ number: 12 }))).toBe(false);
-    expect(sameRace(tokyo11, other({ venue: "京都" }))).toBe(false);
-    expect(sameRace(tokyo11, other({ date: "2026-11-08" }))).toBe(false);
+  test.each(["", "1e1", " 11", "011", "11.5", "99"])(
+    "数値として素直でない %s は null",
+    (number) => {
+      expect(
+        raceKeyOf({ date: "2026-11-02", number, venue: "東京" })
+      ).toBeNull();
+    }
+  );
+
+  test.each([
+    { date: "2026-02-30" },
+    { venue: "ドバイ" },
+    { date: "1899-12-31" },
+  ])("不正な値は null %o", (overrides) => {
+    expect(
+      raceKeyOf({
+        date: "2026-11-02",
+        number: "11",
+        venue: "東京",
+        ...overrides,
+      })
+    ).toBeNull();
   });
 });
 
@@ -103,6 +132,12 @@ describe("raceOf", () => {
         number: 11,
         venue: "東京",
       })
+    ).toStrictEqual({ date: "2026-11-02", number: 11, venue: "東京" });
+  });
+
+  test("レース名が undefined でもレースにする", () => {
+    expect(
+      raceOf({ date: "2026-11-02", number: 11, venue: "東京" })
     ).toStrictEqual({ date: "2026-11-02", number: 11, venue: "東京" });
   });
 

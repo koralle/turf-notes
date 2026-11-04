@@ -1,8 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { raceKey, raceKeySchema } from "@turf-notes/domain";
+import { raceKey, raceKeyOf } from "@turf-notes/domain";
 import { css } from "styled-system/css";
-import * as v from "valibot";
 
 import { EmptyState } from "../components/empty-state";
 import { MemoRow, memoListStyle } from "../components/memo-row";
@@ -26,12 +25,7 @@ const timeline = css({
 
 function RacePage() {
   const { date, venue, raceNumber } = Route.useParams();
-  const parsed = v.safeParse(raceKeySchema, {
-    date,
-    number: Number(raceNumber),
-    venue,
-  });
-  const race = parsed.success ? parsed.output : null;
+  const race = raceKeyOf({ date, number: raceNumber, venue });
   const navigate = useNavigate();
 
   const memoList = useQuery({

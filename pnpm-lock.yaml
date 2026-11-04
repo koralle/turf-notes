@@ -472,9 +472,6 @@ importers:
       react-dom:
         specifier: catalog:react
         version: 19.3.0(react@19.3.0)
-      valibot:
-        specifier: catalog:validation
-        version: 1.4.2(typescript@6.0.2)
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: catalog:cloudflare

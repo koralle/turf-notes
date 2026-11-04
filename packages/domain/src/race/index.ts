@@ -79,21 +79,19 @@ export const raceKeySchema = v.object({
 export type RaceKey = v.InferOutput<typeof raceKeySchema>;
 
 /** パース結果は入れ子まで readonly（型だけの制約で、実行時には凍結しない）。 */
-export const raceSchema = v.pipe(
-  readonlyValue(
-    v.object({
-      ...raceKeySchema.entries,
-      name: v.optional(raceNameSchema),
-    })
-  ),
-  v.brand("Race")
+export const raceSchema = readonlyValue(
+  v.object({
+    ...raceKeySchema.entries,
+    name: v.optional(raceNameSchema),
+  })
 );
 
 export type Race = v.InferOutput<typeof raceSchema>;
 
 /**
- * 3つ組がそろっているときだけレースにする（ADR-0001）。
- * DB の4列のように、どれかが欠けうる値から Race を取り出すための入口。
+ * 永続化された行からレースを取り出す（ADR-0001）。
+ * 3つ組がどれか欠けていれば null、そろっていて値が不正なら例外（破損の検知）。
+ * 入力途中の UI では使わない。値の検証は契約側で行う。
  */
 export const raceOf = (fields: {
   date: string | null;
@@ -118,5 +116,23 @@ export const raceOf = (fields: {
 export const raceKey = ({ date, venue, number }: RaceKey) =>
   `${date}/${venue}/${number}`;
 
-export const sameRace = (left: RaceKey, right: RaceKey) =>
-  raceKey(left) === raceKey(right);
+/**
+ * 文字列の3つ組から RaceKey を作る（URL パラメータなど）。
+ * 数値への変換もここで行い、形が違えば null。
+ */
+export const raceKeyOf = (fields: {
+  date: string;
+  number: string;
+  venue: string;
+}): RaceKey | null => {
+  if (!/^\d{1,2}$/u.test(fields.number)) {
+    return null;
+  }
+
+  const parsed = v.safeParse(raceKeySchema, {
+    date: fields.date,
+    number: Number(fields.number),
+    venue: fields.venue,
+  });
+  return parsed.success ? parsed.output : null;
+};

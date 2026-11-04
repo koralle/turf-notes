@@ -42,7 +42,8 @@ export const tagNameSchema = v.pipe(
 );
 
 /**
- * タグ。同一性は TagId で、名前は表示形と正規化形の組で持つ。
+ * タグ。同一性は TagId。name は表示形で保持し、正規化形は normalizeTagName で導出する
+ * （DB の normalized_name は一意性の判定用。要件 §4.2）。
  * 名前の一意性はユーザーごとに判定するので、ここでは検証しない。
  */
 export const tagSchema = readonlyValue(

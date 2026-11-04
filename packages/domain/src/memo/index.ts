@@ -66,8 +66,7 @@ export const memoSchema = v.pipe(
   v.check(
     (memo) => !(memo.linkIds ?? []).includes(memo.id),
     "自分自身は参照できません"
-  ),
-  v.brand("Memo")
+  )
 );
 
 export type Memo = v.InferOutput<typeof memoSchema>;

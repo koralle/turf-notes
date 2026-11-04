@@ -4,9 +4,14 @@ import type {
 } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memos, memoTags, tags } from "@turf-notes/db/schema";
-import { normalizeTagName, tagDisplayName } from "@turf-notes/domain";
+import {
+  normalizeTagName,
+  tagDisplayName,
+  tagSchema,
+} from "@turf-notes/domain";
 import type { TagId, TagKind, UserId } from "@turf-notes/domain";
 import { and, count, eq, isNull } from "drizzle-orm";
+import * as v from "valibot";
 
 export const listTags = async (
   db: AppDb,
@@ -67,7 +72,8 @@ export const createTag = async (
     throw new Error("tag insert failed");
   }
 
-  return { id: row.id, name: row.name, kind: row.kind };
+  // 書き込み境界。保存した名前が Tag の不変条件（表示形）を満たすことを確かめる。
+  return v.parse(tagSchema, { id: row.id, name: row.name, kind: row.kind });
 };
 
 export const removeTag = async (

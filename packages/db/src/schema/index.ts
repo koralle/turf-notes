@@ -115,7 +115,8 @@ export const authSchema = {
   verification: verifications,
 };
 
-// id 列はドメインの値オブジェクトで型付けする。
+// id 列はドメインの値オブジェクトで型付けする。$type は型注釈だけで実行時検証はしない。
+// 検証は書き込み時と oRPC の output 検証（既定で有効）で行う。
 // users / accounts / sessions / passkeys は Better Auth が読み書きするので素の string のまま。
 export const tags = sqliteTable(
   "tags",

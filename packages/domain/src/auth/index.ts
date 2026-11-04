@@ -34,10 +34,10 @@ export const authMethodsSchema = v.object({
 export type AuthMethods = v.InferOutput<typeof authMethodsSchema>;
 
 /**
- * パスキーが1つも無い状態ではパスワードサインインを無効化できない（FR-A4）。
- * サーバーは拒否し、UI は切り替えを不可能にする。判断はここ1箇所だけに置く。
+ * 次にパスワードサインインを nextEnabled にしても、サインイン手段が残るか（FR-A4）。
+ * パスキーが1つも無い状態では無効化できない。サーバーは拒否し、UI は切り替えを不可能にする。
  */
 export const canSetPasswordSignIn = (state: {
-  enabled: boolean;
   hasPasskey: boolean;
-}): boolean => state.enabled || state.hasPasskey;
+  nextEnabled: boolean;
+}): boolean => state.nextEnabled || state.hasPasskey;
