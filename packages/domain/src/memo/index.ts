@@ -3,8 +3,13 @@ import * as v from "valibot";
 import { raceSchema } from "../race";
 import { readonlyValue } from "../readonly";
 
-/** Memo の同一性（GLOSSARY: 同一性は MemoId であり、タイトルや本文ではない）。 */
-export const memoIdSchema = v.pipe(v.string(), v.uuid());
+/** Memo の同一性。他の uuid（ユーザー・セッションなど）と取り違えないよう brand する。 */
+export const memoIdSchema = v.pipe(v.string(), v.uuid(), v.brand("MemoId"));
+
+export type MemoId = v.InferOutput<typeof memoIdSchema>;
+
+/** 文字列から MemoId を作る。DB 行など外から来た id はこれを通す。 */
+export const memoId = (value: string): MemoId => v.parse(memoIdSchema, value);
 
 /** 任意の表題。未入力のときは本文の1行目を表示上の見出しに使う（GLOSSARY: Title）。 */
 export const memoTitleSchema = v.nullable(v.pipe(v.string(), v.maxLength(200)));

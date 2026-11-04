@@ -1,12 +1,13 @@
 import * as v from "valibot";
 import { describe, expect, expectTypeOf, test } from "vitest";
 
-import { excerptOf, headingOf, memoIdSchema, memoSchema } from ".";
+import { excerptOf, headingOf, memoId, memoIdSchema, memoSchema } from ".";
+import type { MemoId } from ".";
 
-const memoId = "0192f0aa-0000-7000-8000-000000000000";
+const id = "0192f0aa-0000-7000-8000-000000000000";
 const otherMemoId = "0192f0aa-0000-7000-8000-000000000001";
 
-const memo = { body: "道中で力みが出た。", id: memoId };
+const memo = { body: "道中で力みが出た。", id };
 
 const accepted = (input: unknown) => v.safeParse(memoSchema, input).success;
 
@@ -16,10 +17,22 @@ const linkIds = (n: number) =>
     (_, i) => `0192f0aa-0000-7000-8000-${String(i + 1).padStart(12, "0")}`
   );
 
-describe("memoIdSchema", () => {
+describe("memoIdSchema / memoId", () => {
   test("UUID だけを MemoId として通す", () => {
-    expect(v.safeParse(memoIdSchema, memoId).success).toBe(true);
+    expect(v.safeParse(memoIdSchema, id).success).toBe(true);
     expect(v.safeParse(memoIdSchema, "memo-1").success).toBe(false);
+  });
+
+  test("UUID でない文字列からは MemoId を作れない", () => {
+    expect(() => memoId("memo-1")).toThrow();
+    expect(memoId(id)).toBe(id);
+  });
+
+  test("MemoId は素の string と区別される", () => {
+    const plain: string = id;
+    // @ts-expect-error brand されていない string は MemoId として扱えない
+    const branded: MemoId = plain;
+    expect(memoId(branded)).toBe(id);
   });
 });
 
@@ -29,7 +42,7 @@ describe("memoSchema", () => {
   });
 
   test("本文が無い・空ならメモにしない（FR-M1）", () => {
-    expect(accepted({ id: memoId })).toBe(false);
+    expect(accepted({ id })).toBe(false);
     expect(accepted({ ...memo, body: "" })).toBe(false);
   });
 
@@ -104,6 +117,6 @@ describe("Memo の不変条件", () => {
   });
 
   test("自分自身は参照しない", () => {
-    expect(accepted({ ...memo, linkIds: [memoId] })).toBe(false);
+    expect(accepted({ ...memo, linkIds: [id] })).toBe(false);
   });
 });

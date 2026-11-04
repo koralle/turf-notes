@@ -1,6 +1,7 @@
 import type { ExportData } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memoLinks, memos, memoTags, tags } from "@turf-notes/db/schema";
+import { memoId } from "@turf-notes/domain";
 import { and, asc, eq, isNull } from "drizzle-orm";
 
 import type { AuthenticatedUser } from "../../auth/session";
@@ -66,8 +67,8 @@ export const exportAll = async (
     memos: memoRows.map((row) => ({
       body: row.body,
       createdAt: row.createdAt.getTime(),
-      id: row.id,
-      linkIds: linkIdsOf.get(row.id) ?? [],
+      id: memoId(row.id),
+      linkIds: (linkIdsOf.get(row.id) ?? []).map((id) => memoId(id)),
       race: toRace(row),
       tagIds: tagIdsOf.get(row.id) ?? [],
       title: row.title,

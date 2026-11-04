@@ -5,6 +5,7 @@ import {
   createRouter,
   RouterProvider,
 } from "@tanstack/react-router";
+import { memoId } from "@turf-notes/api-contract/schemas";
 import type { MemoSummary } from "@turf-notes/api-contract/schemas";
 import { css } from "styled-system/css";
 
@@ -31,7 +32,7 @@ const withRace: MemoSummary = {
   createdAt: Date.parse("2026-11-02T18:24:00+09:00"),
   excerpt: "道中で力みが出て、折り合いを欠いた。",
   heading: "ソダシは道中で力みが出た",
-  id: "01a175cd-b61e-7992-8d03-54303f56c654",
+  id: memoId("01a175cd-b61e-7992-8d03-54303f56c654"),
   linkCount: 2,
   race: {
     date: "2026-11-02",
@@ -51,7 +52,7 @@ const withoutRace: MemoSummary = {
   excerpt: "三連複の1点あたりの金額が多すぎる。",
   heading:
     "三連複の1点あたりの金額が多すぎる。的中率ではなく回収率で見るべき。点数を絞る勇気を持つ。",
-  id: "01a175cd-b66d-7d8c-ab56-99e9e46cfefc",
+  id: memoId("01a175cd-b66d-7d8c-ab56-99e9e46cfefc"),
   linkCount: 1,
   race: null,
   tags: [{ id: 7, kind: "theme", name: "買い方" }],

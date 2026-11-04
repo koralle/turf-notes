@@ -3,11 +3,12 @@ export {
   excerptOf,
   headingOf,
   memoBodySchema,
+  memoId,
   memoIdSchema,
   memoSchema,
   memoTitleSchema,
   memoWriteSchema,
 } from "./memo";
-export type { Memo, MemoWrite } from "./memo";
+export type { Memo, MemoId, MemoWrite } from "./memo";
 export { raceKey, raceKeySchema, raceSchema, sameRace, venues } from "./race";
 export type { Race, RaceKey } from "./race";

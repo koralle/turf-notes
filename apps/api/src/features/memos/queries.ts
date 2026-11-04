@@ -8,7 +8,7 @@ import type {
 } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memoLinks, memos, memoTags, tags } from "@turf-notes/db/schema";
-import { excerptOf, headingOf } from "@turf-notes/domain";
+import { excerptOf, headingOf, memoId } from "@turf-notes/domain";
 import { and, desc, eq, inArray, isNull, like, lt, or } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 
@@ -102,7 +102,7 @@ const decorate = async (db: AppDb, rows: MemoRow[]): Promise<MemoSummary[]> => {
   }
 
   return rows.map((row) => ({
-    id: row.id,
+    id: memoId(row.id),
     title: row.title,
     heading: headingOf(row.title, row.body),
     excerpt: excerptOf(row.body),
@@ -202,7 +202,10 @@ const findMemo = async (
 const toRefs = (
   rows: { id: string; title: string | null; body: string }[]
 ): MemoRef[] =>
-  rows.map((row) => ({ id: row.id, heading: headingOf(row.title, row.body) }));
+  rows.map((row) => ({
+    id: memoId(row.id),
+    heading: headingOf(row.title, row.body),
+  }));
 
 export const getMemoDetail = async (
   db: AppDb,
@@ -232,7 +235,7 @@ export const getMemoDetail = async (
 
   return {
     ...(summary ?? {
-      id: row.id,
+      id: memoId(row.id),
       title: row.title,
       heading: headingOf(row.title, row.body),
       excerpt: excerptOf(row.body),
