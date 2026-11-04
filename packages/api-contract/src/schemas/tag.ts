@@ -7,6 +7,7 @@ import {
 import * as v from "valibot";
 
 export {
+  defaultTagKind,
   tagId,
   tagIdSchema,
   tagKindSchema,

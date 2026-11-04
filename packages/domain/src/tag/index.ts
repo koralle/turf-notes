@@ -9,6 +9,9 @@ export type TagKind = (typeof tagKinds)[number];
 
 export const tagKindSchema = v.picklist(tagKinds);
 
+/** 新規タグの既定の種類。主題（FR-M5）。 */
+export const defaultTagKind: TagKind = "theme";
+
 /** Tag の同一性。レース番号などの素の整数と取り違えないよう brand する。 */
 export const tagIdSchema = v.pipe(
   v.number(),

@@ -5,7 +5,7 @@ import type {
 } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memos, memoTags, tags } from "@turf-notes/db/schema";
-import { normalizeTagName, tagDisplayName, tagId } from "@turf-notes/domain";
+import { normalizeTagName, tagDisplayName } from "@turf-notes/domain";
 import type { TagId, UserId } from "@turf-notes/domain";
 import { and, count, eq, isNull } from "drizzle-orm";
 
@@ -31,7 +31,7 @@ export const listTags = async (
     .orderBy(tags.kind, tags.name);
 
   return rows.map((row) => ({
-    id: tagId(row.id),
+    id: row.id,
     name: row.name,
     kind: row.kind,
     memoCount: row.memoCount,
@@ -68,7 +68,7 @@ export const createTag = async (
     throw new Error("tag insert failed");
   }
 
-  return { id: tagId(row.id), name: row.name, kind: row.kind };
+  return { id: row.id, name: row.name, kind: row.kind };
 };
 
 export const removeTag = async (

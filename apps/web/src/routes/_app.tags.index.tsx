@@ -1,22 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import type { TagKind } from "@turf-notes/api-contract/schemas";
+import { tagKinds } from "@turf-notes/api-contract/schemas";
 import { css } from "styled-system/css";
 
 import { EmptyState } from "../components/empty-state";
+import { kindLabels } from "../lib/tag-kind";
 import { client } from "../rpc/client";
 
 export const Route = createFileRoute("/_app/tags/")({
   component: TagsPage,
 });
-
-const KINDS = ["horse", "person", "theme"] as const;
-
-const KIND_LABEL: Record<TagKind, string> = {
-  horse: "馬",
-  person: "人",
-  theme: "主題",
-};
 
 const wrap = css({
   maxW: "720px",
@@ -103,14 +96,14 @@ function TagsPage() {
           タグはまだありません。メモを作るときにタグを付けられます。
         </EmptyState>
       ) : (
-        KINDS.map((kind) => {
+        tagKinds.map((kind) => {
           const groupTags = all.filter((tag) => tag.kind === kind);
           if (groupTags.length === 0) {
             return null;
           }
           return (
             <section className={group} key={kind}>
-              <h2 className={groupLabel}>{KIND_LABEL[kind]}</h2>
+              <h2 className={groupLabel}>{kindLabels[kind]}</h2>
               {groupTags.map((tag) => (
                 <Link
                   className={row}

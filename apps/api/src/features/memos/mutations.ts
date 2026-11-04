@@ -5,7 +5,8 @@ import type {
 } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memoLinks, memos, memoTags } from "@turf-notes/db/schema";
-import type { UserId } from "@turf-notes/domain";
+import { memoId } from "@turf-notes/domain";
+import type { MemoId, UserId } from "@turf-notes/domain";
 import { and, eq } from "drizzle-orm";
 import { uuidv7 } from "uuidv7";
 
@@ -20,8 +21,8 @@ export const createMemo = async (
   db: AppDb,
   userId: UserId,
   input: MemoCreateInput
-): Promise<{ id: string }> => {
-  const id = uuidv7();
+): Promise<{ id: MemoId }> => {
+  const id = memoId(uuidv7());
   // id はサーバーで採番するので、自分自身を参照する入力は作れない。
   const tagIds = input.tagIds ?? [];
   const linkIds = input.linkIds ?? [];
@@ -97,7 +98,7 @@ export const updateMemo = async (
 export const softDeleteMemo = async (
   db: AppDb,
   userId: UserId,
-  id: string
+  id: MemoId
 ): Promise<boolean> => {
   const deleted = await db
     .update(memos)

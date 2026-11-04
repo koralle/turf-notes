@@ -1,15 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { venues } from "@turf-notes/api-contract/schemas";
+import {
+  defaultTagKind,
+  raceOf,
+  tagKinds,
+} from "@turf-notes/api-contract/schemas";
 import type {
   MemoDetail,
   MemoRef,
   TagKind,
+  venues,
 } from "@turf-notes/api-contract/schemas";
 import { useState } from "react";
 import { Button as RacButton } from "react-aria-components";
 import { css } from "styled-system/css";
 
+import { kindLabels } from "../lib/tag-kind";
 import { client } from "../rpc/client";
 import { MobileHeader } from "./mobile-header";
 import { TagChip } from "./tag-chip";
@@ -33,13 +39,7 @@ const VENUES = [
   "園田",
   "門別",
   "盛岡",
-] as const;
-
-const KIND_LABEL: Record<TagKind, string> = {
-  horse: "馬",
-  person: "人",
-  theme: "主題",
-};
+] as const satisfies readonly (typeof venues)[number][];
 
 const root = css({
   display: "flex",
@@ -260,7 +260,7 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
   const [links, setLinks] = useState<MemoRef[]>(memo?.links ?? []);
 
   const [newTagName, setNewTagName] = useState("");
-  const [newTagKind, setNewTagKind] = useState<TagKind>("horse");
+  const [newTagKind, setNewTagKind] = useState<TagKind>(defaultTagKind);
   const [refQuery, setRefQuery] = useState("");
 
   const tags = useQuery({
@@ -285,20 +285,15 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
 
   const save = useMutation({
     mutationFn: async () => {
-      const venueParam = venues.find((item) => item === venue);
-      const hasRace =
-        raceDate !== "" && venueParam !== undefined && raceNumber !== "";
       const payload = {
         body: text,
         linkIds: links.map((link) => link.id),
-        race: hasRace
-          ? {
-              date: raceDate,
-              number: Number(raceNumber),
-              venue: venueParam,
-              ...(raceName.trim() === "" ? {} : { name: raceName.trim() }),
-            }
-          : null,
+        race: raceOf({
+          date: raceDate === "" ? null : raceDate,
+          name: raceName.trim() === "" ? null : raceName,
+          number: raceNumber === "" ? null : Number(raceNumber),
+          venue: venue === "" ? null : venue,
+        }),
         tagIds,
         title: title.trim() === "" ? null : title.trim(),
       };
@@ -501,9 +496,9 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
                   }}
                   value={newTagKind}
                 >
-                  {(["horse", "person", "theme"] as const).map((kind) => (
+                  {tagKinds.map((kind) => (
                     <option key={kind} value={kind}>
-                      {KIND_LABEL[kind]}
+                      {kindLabels[kind]}
                     </option>
                   ))}
                 </select>

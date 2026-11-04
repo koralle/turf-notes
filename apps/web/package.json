@@ -26,7 +26,8 @@
     "markdown-it": "catalog:ui",
     "react": "catalog:react",
     "react-aria-components": "catalog:ui",
-    "react-dom": "catalog:react"
+    "react-dom": "catalog:react",
+    "valibot": "catalog:validation"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "catalog:cloudflare",

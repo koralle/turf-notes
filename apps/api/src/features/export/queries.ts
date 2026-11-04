@@ -1,8 +1,7 @@
 import type { ExportData } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memoLinks, memos, memoTags, tags } from "@turf-notes/db/schema";
-import { memoId, tagId } from "@turf-notes/domain";
-import type { TagId, User } from "@turf-notes/domain";
+import type { MemoId, TagId, User } from "@turf-notes/domain";
 import { and, asc, eq, isNull } from "drizzle-orm";
 
 import { toRace } from "../../lib/race";
@@ -45,14 +44,14 @@ export const exportAll = async (db: AppDb, user: User): Promise<ExportData> => {
       .where(and(eq(memos.userId, user.id), isNull(memos.deletedAt))),
   ]);
 
-  const tagIdsOf = new Map<string, TagId[]>();
+  const tagIdsOf = new Map<MemoId, TagId[]>();
   for (const row of memoTagRows) {
     const list = tagIdsOf.get(row.memoId) ?? [];
-    list.push(tagId(row.tagId));
+    list.push(row.tagId);
     tagIdsOf.set(row.memoId, list);
   }
 
-  const linkIdsOf = new Map<string, string[]>();
+  const linkIdsOf = new Map<MemoId, MemoId[]>();
   for (const row of linkRows) {
     const list = linkIdsOf.get(row.fromMemoId) ?? [];
     list.push(row.toMemoId);
@@ -64,14 +63,14 @@ export const exportAll = async (db: AppDb, user: User): Promise<ExportData> => {
     memos: memoRows.map((row) => ({
       body: row.body,
       createdAt: row.createdAt.getTime(),
-      id: memoId(row.id),
-      linkIds: (linkIdsOf.get(row.id) ?? []).map((id) => memoId(id)),
+      id: row.id,
+      linkIds: linkIdsOf.get(row.id) ?? [],
       race: toRace(row),
       tagIds: tagIdsOf.get(row.id) ?? [],
       title: row.title,
       updatedAt: row.updatedAt.getTime(),
     })),
-    tags: tagRows.map((row) => ({ ...row, id: tagId(row.id) })),
+    tags: tagRows,
     user: { email: user.email, id: user.id, name: user.name },
   };
 };
