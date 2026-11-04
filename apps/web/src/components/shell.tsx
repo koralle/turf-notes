@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { tagKinds } from "@turf-notes/api-contract/schemas";
 import type { TagWithCount } from "@turf-notes/api-contract/schemas";
+import { tagKinds } from "@turf-notes/domain";
 import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { css } from "styled-system/css";

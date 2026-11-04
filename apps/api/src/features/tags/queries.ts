@@ -1,12 +1,11 @@
 import type {
-  TagKind,
   TagSummary,
   TagWithCount,
 } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memos, memoTags, tags } from "@turf-notes/db/schema";
 import { normalizeTagName, tagDisplayName } from "@turf-notes/domain";
-import type { TagId, UserId } from "@turf-notes/domain";
+import type { TagId, TagKind, UserId } from "@turf-notes/domain";
 import { and, count, eq, isNull } from "drizzle-orm";
 
 export const listTags = async (

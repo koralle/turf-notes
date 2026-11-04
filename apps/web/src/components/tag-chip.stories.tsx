@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { tagId } from "@turf-notes/api-contract/schemas";
+import { tagId } from "@turf-notes/domain";
 
 import { TagChip } from "./tag-chip";
 

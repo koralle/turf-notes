@@ -1,4 +1,4 @@
-import type { TagKind } from "@turf-notes/api-contract/schemas";
+import type { TagKind } from "@turf-notes/domain";
 
 /** タグの種類の表示名。UI は日本語のみ（NFR-4）。 */
 export const kindLabels: Record<TagKind, string> = {

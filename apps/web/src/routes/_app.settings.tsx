@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { canSetPasswordSignIn } from "@turf-notes/api-contract/schemas";
+import { canSetPasswordSignIn } from "@turf-notes/domain";
 import { useState } from "react";
 import { Button as RacButton } from "react-aria-components";
 import { css } from "styled-system/css";

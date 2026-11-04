@@ -5,8 +5,8 @@ import {
   createRouter,
   RouterProvider,
 } from "@tanstack/react-router";
-import { memoId, tagId } from "@turf-notes/api-contract/schemas";
 import type { MemoSummary } from "@turf-notes/api-contract/schemas";
+import { memoId, tagId } from "@turf-notes/domain";
 import { css } from "styled-system/css";
 
 import { MemoRow, memoListStyle } from "./memo-row";

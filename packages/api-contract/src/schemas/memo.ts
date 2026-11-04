@@ -13,7 +13,6 @@ export type {
   Memo as MemoUpdateInput,
   MemoWrite as MemoCreateInput,
 } from "@turf-notes/domain";
-export { memoId } from "@turf-notes/domain";
 export {
   memoSchema as memoUpdateInputSchema,
   memoWriteSchema as memoCreateInputSchema,

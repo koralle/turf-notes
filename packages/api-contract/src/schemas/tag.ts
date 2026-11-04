@@ -7,15 +7,12 @@ import {
 import * as v from "valibot";
 
 export {
-  defaultTagKind,
-  tagId,
   tagIdSchema,
   tagKindSchema,
-  tagKinds,
   tagNameSchema,
   tagSchema as tagSummarySchema,
 } from "@turf-notes/domain/tag";
-export type { Tag as TagSummary, TagId, TagKind } from "@turf-notes/domain/tag";
+export type { Tag as TagSummary } from "@turf-notes/domain/tag";
 
 /** タグ一覧用。メモ件数を伴う。 */
 export const tagWithCountSchema = v.object({

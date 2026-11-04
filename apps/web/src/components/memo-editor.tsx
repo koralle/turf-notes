@@ -1,16 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import {
-  defaultTagKind,
-  raceOf,
-  tagKinds,
-} from "@turf-notes/api-contract/schemas";
-import type {
-  MemoDetail,
-  MemoRef,
-  TagKind,
-  venues,
-} from "@turf-notes/api-contract/schemas";
+import type { MemoDetail, MemoRef } from "@turf-notes/api-contract/schemas";
+import { defaultTagKind, raceOf, tagKinds } from "@turf-notes/domain";
+import type { TagKind, venues } from "@turf-notes/domain";
 import { useState } from "react";
 import { Button as RacButton } from "react-aria-components";
 import { css } from "styled-system/css";

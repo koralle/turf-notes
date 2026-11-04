@@ -28,6 +28,7 @@ export {
 } from "./race";
 export type { Race, RaceKey } from "./race";
 export {
+  defaultTagKind,
   normalizeTagName,
   tagDisplayName,
   tagId,

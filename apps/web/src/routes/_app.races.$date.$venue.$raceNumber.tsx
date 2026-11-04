@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { raceKey, raceKeySchema } from "@turf-notes/api-contract/schemas";
+import { raceKey, raceKeySchema } from "@turf-notes/domain";
 import { css } from "styled-system/css";
 import * as v from "valibot";
 

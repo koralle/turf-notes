@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { tagKinds } from "@turf-notes/api-contract/schemas";
+import { tagKinds } from "@turf-notes/domain";
 import { css } from "styled-system/css";
 
 import { EmptyState } from "../components/empty-state";
