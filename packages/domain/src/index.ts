@@ -2,8 +2,10 @@
 export {
   excerptOf,
   headingOf,
+  memoBodySchema,
   memoIdSchema,
   memoSchema,
+  memoTitleSchema,
   memoWriteSchema,
 } from "./memo";
 export type { Memo, MemoWrite } from "./memo";

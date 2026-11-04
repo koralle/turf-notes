@@ -7,10 +7,14 @@ import { readonlyValue } from "../readonly";
 export const memoIdSchema = v.pipe(v.string(), v.uuid());
 
 /** 任意の表題。未入力のときは本文の1行目を表示上の見出しに使う（GLOSSARY: Title）。 */
-const titleSchema = v.nullable(v.pipe(v.string(), v.maxLength(200)));
+export const memoTitleSchema = v.nullable(v.pipe(v.string(), v.maxLength(200)));
 
 /** 本文は1文字以上必須（要件 FR-M1）。 */
-const bodySchema = v.pipe(v.string(), v.minLength(1), v.maxLength(65_536));
+export const memoBodySchema = v.pipe(
+  v.string(),
+  v.minLength(1),
+  v.maxLength(65_536)
+);
 
 /** 1つのメモが持てるタグ・参照の上限。同じタグ・同じ参照先を二度持つことはない。 */
 const tagIdsSchema = v.pipe(
@@ -35,8 +39,8 @@ const linkIdsSchema = v.pipe(
  * タイトル・レース情報・タグ・参照はすべて任意で、本文だけが必須（要件 FR-M1）。
  */
 const memoWriteEntries = {
-  body: bodySchema,
-  title: v.optional(titleSchema),
+  body: memoBodySchema,
+  title: v.optional(memoTitleSchema),
   race: v.optional(v.nullable(raceSchema)),
   tagIds: v.optional(tagIdsSchema),
   linkIds: v.optional(linkIdsSchema),

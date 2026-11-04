@@ -1,4 +1,8 @@
-import { memoIdSchema } from "@turf-notes/domain";
+import {
+  memoBodySchema,
+  memoIdSchema,
+  memoTitleSchema,
+} from "@turf-notes/domain";
 import * as v from "valibot";
 
 import { raceKeySchema, raceSchema } from "./race";
@@ -15,7 +19,7 @@ export {
 
 export const memoSummarySchema = v.object({
   id: memoIdSchema,
-  title: v.nullable(v.string()),
+  title: memoTitleSchema,
   /** 一覧・参照で見出しとして使う文字列。タイトル、無ければ本文の1行目。 */
   heading: v.string(),
   /** 一覧に出す本文の抜粋。 */
@@ -36,7 +40,7 @@ export type MemoRef = v.InferOutput<typeof memoRefSchema>;
 
 export const memoDetailSchema = v.object({
   ...memoSummarySchema.entries,
-  body: v.string(),
+  body: memoBodySchema,
   /** このメモが参照しているメモ。 */
   links: v.array(memoRefSchema),
   /** このメモを参照しているメモ。 */
