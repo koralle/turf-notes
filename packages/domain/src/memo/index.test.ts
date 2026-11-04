@@ -3,6 +3,8 @@ import { describe, expect, expectTypeOf, test } from "vitest";
 
 import { excerptOf, headingOf, memoId, memoIdSchema, memoSchema } from ".";
 import type { MemoId } from ".";
+import { tagId } from "../tag";
+import type { TagId } from "../tag";
 
 const id = "0192f0aa-0000-7000-8000-000000000000";
 const otherMemoId = "0192f0aa-0000-7000-8000-000000000001";
@@ -65,16 +67,25 @@ describe("memoSchema", () => {
     expect(accepted({ ...memo, linkIds: linkIds(50) })).toBe(true);
     expect(accepted({ ...memo, linkIds: linkIds(51) })).toBe(false);
     expect(
-      accepted({ ...memo, tagIds: Array.from({ length: 20 }, (_, i) => i) })
+      accepted({
+        ...memo,
+        tagIds: Array.from({ length: 20 }, (_, i) => tagId(i + 1)),
+      })
     ).toBe(true);
     expect(
-      accepted({ ...memo, tagIds: Array.from({ length: 21 }, (_, i) => i) })
+      accepted({
+        ...memo,
+        tagIds: Array.from({ length: 21 }, (_, i) => tagId(i + 1)),
+      })
     ).toBe(false);
   });
   test("パース結果は readonly（型だけの制約）", () => {
-    const parsed = v.parse(memoSchema, { ...memo, tagIds: [1, 2] });
+    const parsed = v.parse(memoSchema, {
+      ...memo,
+      tagIds: [tagId(1), tagId(2)],
+    });
     expectTypeOf(parsed.body).toEqualTypeOf<string>();
-    expectTypeOf(parsed.tagIds).toEqualTypeOf<readonly number[] | undefined>();
+    expectTypeOf(parsed.tagIds).toEqualTypeOf<readonly TagId[] | undefined>();
     // @ts-expect-error readonly なので書き換えられない
     parsed.body = "書き換え";
   });
@@ -105,8 +116,8 @@ describe("excerptOf", () => {
 
 describe("Memo の不変条件", () => {
   test("同じタグを重複して持たない", () => {
-    expect(accepted({ ...memo, tagIds: [1, 2] })).toBe(true);
-    expect(accepted({ ...memo, tagIds: [1, 1] })).toBe(false);
+    expect(accepted({ ...memo, tagIds: [tagId(1), tagId(2)] })).toBe(true);
+    expect(accepted({ ...memo, tagIds: [tagId(1), tagId(1)] })).toBe(false);
   });
 
   test("同じメモを重複して参照しない", () => {

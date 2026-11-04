@@ -2,6 +2,7 @@ import * as v from "valibot";
 
 import { raceSchema } from "../race";
 import { readonlyValue } from "../readonly";
+import { tagIdSchema } from "../tag";
 
 /** Memo の同一性。他の uuid（ユーザー・セッションなど）と取り違えないよう brand する。 */
 export const memoIdSchema = v.pipe(v.string(), v.uuid(), v.brand("MemoId"));
@@ -23,7 +24,7 @@ export const memoBodySchema = v.pipe(
 
 /** 1つのメモが持てるタグ・参照の上限。同じタグ・同じ参照先を二度持つことはない。 */
 const tagIdsSchema = v.pipe(
-  v.array(v.number()),
+  v.array(tagIdSchema),
   v.maxLength(20),
   v.check(
     (ids) => new Set(ids).size === ids.length,

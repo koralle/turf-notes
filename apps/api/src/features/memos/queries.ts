@@ -8,7 +8,7 @@ import type {
 } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memoLinks, memos, memoTags, tags } from "@turf-notes/db/schema";
-import { excerptOf, headingOf, memoId } from "@turf-notes/domain";
+import { excerptOf, headingOf, memoId, tagId } from "@turf-notes/domain";
 import { and, desc, eq, inArray, isNull, like, lt, or } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 
@@ -80,7 +80,7 @@ const decorate = async (db: AppDb, rows: MemoRow[]): Promise<MemoSummary[]> => {
   const tagsByMemo = new Map<string, TagSummary[]>();
   for (const row of tagRows) {
     const list = tagsByMemo.get(row.memoId) ?? [];
-    list.push({ id: row.id, name: row.name, kind: row.kind });
+    list.push({ id: tagId(row.id), name: row.name, kind: row.kind });
     tagsByMemo.set(row.memoId, list);
   }
 
@@ -136,11 +136,11 @@ export const listMemos = async (
     }
   }
 
-  for (const tagId of input.tagIds ?? []) {
+  for (const id of input.tagIds ?? []) {
     const taggedMemoIds = db
       .select({ id: memoTags.memoId })
       .from(memoTags)
-      .where(eq(memoTags.tagId, tagId));
+      .where(eq(memoTags.tagId, id));
     conditions.push(inArray(memos.id, taggedMemoIds));
   }
 

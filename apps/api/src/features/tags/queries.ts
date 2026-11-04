@@ -5,9 +5,9 @@ import type {
 } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memos, memoTags, tags } from "@turf-notes/db/schema";
+import { normalizeTagName, tagDisplayName, tagId } from "@turf-notes/domain";
+import type { TagId } from "@turf-notes/domain";
 import { and, count, eq, isNull } from "drizzle-orm";
-
-import { normalizeTagName } from "../../lib/text";
 
 export const listTags = async (
   db: AppDb,
@@ -31,7 +31,7 @@ export const listTags = async (
     .orderBy(tags.kind, tags.name);
 
   return rows.map((row) => ({
-    id: row.id,
+    id: tagId(row.id),
     name: row.name,
     kind: row.kind,
     memoCount: row.memoCount,
@@ -47,7 +47,7 @@ export const createTag = async (
   name: string,
   kind: TagKind
 ): Promise<TagSummary> => {
-  const display = name.normalize("NFC").trim().replaceAll(/\s+/g, " ");
+  const display = tagDisplayName(name);
   const normalizedName = normalizeTagName(display);
 
   await db
@@ -68,13 +68,13 @@ export const createTag = async (
     throw new Error("tag insert failed");
   }
 
-  return { id: row.id, name: row.name, kind: row.kind };
+  return { id: tagId(row.id), name: row.name, kind: row.kind };
 };
 
 export const removeTag = async (
   db: AppDb,
   userId: string,
-  id: number
+  id: TagId
 ): Promise<boolean> => {
   const deleted = await db
     .delete(tags)

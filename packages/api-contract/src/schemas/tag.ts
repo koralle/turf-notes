@@ -1,25 +1,32 @@
+// ルートの @turf-notes/domain を引くと schemas のバレルが no-barrel-file の上限を超えるため、タグだけを読む。
+import {
+  tagIdSchema,
+  tagKindSchema,
+  tagNameSchema,
+} from "@turf-notes/domain/tag";
 import * as v from "valibot";
 
-/** タグの種類。馬・人（騎手／調教師）・主題の3種。 */
-export const tagKinds = ["horse", "person", "theme"] as const;
-export type TagKind = (typeof tagKinds)[number];
-export const tagKindSchema = v.picklist(tagKinds);
+export {
+  tagId,
+  tagIdSchema,
+  tagKindSchema,
+  tagKinds,
+  tagNameSchema,
+  tagSchema as tagSummarySchema,
+} from "@turf-notes/domain/tag";
+export type { Tag as TagSummary, TagId, TagKind } from "@turf-notes/domain/tag";
 
-export const tagSummarySchema = v.object({
-  id: v.number(),
-  name: v.string(),
-  kind: tagKindSchema,
-});
-export type TagSummary = v.InferOutput<typeof tagSummarySchema>;
-
+/** タグ一覧用。メモ件数を伴う。 */
 export const tagWithCountSchema = v.object({
-  ...tagSummarySchema.entries,
+  id: tagIdSchema,
+  name: tagNameSchema,
+  kind: tagKindSchema,
   memoCount: v.number(),
 });
 export type TagWithCount = v.InferOutput<typeof tagWithCountSchema>;
 
 export const tagCreateInputSchema = v.object({
-  name: v.pipe(v.string(), v.minLength(1), v.maxLength(32)),
+  name: tagNameSchema,
   kind: tagKindSchema,
 });
 export type TagCreateInput = v.InferOutput<typeof tagCreateInputSchema>;

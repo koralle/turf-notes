@@ -2,6 +2,7 @@ import {
   memoBodySchema,
   memoIdSchema,
   memoTitleSchema,
+  tagIdSchema,
 } from "@turf-notes/domain";
 import * as v from "valibot";
 
@@ -51,7 +52,7 @@ export type MemoDetail = v.InferOutput<typeof memoDetailSchema>;
 
 export const memoListInputSchema = v.object({
   q: v.optional(v.string()),
-  tagIds: v.optional(v.array(v.number())),
+  tagIds: v.optional(v.array(tagIdSchema)),
   race: v.optional(raceKeySchema),
   cursor: v.optional(v.string()),
 });

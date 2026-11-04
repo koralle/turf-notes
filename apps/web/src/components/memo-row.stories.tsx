@@ -5,7 +5,7 @@ import {
   createRouter,
   RouterProvider,
 } from "@tanstack/react-router";
-import { memoId } from "@turf-notes/api-contract/schemas";
+import { memoId, tagId } from "@turf-notes/api-contract/schemas";
 import type { MemoSummary } from "@turf-notes/api-contract/schemas";
 import { css } from "styled-system/css";
 
@@ -41,8 +41,8 @@ const withRace: MemoSummary = {
     venue: "東京",
   } as MemoSummary["race"],
   tags: [
-    { id: 1, kind: "horse", name: "ソダシ" },
-    { id: 5, kind: "theme", name: "展開" },
+    { id: tagId(1), kind: "horse", name: "ソダシ" },
+    { id: tagId(5), kind: "theme", name: "展開" },
   ],
   title: "ソダシは道中で力みが出た",
 };
@@ -55,7 +55,7 @@ const withoutRace: MemoSummary = {
   id: memoId("01a175cd-b66d-7d8c-ab56-99e9e46cfefc"),
   linkCount: 1,
   race: null,
-  tags: [{ id: 7, kind: "theme", name: "買い方" }],
+  tags: [{ id: tagId(7), kind: "theme", name: "買い方" }],
   title: null,
 };
 

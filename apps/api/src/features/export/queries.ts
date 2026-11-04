@@ -1,7 +1,8 @@
 import type { ExportData } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memoLinks, memos, memoTags, tags } from "@turf-notes/db/schema";
-import { memoId } from "@turf-notes/domain";
+import { memoId, tagId } from "@turf-notes/domain";
+import type { TagId } from "@turf-notes/domain";
 import { and, asc, eq, isNull } from "drizzle-orm";
 
 import type { AuthenticatedUser } from "../../auth/session";
@@ -48,10 +49,10 @@ export const exportAll = async (
       .where(and(eq(memos.userId, user.id), isNull(memos.deletedAt))),
   ]);
 
-  const tagIdsOf = new Map<string, number[]>();
+  const tagIdsOf = new Map<string, TagId[]>();
   for (const row of memoTagRows) {
     const list = tagIdsOf.get(row.memoId) ?? [];
-    list.push(row.tagId);
+    list.push(tagId(row.tagId));
     tagIdsOf.set(row.memoId, list);
   }
 
@@ -74,7 +75,7 @@ export const exportAll = async (
       title: row.title,
       updatedAt: row.updatedAt.getTime(),
     })),
-    tags: tagRows,
+    tags: tagRows.map((row) => ({ ...row, id: tagId(row.id) })),
     user: { email: user.email, id: user.id, name: user.name },
   };
 };
