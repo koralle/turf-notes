@@ -15,9 +15,10 @@ export {
   memoIdSchema,
   memoSchema,
   memoTitleSchema,
+  memoVersionSchema,
   memoWriteSchema,
 } from "./memo";
-export type { Memo, MemoId, MemoWrite } from "./memo";
+export type { Memo, MemoId, MemoVersion, MemoWrite } from "./memo";
 export {
   raceKey,
   raceKeyOf,

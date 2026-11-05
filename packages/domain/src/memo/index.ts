@@ -58,11 +58,25 @@ export const memoWriteSchema = readonlyValue(v.object(memoWriteEntries));
 export type MemoWrite = v.InferOutput<typeof memoWriteSchema>;
 
 /**
+ * 版番号。編集画面が読み込んだ時点の値で、保存時に一致していなければ拒否する
+ * （楽観ロック）。利用者が値を意識することはない。
+ */
+export const memoVersionSchema = v.pipe(v.number(), v.integer(), v.minValue(0));
+
+export type MemoVersion = v.InferOutput<typeof memoVersionSchema>;
+
+/**
  * メモ。同一性は MemoId で、内容は丸ごと差し替えられる。
  * 自分自身への参照は持てない（MemoLink は別の Memo への参照）。
  */
 export const memoSchema = v.pipe(
-  readonlyValue(v.object({ id: memoIdSchema, ...memoWriteEntries })),
+  readonlyValue(
+    v.object({
+      id: memoIdSchema,
+      version: memoVersionSchema,
+      ...memoWriteEntries,
+    })
+  ),
   v.check(
     (memo) => !(memo.linkIds ?? []).includes(memo.id),
     "自分自身は参照できません"

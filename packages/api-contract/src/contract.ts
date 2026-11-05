@@ -23,6 +23,8 @@ const authed = oc.errors({
   UNAUTHORIZED: { status: 401 },
   "memo-not-found": { status: 404 },
   "tag-not-found": { status: 404 },
+  /** 読み込んだ版番号が古い。他で保存済みなので、読み込み直しが要る。 */
+  "memo-conflict": { status: 409 },
   // パスキーが1つも無い状態ではパスワードサインインを無効化できない（ADR-0002）。
   "no-passkey": { status: 409 },
 });

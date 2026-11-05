@@ -6,7 +6,7 @@ import { Button as RacButton } from "react-aria-components";
 import { css } from "styled-system/css";
 
 import { authClient } from "../features/auth/auth-client";
-import { client } from "../rpc/client";
+import { client, errorCode } from "../rpc/client";
 
 export const Route = createFileRoute("/_app/settings")({
   component: SettingsPage,
@@ -173,14 +173,8 @@ function SettingsPage() {
     mutationFn: async (enabled: boolean) =>
       await client.settings.setPasswordSignIn({ enabled }),
     onError: (mutationError: unknown) => {
-      const code =
-        typeof mutationError === "object" &&
-        mutationError !== null &&
-        "code" in mutationError
-          ? String(mutationError.code)
-          : "";
       setError(
-        code === "no-passkey"
+        errorCode(mutationError) === "no-passkey"
           ? "パスキーを1つ登録するまで、パスワードサインインは無効化できません"
           : "設定を保存できませんでした"
       );

@@ -45,9 +45,12 @@ export const createMemosRouter = ({ impl, requireAuth }: RouterKit) => {
     update: memos.update
       .use(requireAuth)
       .handler(async ({ context, errors, input }) => {
-        const updated = await updateMemo(context.db, context.user.id, input);
-        if (!updated) {
+        const result = await updateMemo(context.db, context.user.id, input);
+        if (result.kind === "not-found") {
           throw errors["memo-not-found"]();
+        }
+        if (result.kind === "conflict") {
+          throw errors["memo-conflict"]();
         }
         return { id: input.id };
       }),

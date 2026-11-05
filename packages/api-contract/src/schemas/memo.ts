@@ -2,6 +2,7 @@ import {
   memoBodySchema,
   memoIdSchema,
   memoTitleSchema,
+  memoVersionSchema,
   tagIdSchema,
 } from "@turf-notes/domain";
 import * as v from "valibot";
@@ -42,6 +43,8 @@ export type MemoRef = v.InferOutput<typeof memoRefSchema>;
 export const memoDetailSchema = v.object({
   ...memoSummarySchema.entries,
   body: memoBodySchema,
+  /** 保存時に送り返す版番号。読み込んだ後で他が保存していれば保存は拒否される。 */
+  version: memoVersionSchema,
   /** このメモが参照しているメモ。 */
   links: v.array(memoRefSchema),
   /** このメモを参照しているメモ。 */

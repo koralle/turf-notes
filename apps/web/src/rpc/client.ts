@@ -14,3 +14,9 @@ const link = new RPCLink({
 
 /** ブラウザから `/rpc` を叩く oRPC クライアント。型は contract から来る。 */
 export const client: ContractRouterClient<ApiContract> = createORPCClient(link);
+
+/** oRPC の定義済みエラーのコード。エラーでなければ空文字を返す。 */
+export const errorCode = (error: unknown): string =>
+  typeof error === "object" && error !== null && "code" in error
+    ? String(error.code)
+    : "";

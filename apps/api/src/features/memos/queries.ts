@@ -28,6 +28,7 @@ interface MemoRow {
   raceName: string | null;
   createdAt: Date;
   deletedAt: Date | null;
+  version: number;
 }
 
 const memoColumns = {
@@ -40,6 +41,7 @@ const memoColumns = {
   raceName: memos.raceName,
   createdAt: memos.createdAt,
   deletedAt: memos.deletedAt,
+  version: memos.version,
 };
 
 const encodeCursor = (createdAt: Date, id: MemoId): string =>
@@ -247,6 +249,7 @@ export const getMemoDetail = async (
       linkCount: 0,
     }),
     body: row.body,
+    version: row.version,
     links: toRefs(linkRows),
     backlinks: toRefs(backlinkRows),
   };

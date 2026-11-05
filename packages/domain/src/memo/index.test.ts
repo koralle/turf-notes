@@ -9,7 +9,7 @@ import type { TagId } from "../tag";
 const id = "0192f0aa-0000-7000-8000-000000000000";
 const otherMemoId = "0192f0aa-0000-7000-8000-000000000001";
 
-const memo = { body: "道中で力みが出た。", id };
+const memo = { body: "道中で力みが出た。", id, version: 0 };
 
 const accepted = (input: unknown) => v.safeParse(memoSchema, input).success;
 

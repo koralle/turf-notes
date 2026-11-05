@@ -52,11 +52,20 @@ export const createMemo = async (
   return { id };
 };
 
+export type UpdateMemoResult =
+  | { kind: "ok" }
+  | { kind: "not-found" }
+  | { kind: "conflict" };
+
+/**
+ * 内容を丸ごと差し替える。読み込んだ版番号と一致しない時は書き換えずに conflict を返す
+ * （楽観ロック）。タグと参照も同じトランザクションで入れ替える。
+ */
 export const updateMemo = async (
   db: AppDb,
   userId: UserId,
   input: MemoUpdateInput
-): Promise<boolean> =>
+): Promise<UpdateMemoResult> =>
   await db.transaction(async (tx) => {
     const updated = await tx
       .update(memos)
@@ -64,13 +73,27 @@ export const updateMemo = async (
         title: input.title ?? null,
         body: input.body,
         ...raceColumns(input.race),
+        version: input.version + 1,
         updatedAt: new Date(),
       })
-      .where(and(eq(memos.id, input.id), eq(memos.userId, userId)))
+      .where(
+        and(
+          eq(memos.id, input.id),
+          eq(memos.userId, userId),
+          eq(memos.version, input.version)
+        )
+      )
       .returning({ id: memos.id });
 
     if (updated.length === 0) {
-      return false;
+      // 版番号が合わなかったのか、そもそも無いのかを分けて返す。
+      const rows = await tx
+        .select({ id: memos.id })
+        .from(memos)
+        .where(and(eq(memos.id, input.id), eq(memos.userId, userId)))
+        .limit(1);
+
+      return rows.length > 0 ? { kind: "conflict" } : { kind: "not-found" };
     }
 
     await tx.delete(memoTags).where(eq(memoTags.memoId, input.id));
@@ -91,7 +114,7 @@ export const updateMemo = async (
         );
     }
 
-    return true;
+    return { kind: "ok" };
   });
 
 /** 論理削除。関連するタグ紐付けと参照は残すが、読み出しでは除外する。 */
