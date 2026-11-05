@@ -8,7 +8,7 @@ import { Button as RacButton } from "react-aria-components";
 import { css } from "styled-system/css";
 
 import { kindLabels } from "../lib/tag-kind";
-import { client } from "../rpc/client";
+import { client, errorCode } from "../rpc/client";
 import { MobileHeader } from "./mobile-header";
 import { TagChip } from "./tag-chip";
 
@@ -276,7 +276,11 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
 
       return memo === undefined
         ? await client.memos.create(payload)
-        : await client.memos.update({ id: memo.id, ...payload });
+        : await client.memos.update({
+            id: memo.id,
+            version: memo.version,
+            ...payload,
+          });
     },
     onSuccess: async (result) => {
       await queryClient.invalidateQueries({ queryKey: ["memos"] });
@@ -287,6 +291,11 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
 
   const tagList = tags.data ?? [];
   const selectedTags = tagList.filter((tag) => tagIds.includes(tag.id));
+  // 他の画面で先に保存されていたら、こちらの内容は上書きせずに知らせる。
+  const saveErrorMessage =
+    errorCode(save.error) === "memo-conflict"
+      ? "他の画面で更新されています。読み込み直してください"
+      : "保存に失敗しました";
 
   return (
     <div className={root}>
@@ -308,7 +317,7 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
         </button>
         {save.isError ? (
           <span className={css({ color: "danger", fontSize: "11.5px" })}>
-            保存に失敗しました
+            {saveErrorMessage}
           </span>
         ) : null}
         <RacButton
@@ -578,7 +587,7 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
         style={{ paddingBottom: "calc(10px + env(safe-area-inset-bottom))" }}
       >
         {save.isError ? (
-          <div className={saveError}>保存に失敗しました</div>
+          <div className={saveError}>{saveErrorMessage}</div>
         ) : null}
         <RacButton
           className={primaryBtnFull}

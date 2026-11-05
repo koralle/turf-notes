@@ -157,6 +157,11 @@ export const memos = sqliteTable("memos", {
   raceNumber: integer("race_number"),
   /** 任意の表示名。平場では条件を書く。同定には使わない。 */
   raceName: text("race_name"),
+  /**
+   * 楽観ロック用の版番号。読み込んだ値と一致しない更新はアプリ層で拒否する。
+   * 更新のたびに1増える。
+   */
+  version: integer("version").notNull().default(0),
   ...timestamps,
   deletedAt: integer("deleted_at", { mode: "timestamp_ms" }),
 });
