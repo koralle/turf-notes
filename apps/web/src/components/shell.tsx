@@ -1,10 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import type { TagWithCount } from "@turf-notes/api-contract/schemas";
+import { tagKinds } from "@turf-notes/domain";
 import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { css } from "styled-system/css";
 
+import { kindLabels } from "../lib/tag-kind";
 import { client } from "../rpc/client";
 import { HomeIcon, SettingsIcon, TagIcon } from "./icons";
 
@@ -107,8 +109,6 @@ const mainCol = css({
   overflow: "auto",
 });
 
-const kindLabel = { horse: "馬", person: "人", theme: "主題" } as const;
-
 const Sidebar = () => {
   const tags = useQuery({
     queryFn: async () => await client.tags.list(),
@@ -140,10 +140,10 @@ const Sidebar = () => {
       <Link className={navItem} to="/settings">
         設定
       </Link>
-      {(["horse", "person", "theme"] as const).map((kind) =>
+      {tagKinds.map((kind) =>
         (grouped[kind] ?? []).length === 0 ? null : (
           <div key={kind}>
-            <div className={sideLabel}>{kindLabel[kind]}</div>
+            <div className={sideLabel}>{kindLabels[kind]}</div>
             {(grouped[kind] ?? []).map((tag) => (
               <Link
                 className={tagRow}

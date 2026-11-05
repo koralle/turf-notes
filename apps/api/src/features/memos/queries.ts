@@ -8,16 +8,18 @@ import type {
 } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memoLinks, memos, memoTags, tags } from "@turf-notes/db/schema";
+import { excerptOf, headingOf, memoIdSchema } from "@turf-notes/domain";
+import type { MemoId, UserId } from "@turf-notes/domain";
 import { and, desc, eq, inArray, isNull, like, lt, or } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
+import * as v from "valibot";
 
 import { toRace } from "../../lib/race";
-import { excerptOf, headingOf } from "../../lib/text";
 
 const MEMO_PAGE_SIZE = 20;
 
 interface MemoRow {
-  id: string;
+  id: MemoId;
   title: string | null;
   body: string;
   raceDate: string | null;
@@ -40,22 +42,22 @@ const memoColumns = {
   deletedAt: memos.deletedAt,
 };
 
-const encodeCursor = (createdAt: Date, id: string): string =>
+const encodeCursor = (createdAt: Date, id: MemoId): string =>
   `${createdAt.getTime()}_${id}`;
 
-const decodeCursor = (cursor: string): { ms: number; id: string } | null => {
+const decodeCursor = (cursor: string): { ms: number; id: MemoId } | null => {
   const separator = cursor.indexOf("_");
   if (separator <= 0) {
     return null;
   }
 
   const ms = Number(cursor.slice(0, separator));
-  const id = cursor.slice(separator + 1);
-  if (!Number.isFinite(ms) || id.length === 0) {
+  const parsed = v.safeParse(memoIdSchema, cursor.slice(separator + 1));
+  if (!Number.isFinite(ms) || !parsed.success) {
     return null;
   }
 
-  return { ms, id };
+  return { ms, id: parsed.output };
 };
 
 /** メモ id の集合に対して、タグと参照件数をまとめて取る。 */
@@ -77,7 +79,7 @@ const decorate = async (db: AppDb, rows: MemoRow[]): Promise<MemoSummary[]> => {
     .innerJoin(tags, eq(memoTags.tagId, tags.id))
     .where(inArray(memoTags.memoId, ids));
 
-  const tagsByMemo = new Map<string, TagSummary[]>();
+  const tagsByMemo = new Map<MemoId, TagSummary[]>();
   for (const row of tagRows) {
     const list = tagsByMemo.get(row.memoId) ?? [];
     list.push({ id: row.id, name: row.name, kind: row.kind });
@@ -91,7 +93,7 @@ const decorate = async (db: AppDb, rows: MemoRow[]): Promise<MemoSummary[]> => {
       or(inArray(memoLinks.fromMemoId, ids), inArray(memoLinks.toMemoId, ids))
     );
 
-  const linkCounts = new Map<string, number>();
+  const linkCounts = new Map<MemoId, number>();
   for (const row of linkRows) {
     if (ids.includes(row.fromMemoId)) {
       linkCounts.set(row.fromMemoId, (linkCounts.get(row.fromMemoId) ?? 0) + 1);
@@ -113,14 +115,14 @@ const decorate = async (db: AppDb, rows: MemoRow[]): Promise<MemoSummary[]> => {
   }));
 };
 
-const baseConditions = (userId: string): SQL[] => [
+const baseConditions = (userId: UserId): SQL[] => [
   eq(memos.userId, userId),
   isNull(memos.deletedAt),
 ];
 
 export const listMemos = async (
   db: AppDb,
-  userId: string,
+  userId: UserId,
   input: MemoListInput
 ): Promise<{ items: MemoSummary[]; nextCursor: string | null }> => {
   const conditions = baseConditions(userId);
@@ -136,11 +138,11 @@ export const listMemos = async (
     }
   }
 
-  for (const tagId of input.tagIds ?? []) {
+  for (const id of input.tagIds ?? []) {
     const taggedMemoIds = db
       .select({ id: memoTags.memoId })
       .from(memoTags)
-      .where(eq(memoTags.tagId, tagId));
+      .where(eq(memoTags.tagId, id));
     conditions.push(inArray(memos.id, taggedMemoIds));
   }
 
@@ -187,8 +189,8 @@ export const listMemos = async (
 
 const findMemo = async (
   db: AppDb,
-  userId: string,
-  id: string
+  userId: UserId,
+  id: MemoId
 ): Promise<MemoRow | null> => {
   const rows = await db
     .select(memoColumns)
@@ -200,14 +202,17 @@ const findMemo = async (
 };
 
 const toRefs = (
-  rows: { id: string; title: string | null; body: string }[]
+  rows: { id: MemoId; title: string | null; body: string }[]
 ): MemoRef[] =>
-  rows.map((row) => ({ id: row.id, heading: headingOf(row.title, row.body) }));
+  rows.map((row) => ({
+    id: row.id,
+    heading: headingOf(row.title, row.body),
+  }));
 
 export const getMemoDetail = async (
   db: AppDb,
-  userId: string,
-  id: string
+  userId: UserId,
+  id: MemoId
 ): Promise<MemoDetail | null> => {
   const row = await findMemo(db, userId, id);
   if (row === null) {
@@ -249,7 +254,7 @@ export const getMemoDetail = async (
 
 export const listMemosForRace = async (
   db: AppDb,
-  userId: string,
+  userId: UserId,
   key: RaceKey
 ): Promise<MemoSummary[]> => {
   const rows = await db

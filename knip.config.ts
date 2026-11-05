@@ -28,6 +28,9 @@ const config: KnipConfig = {
     "apps/api": {
       vitest: { config: ["vitest.config.ts"] },
     },
+    "packages/domain": {
+      vitest: { config: ["vitest.config.ts"] },
+    },
     "apps/web": {
       // Storybook 専用の Vite 設定は main.ts からパス文字列で参照している
       entry: [".storybook/vite.config.ts", "src/**/*.stories.tsx"],

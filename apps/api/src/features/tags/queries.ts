@@ -1,17 +1,21 @@
 import type {
-  TagKind,
   TagSummary,
   TagWithCount,
 } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memos, memoTags, tags } from "@turf-notes/db/schema";
+import {
+  normalizeTagName,
+  tagDisplayName,
+  tagSchema,
+} from "@turf-notes/domain";
+import type { TagId, TagKind, UserId } from "@turf-notes/domain";
 import { and, count, eq, isNull } from "drizzle-orm";
-
-import { normalizeTagName } from "../../lib/text";
+import * as v from "valibot";
 
 export const listTags = async (
   db: AppDb,
-  userId: string
+  userId: UserId
 ): Promise<TagWithCount[]> => {
   const rows = await db
     .select({
@@ -43,11 +47,11 @@ export const listTags = async (
  */
 export const createTag = async (
   db: AppDb,
-  userId: string,
+  userId: UserId,
   name: string,
   kind: TagKind
 ): Promise<TagSummary> => {
-  const display = name.normalize("NFC").trim().replaceAll(/\s+/g, " ");
+  const display = tagDisplayName(name);
   const normalizedName = normalizeTagName(display);
 
   await db
@@ -68,13 +72,14 @@ export const createTag = async (
     throw new Error("tag insert failed");
   }
 
-  return { id: row.id, name: row.name, kind: row.kind };
+  // 書き込み境界。保存した名前が Tag の不変条件（表示形）を満たすことを確かめる。
+  return v.parse(tagSchema, { id: row.id, name: row.name, kind: row.kind });
 };
 
 export const removeTag = async (
   db: AppDb,
-  userId: string,
-  id: number
+  userId: UserId,
+  id: TagId
 ): Promise<boolean> => {
   const deleted = await db
     .delete(tags)

@@ -1,22 +1,17 @@
-import type { Race } from "@turf-notes/api-contract/schemas";
+import type { memos } from "@turf-notes/db/schema";
+import { raceOf } from "@turf-notes/domain";
+import type { Race } from "@turf-notes/domain";
 
-interface RaceColumns {
-  raceDate: string | null;
-  venue: string | null;
-  raceNumber: number | null;
-  raceName: string | null;
-}
+type RaceColumns = Pick<
+  typeof memos.$inferSelect,
+  "raceDate" | "raceName" | "raceNumber" | "venue"
+>;
 
-/** 3つ組がそろっているときだけレースとして扱う（ADR-0001）。 */
-export const toRace = (row: RaceColumns): Race | null => {
-  if (row.raceDate === null || row.venue === null || row.raceNumber === null) {
-    return null;
-  }
-
-  return {
+/** DB の列からレースを取り出す。3つ組の判定はドメイン（raceOf）が持つ（ADR-0001）。 */
+export const toRace = (row: RaceColumns): Race | null =>
+  raceOf({
     date: row.raceDate,
-    venue: row.venue,
-    number: row.raceNumber,
     name: row.raceName,
-  };
-};
+    number: row.raceNumber,
+    venue: row.venue,
+  });

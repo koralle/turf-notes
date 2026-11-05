@@ -22,6 +22,7 @@
     "@tanstack/react-router-ssr-query": "catalog:tanstack",
     "@tanstack/react-start": "catalog:tanstack",
     "@turf-notes/api-contract": "workspace:*",
+    "@turf-notes/domain": "workspace:*",
     "better-auth": "catalog:auth",
     "markdown-it": "catalog:ui",
     "react": "catalog:react",

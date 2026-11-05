@@ -1,3 +1,4 @@
+import type { MemoId, TagId, TagKind, UserId } from "@turf-notes/domain";
 import { sql } from "drizzle-orm";
 import {
   index,
@@ -114,18 +115,18 @@ export const authSchema = {
   verification: verifications,
 };
 
-/** タグの種類。馬・人（騎手／調教師）・主題の3種。 */
-export const tagKinds = ["horse", "person", "theme"] as const;
-export type TagKind = (typeof tagKinds)[number];
-
+// id 列はドメインの値オブジェクトで型付けする。$type は型注釈だけで実行時検証はしない。
+// 検証は書き込み時と oRPC の output 検証（既定で有効）で行う。
+// users / accounts / sessions / passkeys は Better Auth が読み書きするので素の string のまま。
 export const tags = sqliteTable(
   "tags",
   {
-    id: integer("id").primaryKey({ autoIncrement: true }),
+    id: integer("id").primaryKey({ autoIncrement: true }).$type<TagId>(),
     userId: text("user_id")
       .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    kind: text("kind", { enum: tagKinds }).notNull(),
+      .references(() => users.id, { onDelete: "cascade" })
+      .$type<UserId>(),
+    kind: text("kind").notNull().$type<TagKind>(),
     /** ユーザーが見て編集する書き形（名前の正本）。 */
     name: text("name").notNull(),
     /** `name` から常に導出される正規化形。一意性の判定に使う。 */
@@ -142,10 +143,11 @@ export const tags = sqliteTable(
  * 開催日・競馬場・レース番号の3つ組で同定する（ADR-0001）。
  */
 export const memos = sqliteTable("memos", {
-  id: text("id").primaryKey(),
+  id: text("id").primaryKey().$type<MemoId>(),
   userId: text("user_id")
     .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
+    .references(() => users.id, { onDelete: "cascade" })
+    .$type<UserId>(),
   /** 任意の表題。未入力なら本文の1行目を見出しに使う。 */
   title: text("title"),
   body: text("body").notNull(),
@@ -164,10 +166,12 @@ export const memoTags = sqliteTable(
   {
     memoId: text("memo_id")
       .notNull()
-      .references(() => memos.id, { onDelete: "cascade" }),
+      .references(() => memos.id, { onDelete: "cascade" })
+      .$type<MemoId>(),
     tagId: integer("tag_id")
       .notNull()
-      .references(() => tags.id, { onDelete: "cascade" }),
+      .references(() => tags.id, { onDelete: "cascade" })
+      .$type<TagId>(),
   },
   (table) => [uniqueIndex("memo_tags_memo_tag").on(table.memoId, table.tagId)]
 );
@@ -178,10 +182,12 @@ export const memoLinks = sqliteTable(
   {
     fromMemoId: text("from_memo_id")
       .notNull()
-      .references(() => memos.id, { onDelete: "cascade" }),
+      .references(() => memos.id, { onDelete: "cascade" })
+      .$type<MemoId>(),
     toMemoId: text("to_memo_id")
       .notNull()
-      .references(() => memos.id, { onDelete: "cascade" }),
+      .references(() => memos.id, { onDelete: "cascade" })
+      .$type<MemoId>(),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .notNull()
       .default(nowMs),

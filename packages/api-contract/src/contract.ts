@@ -1,10 +1,10 @@
 import { oc } from "@orpc/contract";
+import { memoIdSchema, tagIdSchema } from "@turf-notes/domain";
 import * as v from "valibot";
 
 import {
   authMethodsSchema,
   exportDataSchema,
-  idSchema,
   memoCreateInputSchema,
   memoDetailSchema,
   memoListInputSchema,
@@ -15,6 +15,7 @@ import {
   tagCreateInputSchema,
   tagSummarySchema,
   tagWithCountSchema,
+  userSchema,
 } from "./schemas";
 
 /** 認証済みの手続き。未認証は UNAUTHORIZED を返す。 */
@@ -31,24 +32,20 @@ const okSchema = v.object({ ok: v.literal(true) });
 export const contract = {
   health: oc.output(okSchema),
 
-  me: authed.output(
-    v.object({
-      id: v.string(),
-      name: v.string(),
-      email: v.string(),
-    })
-  ),
+  me: authed.output(userSchema),
 
   memos: {
     list: authed.input(memoListInputSchema).output(memoListOutputSchema),
-    detail: authed.input(v.object({ id: idSchema })).output(memoDetailSchema),
+    detail: authed
+      .input(v.object({ id: memoIdSchema }))
+      .output(memoDetailSchema),
     create: authed
       .input(memoCreateInputSchema)
-      .output(v.object({ id: idSchema })),
+      .output(v.object({ id: memoIdSchema })),
     update: authed
       .input(memoUpdateInputSchema)
-      .output(v.object({ id: idSchema })),
-    delete: authed.input(v.object({ id: idSchema })).output(okSchema),
+      .output(v.object({ id: memoIdSchema })),
+    delete: authed.input(v.object({ id: memoIdSchema })).output(okSchema),
     /** 同じ開催日・競馬場・レース番号のメモ（レースページ）。 */
     forRace: authed
       .input(raceKeySchema)
@@ -71,7 +68,7 @@ export const contract = {
   tags: {
     list: authed.output(v.array(tagWithCountSchema)),
     create: authed.input(tagCreateInputSchema).output(tagSummarySchema),
-    remove: authed.input(v.object({ id: v.number() })).output(okSchema),
+    remove: authed.input(v.object({ id: tagIdSchema })).output(okSchema),
   },
 } as const;
 

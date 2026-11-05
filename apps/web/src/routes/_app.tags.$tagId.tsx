@@ -1,22 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import type { TagKind } from "@turf-notes/api-contract/schemas";
 import { css } from "styled-system/css";
 
 import { EmptyState } from "../components/empty-state";
 import { MemoRow, memoListStyle } from "../components/memo-row";
 import { MobileHeader } from "../components/mobile-header";
+import { kindLabels } from "../lib/tag-kind";
 import { client } from "../rpc/client";
 
 export const Route = createFileRoute("/_app/tags/$tagId")({
   component: TagPage,
 });
-
-const KIND_LABEL: Record<TagKind, string> = {
-  horse: "馬",
-  person: "人",
-  theme: "主題",
-};
 
 const dotOf = {
   horse: css({ bg: "horse" }),
@@ -92,7 +86,7 @@ function TagPage() {
         {tag === undefined ? null : (
           <div className={kindLine}>
             <span className={`${kindDot} ${dotOf[tag.kind]}`} />
-            {KIND_LABEL[tag.kind]}
+            {kindLabels[tag.kind]}
           </div>
         )}
       </div>

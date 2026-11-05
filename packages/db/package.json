@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@libsql/client": "catalog:db",
+    "@turf-notes/domain": "workspace:*",
     "drizzle-orm": "catalog:db"
   },
   "devDependencies": {

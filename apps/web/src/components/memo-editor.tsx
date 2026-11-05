@@ -1,44 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import type {
-  MemoDetail,
-  MemoRef,
-  TagKind,
-} from "@turf-notes/api-contract/schemas";
+import type { MemoDetail, MemoRef } from "@turf-notes/api-contract/schemas";
+import { defaultTagKind, tagKinds, venues } from "@turf-notes/domain";
+import type { TagId, TagKind } from "@turf-notes/domain";
 import { useState } from "react";
 import { Button as RacButton } from "react-aria-components";
 import { css } from "styled-system/css";
 
+import { kindLabels } from "../lib/tag-kind";
 import { client } from "../rpc/client";
 import { MobileHeader } from "./mobile-header";
 import { TagChip } from "./tag-chip";
-
-const VENUES = [
-  "東京",
-  "中山",
-  "京都",
-  "阪神",
-  "中京",
-  "小倉",
-  "新潟",
-  "福島",
-  "函館",
-  "札幌",
-  "大井",
-  "川崎",
-  "船橋",
-  "浦和",
-  "名古屋",
-  "園田",
-  "門別",
-  "盛岡",
-] as const;
-
-const KIND_LABEL: Record<TagKind, string> = {
-  horse: "馬",
-  person: "人",
-  theme: "主題",
-};
 
 const root = css({
   display: "flex",
@@ -253,13 +225,13 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
     memo?.race?.number.toString() ?? ""
   );
   const [raceName, setRaceName] = useState(memo?.race?.name ?? "");
-  const [tagIds, setTagIds] = useState<number[]>(
+  const [tagIds, setTagIds] = useState<TagId[]>(
     memo?.tags.map((tag) => tag.id) ?? []
   );
   const [links, setLinks] = useState<MemoRef[]>(memo?.links ?? []);
 
   const [newTagName, setNewTagName] = useState("");
-  const [newTagKind, setNewTagKind] = useState<TagKind>("horse");
+  const [newTagKind, setNewTagKind] = useState<TagKind>(defaultTagKind);
   const [refQuery, setRefQuery] = useState("");
 
   const tags = useQuery({
@@ -284,18 +256,20 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
 
   const save = useMutation({
     mutationFn: async () => {
-      const hasRace = raceDate !== "" && venue !== "" && raceNumber !== "";
+      // 3つ組がそろっているかだけを見る。値の検証は契約（サーバー）に任せる。
+      const venueParam = venues.find((item) => item === venue);
       const payload = {
         body: text,
         linkIds: links.map((link) => link.id),
-        race: hasRace
-          ? {
-              date: raceDate,
-              number: Number(raceNumber),
-              venue,
-              ...(raceName.trim() === "" ? {} : { name: raceName.trim() }),
-            }
-          : null,
+        race:
+          raceDate === "" || venueParam === undefined || raceNumber === ""
+            ? null
+            : {
+                date: raceDate,
+                number: Number(raceNumber),
+                venue: venueParam,
+                ...(raceName.trim() === "" ? {} : { name: raceName.trim() }),
+              },
         tagIds,
         title: title.trim() === "" ? null : title.trim(),
       };
@@ -402,7 +376,7 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
                     value={venue}
                   >
                     <option value="">競馬場</option>
-                    {VENUES.map((item) => (
+                    {venues.map((item) => (
                       <option key={item} value={item}>
                         {item}
                       </option>
@@ -498,9 +472,9 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
                   }}
                   value={newTagKind}
                 >
-                  {(["horse", "person", "theme"] as const).map((kind) => (
+                  {tagKinds.map((kind) => (
                     <option key={kind} value={kind}>
-                      {KIND_LABEL[kind]}
+                      {kindLabels[kind]}
                     </option>
                   ))}
                 </select>

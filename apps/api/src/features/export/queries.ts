@@ -1,15 +1,13 @@
 import type { ExportData } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memoLinks, memos, memoTags, tags } from "@turf-notes/db/schema";
+import type { MemoId, TagId, User } from "@turf-notes/domain";
 import { and, asc, eq, isNull } from "drizzle-orm";
 
-import type { AuthenticatedUser } from "../../auth/session";
+import { toRace } from "../../lib/race";
 
 /** 全メモ・タグ・参照を1つの JSON にまとめる（要件 FR-S3）。 */
-export const exportAll = async (
-  db: AppDb,
-  user: AuthenticatedUser
-): Promise<ExportData> => {
+export const exportAll = async (db: AppDb, user: User): Promise<ExportData> => {
   const [tagRows, memoRows, memoTagRows, linkRows] = await Promise.all([
     db
       .select({ id: tags.id, kind: tags.kind, name: tags.name })
@@ -46,14 +44,14 @@ export const exportAll = async (
       .where(and(eq(memos.userId, user.id), isNull(memos.deletedAt))),
   ]);
 
-  const tagIdsOf = new Map<string, number[]>();
+  const tagIdsOf = new Map<MemoId, TagId[]>();
   for (const row of memoTagRows) {
     const list = tagIdsOf.get(row.memoId) ?? [];
     list.push(row.tagId);
     tagIdsOf.set(row.memoId, list);
   }
 
-  const linkIdsOf = new Map<string, string[]>();
+  const linkIdsOf = new Map<MemoId, MemoId[]>();
   for (const row of linkRows) {
     const list = linkIdsOf.get(row.fromMemoId) ?? [];
     list.push(row.toMemoId);
@@ -67,15 +65,7 @@ export const exportAll = async (
       createdAt: row.createdAt.getTime(),
       id: row.id,
       linkIds: linkIdsOf.get(row.id) ?? [],
-      race:
-        row.raceDate === null || row.venue === null || row.raceNumber === null
-          ? null
-          : {
-              date: row.raceDate,
-              name: row.raceName,
-              number: row.raceNumber,
-              venue: row.venue,
-            },
+      race: toRace(row),
       tagIds: tagIdsOf.get(row.id) ?? [],
       title: row.title,
       updatedAt: row.updatedAt.getTime(),

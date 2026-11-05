@@ -5,11 +5,10 @@ import type {
 } from "@turf-notes/api-contract/schemas";
 import type { AppDb } from "@turf-notes/db";
 import { memoLinks, memos, memoTags } from "@turf-notes/db/schema";
+import { memoId } from "@turf-notes/domain";
+import type { MemoId, UserId } from "@turf-notes/domain";
 import { and, eq } from "drizzle-orm";
 import { uuidv7 } from "uuidv7";
-
-const uniqueIds = (ids: readonly string[]): string[] =>
-  ids.filter((id, index) => ids.indexOf(id) === index);
 
 const raceColumns = (race: RaceInput | null | undefined) => ({
   raceDate: race?.date ?? null,
@@ -20,10 +19,13 @@ const raceColumns = (race: RaceInput | null | undefined) => ({
 
 export const createMemo = async (
   db: AppDb,
-  userId: string,
+  userId: UserId,
   input: MemoCreateInput
-): Promise<{ id: string }> => {
-  const id = uuidv7();
+): Promise<{ id: MemoId }> => {
+  const id = memoId(uuidv7());
+  // id はサーバーで採番するので、自分自身を参照する入力は作れない。
+  const tagIds = input.tagIds ?? [];
+  const linkIds = input.linkIds ?? [];
 
   await db.transaction(async (tx) => {
     await tx.insert(memos).values({
@@ -34,18 +36,16 @@ export const createMemo = async (
       ...raceColumns(input.race),
     });
 
-    if (input.tagIds !== undefined && input.tagIds.length > 0) {
+    if (tagIds.length > 0) {
       await tx
         .insert(memoTags)
-        .values(input.tagIds.map((tagId) => ({ memoId: id, tagId })));
+        .values(tagIds.map((tagId) => ({ memoId: id, tagId })));
     }
 
-    if (input.linkIds !== undefined && input.linkIds.length > 0) {
-      await tx.insert(memoLinks).values(
-        uniqueIds(input.linkIds)
-          .filter((toMemoId) => toMemoId !== id)
-          .map((toMemoId) => ({ fromMemoId: id, toMemoId }))
-      );
+    if (linkIds.length > 0) {
+      await tx
+        .insert(memoLinks)
+        .values(linkIds.map((toMemoId) => ({ fromMemoId: id, toMemoId })));
     }
   });
 
@@ -54,7 +54,7 @@ export const createMemo = async (
 
 export const updateMemo = async (
   db: AppDb,
-  userId: string,
+  userId: UserId,
   input: MemoUpdateInput
 ): Promise<boolean> =>
   await db.transaction(async (tx) => {
@@ -74,16 +74,15 @@ export const updateMemo = async (
     }
 
     await tx.delete(memoTags).where(eq(memoTags.memoId, input.id));
-    if (input.tagIds !== undefined && input.tagIds.length > 0) {
+    const tagIds = input.tagIds ?? [];
+    if (tagIds.length > 0) {
       await tx
         .insert(memoTags)
-        .values(input.tagIds.map((tagId) => ({ memoId: input.id, tagId })));
+        .values(tagIds.map((tagId) => ({ memoId: input.id, tagId })));
     }
 
     await tx.delete(memoLinks).where(eq(memoLinks.fromMemoId, input.id));
-    const linkIds = uniqueIds(input.linkIds ?? []).filter(
-      (toMemoId) => toMemoId !== input.id
-    );
+    const linkIds = input.linkIds ?? [];
     if (linkIds.length > 0) {
       await tx
         .insert(memoLinks)
@@ -98,8 +97,8 @@ export const updateMemo = async (
 /** 論理削除。関連するタグ紐付けと参照は残すが、読み出しでは除外する。 */
 export const softDeleteMemo = async (
   db: AppDb,
-  userId: string,
-  id: string
+  userId: UserId,
+  id: MemoId
 ): Promise<boolean> => {
   const deleted = await db
     .update(memos)

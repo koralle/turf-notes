@@ -1,16 +1,10 @@
+import { userId } from "@turf-notes/domain";
+import type { User } from "@turf-notes/domain";
+
 import type { Auth } from "./create-auth";
 
-/** 認証済みユーザー。contract の `me` の出力と同じ形。 */
-export interface AuthenticatedUser {
-  id: string;
-  name: string;
-  email: string;
-}
-
 /** リクエストヘッダーからサインイン済みユーザーを解決する port。 */
-export type Authenticator = (
-  headers: Headers
-) => Promise<AuthenticatedUser | null>;
+export type Authenticator = (headers: Headers) => Promise<User | null>;
 
 /** Better Auth の Cookie セッションを読む authenticator を作る。 */
 export const cookieSessionAuthenticator =
@@ -22,7 +16,7 @@ export const cookieSessionAuthenticator =
     }
 
     return {
-      id: session.user.id,
+      id: userId(session.user.id),
       name: session.user.name,
       email: session.user.email,
     };

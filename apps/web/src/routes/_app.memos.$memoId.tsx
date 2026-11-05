@@ -209,7 +209,7 @@ function MemoDetailPage() {
               to="/races/$date/$venue/$raceNumber"
             >
               {fullDate(item.race.date)} {item.race.venue} {item.race.number}R
-              {item.race.name === null ? "" : ` ${item.race.name}`}
+              {item.race.name === undefined ? "" : ` ${item.race.name}`}
             </Link>
           )}
           {item.tags.map((tag) => (

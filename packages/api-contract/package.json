@@ -4,14 +4,15 @@
   "type": "module",
   "exports": {
     ".": "./src/contract.ts",
-    "./schemas": "./src/schemas.ts"
+    "./schemas": "./src/schemas/index.ts"
   },
   "scripts": {
     "typecheck": "tsrs"
   },
   "dependencies": {
     "@orpc/contract": "catalog:rpc",
-    "valibot": "catalog:rpc"
+    "@turf-notes/domain": "workspace:*",
+    "valibot": "catalog:validation"
   },
   "devDependencies": {
     "@turf-notes/forge": "workspace:*",

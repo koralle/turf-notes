@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { canSetPasswordSignIn } from "@turf-notes/domain";
 import { useState } from "react";
 import { Button as RacButton } from "react-aria-components";
 import { css } from "styled-system/css";
@@ -397,7 +398,12 @@ function SettingsPage() {
           </div>
           <RacButton
             className={smallButton}
-            isDisabled={!hasPasskey || togglePassword.isPending}
+            isDisabled={
+              !canSetPasswordSignIn({
+                hasPasskey,
+                nextEnabled: !passwordEnabled,
+              }) || togglePassword.isPending
+            }
             onPress={() => {
               togglePassword.mutate(!passwordEnabled);
             }}

@@ -27,6 +27,9 @@ catalogs:
     "@cloudflare/vite-plugin": 1.52.1
     wrangler: 4.123.0
 
+  date:
+    "@internationalized/date": 3.12.4
+
   db:
     "@libsql/client": 0.17.4
     drizzle-kit: 1.0.0-rc.5-ab785fc
@@ -50,7 +53,6 @@ catalogs:
     "@orpc/contract": 1.15.0
     "@orpc/server": 1.15.0
     hono: 4.13.13
-    valibot: 1.4.2
 
   storybook:
     "@storybook/addon-docs": 10.6.2
@@ -77,6 +79,7 @@ catalogs:
     "@tsconfig/strictest": 2.0.8
     "@types/node": 25.9.5
     tsrs: 0.20.1-ts7.1.0-beta
+    type-fest: 5.10.0
 
   ui:
     "@fontsource/noto-sans-jp": 5.3.0
@@ -87,6 +90,9 @@ catalogs:
     markdown-it: 14.1.0
     postcss: 8.5.26
     react-aria-components: 1.20.0
+
+  validation:
+    valibot: 1.4.2
 
   vite:
     "@vitejs/plugin-react": 6.0.5

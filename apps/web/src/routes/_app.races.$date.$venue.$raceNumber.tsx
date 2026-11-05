@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { raceKey, raceKeyOf } from "@turf-notes/domain";
 import { css } from "styled-system/css";
 
 import { EmptyState } from "../components/empty-state";
@@ -24,16 +25,18 @@ const timeline = css({
 
 function RacePage() {
   const { date, venue, raceNumber } = Route.useParams();
-  const number = Number(raceNumber);
+  const race = raceKeyOf({ date, number: raceNumber, venue });
   const navigate = useNavigate();
 
   const memoList = useQuery({
-    queryFn: async () => await client.memos.forRace({ date, number, venue }),
-    queryKey: ["memos", "race", date, venue, number],
+    queryFn: async () =>
+      race === null ? { items: [] } : await client.memos.forRace(race),
+    queryKey: ["memos", "race", race === null ? null : raceKey(race)],
   });
 
   const items = memoList.data?.items ?? [];
-  const raceName = items.find((item) => item.race?.name !== null)?.race?.name;
+  const raceName = items.find((item) => item.race?.name !== undefined)?.race
+    ?.name;
 
   return (
     <>
@@ -61,7 +64,7 @@ function RacePage() {
             mt: "4px",
           })}
         >
-          {fullDate(date)} {venue} {number}R
+          {fullDate(date)} {venue} {raceNumber}R
         </h1>
         {raceName === undefined || raceName === null ? null : (
           <div
