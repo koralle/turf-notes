@@ -14,6 +14,10 @@
     "valibot": {
       "url": "https://valibot.dev/mcp",
       "protocolVersion": "auto"
+    },
+    "better-auth": {
+      "url": "https://mcp.better-auth.com/mcp",
+      "protocolVersion": "auth"
     }
   }
 }
