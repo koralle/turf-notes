@@ -19,93 +19,135 @@ skills:
 
 catalogs:
   auth:
-    "@better-auth/drizzle-adapter": 1.6.27
-    "@better-auth/passkey": 1.6.27
-    better-auth: 1.6.27
+    "@better-auth/drizzle-adapter": 1.7.18
+    "@better-auth/passkey": 1.7.18
+    better-auth: 1.7.18
 
   cloudflare:
-    "@cloudflare/vite-plugin": 1.52.1
-    wrangler: 4.123.0
+    "@cloudflare/vite-plugin": 1.67.0
+    wrangler: 4.158.0
 
   date:
     "@internationalized/date": 3.12.4
 
   db:
-    "@libsql/client": 0.17.4
-    drizzle-kit: 1.0.0-rc.5-ab785fc
-    drizzle-orm: 1.0.0-rc.5-169397b
+    "@libsql/client": 0.18.0
+    drizzle-kit: 1.0.0-rc.5
+    drizzle-orm: 1.0.0-rc.5
     uuidv7: 1.2.1
 
   lint:
-    oxfmt: 0.66.0
-    oxlint: 1.81.0
-    oxlint-tsgolint: 7.0.2001
-    ultracite: 7.11.0
+    oxfmt: 0.77.0
+    oxlint: 1.92.0
+    oxlint-tsgolint: 7.0.2006
+    ultracite: 8.1.1
 
   react:
     "@types/react": 19.3.0
     "@types/react-dom": 19.3.0
-    react: 19.3.0
-    react-dom: 19.3.0
+    react: 19.3.1
+    react-dom: 19.3.1
 
   rpc:
-    "@orpc/client": 1.15.0
-    "@orpc/contract": 1.15.0
-    "@orpc/server": 1.15.0
-    hono: 4.13.13
+    "@orpc/client": 1.16.2
+    "@orpc/contract": 1.16.2
+    "@orpc/server": 1.16.2
+    hono: 4.13.16
 
   storybook:
-    "@storybook/addon-docs": 10.6.2
-    "@storybook/builder-vite": 10.6.2
-    "@storybook/react-vite": 10.6.2
-    storybook: 10.6.2
+    "@storybook/addon-docs": 10.6.6
+    "@storybook/builder-vite": 10.6.6
+    "@storybook/react-vite": 10.6.6
+    storybook: 10.6.6
 
   tanstack:
-    "@tanstack/react-query": 5.101.4
+    "@tanstack/react-query": 5.106.1
     "@tanstack/react-router": 1.170.46
-    "@tanstack/react-router-ssr-query": 1.167.1
+    "@tanstack/react-router-ssr-query": 1.167.3
     "@tanstack/react-start": 1.169.4
 
   test:
-    vitest: 5.0.5
+    vitest: 5.1.0
 
   tooling:
     "@tanstack/intent": 0.5.6
-    knip: 6.32.2
-    lefthook: 2.1.10
-    tsx: 4.23.12
+    knip: 6.44.1
+    lefthook: 2.2.2
+    tsx: 4.23.15
 
   typescript:
     "@tsconfig/strictest": 2.0.8
-    "@types/node": 25.9.5
-    tsrs: 0.20.1-ts7.1.0-beta
+    "@types/node": 26.6.6
+    tsrs: 0.22.0-ts7.1.0-beta
     type-fest: 5.10.0
 
   ui:
-    "@fontsource/noto-sans-jp": 5.3.0
-    "@pandacss/dev": 2.4.0
-    "@pandacss/preset-base": 2.4.0
-    "@pandacss/preset-panda": 2.4.0
-    "@types/markdown-it": 14.1.2
-    markdown-it: 14.1.0
-    postcss: 8.5.26
-    react-aria-components: 1.20.0
+    "@fontsource/noto-sans-jp": 5.3.1
+    "@pandacss/dev": 2.5.0
+    "@pandacss/preset-base": 2.5.0
+    "@pandacss/preset-panda": 2.5.0
+    markdown-it: 15.0.3
+    postcss: 8.5.32
+    react-aria-components: 1.22.1
 
   validation:
-    valibot: 1.4.2
+    valibot: 1.5.0
 
   vite:
-    "@vitejs/plugin-react": 6.0.5
-    vite: 8.2.1
+    "@vitejs/plugin-react": 6.2.1
+    vite: 8.3.6
 
-# tsrs はリリース直後のため、pnpm の minimumReleaseAge の対象から明示的に除外する
+# リリース直後のパッケージは pnpm の minimumReleaseAge の対象から明示的に除外する
 # （CI の `pnpm install --frozen-lockfile` を supply-chain policy で失敗させないため）。
 minimumReleaseAgeExclude:
-  - "@tsrs/darwin-arm64@0.20.1-ts7.1.0-beta"
-  - "@tsrs/darwin-x64@0.20.1-ts7.1.0-beta"
-  - "@tsrs/linux-arm64-gnu@0.20.1-ts7.1.0-beta"
-  - "@tsrs/linux-arm64-musl@0.20.1-ts7.1.0-beta"
-  - "@tsrs/linux-x64-gnu@0.20.1-ts7.1.0-beta"
-  - "@tsrs/linux-x64-musl@0.20.1-ts7.1.0-beta"
-  - "@tsrs/win32-x64@0.20.1-ts7.1.0-beta"
-  - tsrs@0.20.1-ts7.1.0-beta
+  - "@orpc/client@1.16.2"
+  - "@orpc/contract@1.16.2"
+  - "@orpc/interop@1.16.2"
+  - "@orpc/server@1.16.2"
+  - "@orpc/shared@1.16.2"
+  - "@orpc/standard-server-aws-lambda@1.16.2"
+  - "@orpc/standard-server-fastify@1.16.2"
+  - "@orpc/standard-server-fetch@1.16.2"
+  - "@orpc/standard-server-node@1.16.2"
+  - "@orpc/standard-server-peer@1.16.2"
+  - "@orpc/standard-server@1.16.2"
+  - "@oxfmt/binding-android-arm-eabi@0.77.0"
+  - "@oxfmt/binding-android-arm64@0.77.0"
+  - "@oxfmt/binding-darwin-arm64@0.77.0"
+  - "@oxfmt/binding-darwin-x64@0.77.0"
+  - "@oxfmt/binding-freebsd-x64@0.77.0"
+  - "@oxfmt/binding-linux-arm-gnueabihf@0.77.0"
+  - "@oxfmt/binding-linux-arm-musleabihf@0.77.0"
+  - "@oxfmt/binding-linux-arm64-gnu@0.77.0"
+  - "@oxfmt/binding-linux-arm64-musl@0.77.0"
+  - "@oxfmt/binding-linux-ppc64-gnu@0.77.0"
+  - "@oxfmt/binding-linux-riscv64-gnu@0.77.0"
+  - "@oxfmt/binding-linux-riscv64-musl@0.77.0"
+  - "@oxfmt/binding-linux-s390x-gnu@0.77.0"
+  - "@oxfmt/binding-linux-x64-gnu@0.77.0"
+  - "@oxfmt/binding-linux-x64-musl@0.77.0"
+  - "@oxfmt/binding-openharmony-arm64@0.77.0"
+  - "@oxfmt/binding-win32-arm64-msvc@0.77.0"
+  - "@oxfmt/binding-win32-ia32-msvc@0.77.0"
+  - "@oxfmt/binding-win32-x64-msvc@0.77.0"
+  - "@oxlint/binding-android-arm-eabi@1.92.0"
+  - "@oxlint/binding-android-arm64@1.92.0"
+  - "@oxlint/binding-darwin-arm64@1.92.0"
+  - "@oxlint/binding-darwin-x64@1.92.0"
+  - "@oxlint/binding-freebsd-x64@1.92.0"
+  - "@oxlint/binding-linux-arm-gnueabihf@1.92.0"
+  - "@oxlint/binding-linux-arm-musleabihf@1.92.0"
+  - "@oxlint/binding-linux-arm64-gnu@1.92.0"
+  - "@oxlint/binding-linux-arm64-musl@1.92.0"
+  - "@oxlint/binding-linux-ppc64-gnu@1.92.0"
+  - "@oxlint/binding-linux-riscv64-gnu@1.92.0"
+  - "@oxlint/binding-linux-riscv64-musl@1.92.0"
+  - "@oxlint/binding-linux-s390x-gnu@1.92.0"
+  - "@oxlint/binding-linux-x64-gnu@1.92.0"
+  - "@oxlint/binding-linux-x64-musl@1.92.0"
+  - "@oxlint/binding-openharmony-arm64@1.92.0"
+  - "@oxlint/binding-win32-arm64-msvc@1.92.0"
+  - "@oxlint/binding-win32-ia32-msvc@1.92.0"
+  - "@oxlint/binding-win32-x64-msvc@1.92.0"
+  - oxfmt@0.77.0
+  - oxlint@1.92.0
