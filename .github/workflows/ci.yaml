@@ -65,17 +65,18 @@ jobs:
           BASE_REF: origin/${{ github.base_ref || 'main' }}
         run: bash .github/scripts/forbid-existing-migration-changes.sh
 
-  skills:
-    name: Skills match apm.lock.yaml
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      # .agents/skills は apm の生成物。手で直すとロックとずれるので CI で検出する。
-      - name: Install apm
-        run: brew install apm
-      - name: Check deployed skills against apm.lock.yaml
-        run: apm audit --ci
+  # TODO: 有効化する。CI ランナーでの apm の用意がまだ未確認。
+  # skills:
+  #   name: Skills match apm.lock.yaml
+  #   runs-on: ubuntu-24.04
+  #   timeout-minutes: 10
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     # .agents/skills は apm の生成物。手で直すとロックとずれるので CI で検出する。
+  #     - name: Install apm
+  #       run: brew install apm
+  #     - name: Check deployed skills against apm.lock.yaml
+  #       run: apm audit --ci
 
   build:
     name: Build
