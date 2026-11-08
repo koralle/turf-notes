@@ -16,4 +16,5 @@ React 19 の公式 API（`useTransition` / `useOptimistic` / `useActionState`）
 
 - mutation のエラーは `.error` から導出し、`useState` に写さない（表示の二重管理をしない）。Better Auth のように失敗を返り値で返す API は、`mutationFn` の中で例外に揃える。
 - `useOptimistic` の仮データは保存中だけ有効で、保存後にサーバーのデータで置き換わる。仮の id は保存が終わるまでリンク先を持たない。
+- 楽観行の仮データは契約（`memoSummarySchema`）を満たすことをテストで確認する（`apps/web/src/lib/pending-memo.test.ts`）。
 - 読み取りを loader に移して `@tanstack/react-query` を外す判断をしたとき、この分担は見直す。

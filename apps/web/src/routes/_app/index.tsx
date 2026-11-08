@@ -9,13 +9,14 @@ import type {
   MemoListOutput,
   MemoSummary,
 } from "@turf-notes/api-contract/schemas";
-import { excerptOf, headingOf, memoId } from "@turf-notes/domain";
 import { useOptimistic, useState, useTransition } from "react";
 import { css } from "styled-system/css";
 
 import { EmptyState } from "../../components/empty-state";
 import { CloseIcon, PlusIcon, SearchIcon } from "../../components/icons";
+import { InlineError } from "../../components/inline-error";
 import { MemoRow, memoListStyle } from "../../components/memo-row";
+import { pendingMemo } from "../../lib/pending-memo";
 import { client } from "../../rpc/client";
 
 export const Route = createFileRoute("/_app/")({
@@ -84,11 +85,10 @@ const saveButton = css({
   justifyContent: "center",
   px: "12px",
   py: { base: "0", md: "6px" },
+  _disabled: { cursor: "default", opacity: 0.5 },
 });
 
 const composerError = css({
-  color: "danger",
-  fontSize: "11.5px",
   mt: "6px",
   px: { base: "18px", md: "32px" },
 });
@@ -227,10 +227,10 @@ function HomePage() {
     },
   });
 
-  const items = [
-    ...pendingMemos,
-    ...(list.data?.pages ?? []).flatMap((page) => page.items),
-  ];
+  const realItems = (list.data?.pages ?? []).flatMap((page) => page.items);
+  // 検索中は、検索に合うか分からない行を先頭に出さない。
+  const pendingRows = query.trim() === "" ? pendingMemos : [];
+  const items = [...pendingRows, ...realItems];
 
   const submitDraft = () => {
     const body = draft.trim();
@@ -238,20 +238,11 @@ function HomePage() {
       return;
     }
     startSaving(async () => {
-      addPendingMemo({
-        createdAt: Date.now(),
-        excerpt: excerptOf(body),
-        heading: headingOf(null, body),
-        // 保存中だけ使う仮の id。保存が終わればサーバーの id に置き換わる。
-        id: memoId(crypto.randomUUID()),
-        linkCount: 0,
-        race: null,
-        tags: [],
-        title: null,
-      });
+      addPendingMemo(pendingMemo(body));
       try {
         await create.mutateAsync(body);
-        setDraft("");
+        // 保存中に入力された分は消さずに残す。
+        setDraft((current) => (current.trim() === body ? "" : current));
       } catch {
         // 保存できたときだけ下書きを消す。失敗は create.isError で表示する。
       }
@@ -271,7 +262,10 @@ function HomePage() {
     }
     return (
       <div className={memoListStyle}>
-        {items.map((memo) => (
+        {pendingRows.map((memo) => (
+          <MemoRow isPending key={memo.id} memo={memo} />
+        ))}
+        {realItems.map((memo) => (
           <MemoRow key={memo.id} memo={memo} />
         ))}
       </div>
@@ -316,13 +310,18 @@ function HomePage() {
           placeholder="思いついたことを書く…"
           value={draft}
         />
-        <button className={saveButton} onClick={submitDraft} type="button">
+        <button
+          className={saveButton}
+          disabled={isSaving}
+          onClick={submitDraft}
+          type="button"
+        >
           保存
         </button>
       </div>
 
       {create.isError ? (
-        <div className={composerError}>保存に失敗しました</div>
+        <InlineError className={composerError}>保存に失敗しました</InlineError>
       ) : null}
 
       <div className={toolbar}>

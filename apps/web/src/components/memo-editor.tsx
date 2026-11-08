@@ -9,6 +9,7 @@ import { css } from "styled-system/css";
 
 import { kindLabels } from "../lib/tag-kind";
 import { client, errorCode } from "../rpc/client";
+import { InlineError } from "./inline-error";
 import { MobileHeader } from "./mobile-header";
 import { TagChip } from "./tag-chip";
 
@@ -175,9 +176,7 @@ const primaryBtnFull = css({
   w: "100%",
 });
 
-const saveError = css({
-  color: "danger",
-  fontSize: "11.5px",
+const saveErrorSpacing = css({
   mb: "6px",
   textAlign: "center",
 });
@@ -315,11 +314,7 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
         >
           ← 戻る
         </button>
-        {save.isError ? (
-          <span className={css({ color: "danger", fontSize: "11.5px" })}>
-            {saveErrorMessage}
-          </span>
-        ) : null}
+        {save.isError ? <InlineError>{saveErrorMessage}</InlineError> : null}
         <RacButton
           className={primaryBtn}
           isDisabled={save.isPending || text.trim().length === 0}
@@ -587,7 +582,9 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
         style={{ paddingBottom: "calc(10px + env(safe-area-inset-bottom))" }}
       >
         {save.isError ? (
-          <div className={saveError}>{saveErrorMessage}</div>
+          <InlineError className={saveErrorSpacing}>
+            {saveErrorMessage}
+          </InlineError>
         ) : null}
         <RacButton
           className={primaryBtnFull}

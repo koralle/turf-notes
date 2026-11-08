@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { Button as RacButton } from "react-aria-components";
 import { css } from "styled-system/css";
 
+import { InlineError } from "../../components/inline-error";
 import { authClient } from "../../features/auth/auth-client";
 import { client, errorCode } from "../../rpc/client";
 
@@ -67,7 +68,7 @@ const row = css({
   py: "10px",
 });
 const muted = css({ color: "muted", fontSize: "12px" });
-const errorText = css({ color: "danger", fontSize: "11.5px", mt: "8px" });
+const errorSpacing = css({ mt: "8px" });
 const accountRow = css({
   alignItems: { base: "stretch", md: "center" },
   display: "flex",
@@ -117,6 +118,7 @@ function SettingsPage() {
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [isExporting, startExport] = useTransition();
+  const [exportFailed, setExportFailed] = useState(false);
 
   const me = useQuery({
     queryFn: async () => await client.me(),
@@ -149,6 +151,8 @@ function SettingsPage() {
     },
     onSuccess: async () => {
       setNewPasskeyName("");
+      // パスキーが増えると「パスキーが無い」を理由にしたエラーは成り立たなくなる。
+      togglePassword.reset();
       await refresh();
     },
   });
@@ -174,6 +178,7 @@ function SettingsPage() {
     mutationFn: async (enabled: boolean) =>
       await client.settings.setPasswordSignIn({ enabled }),
     onSuccess: async () => {
+      addPasskey.reset();
       await refresh();
     },
   });
@@ -189,6 +194,7 @@ function SettingsPage() {
 
   // サーバーの状態を変えないので mutation ではない。保留状態だけ React に任せる。
   const exportAll = () => {
+    setExportFailed(false);
     startExport(async () => {
       try {
         const data = await client.exportAll();
@@ -202,7 +208,7 @@ function SettingsPage() {
         anchor.click();
         URL.revokeObjectURL(url);
       } catch {
-        // 書き出せなかったことを伝える先が無いので、ボタンを押し直せる状態に戻すだけ。
+        setExportFailed(true);
       }
     });
   };
@@ -434,17 +440,24 @@ function SettingsPage() {
             エクスポート
           </RacButton>
         </div>
+        {exportFailed ? (
+          <InlineError className={errorSpacing}>
+            エクスポートに失敗しました
+          </InlineError>
+        ) : null}
       </div>
 
       {addPasskey.isError ? (
-        <div className={errorText}>パスキーを登録できませんでした</div>
+        <InlineError className={errorSpacing}>
+          パスキーを登録できませんでした
+        </InlineError>
       ) : null}
       {togglePassword.isError ? (
-        <div className={errorText}>
+        <InlineError className={errorSpacing}>
           {errorCode(togglePassword.error) === "no-passkey"
             ? "パスキーを1つ登録するまで、パスワードサインインは無効化できません"
             : "設定を保存できませんでした"}
-        </div>
+        </InlineError>
       ) : null}
     </div>
   );
