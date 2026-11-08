@@ -5,8 +5,8 @@ import { css } from "styled-system/css";
 
 import { Markdown } from "../components/markdown";
 import { MobileHeader } from "../components/mobile-header";
+import { RaceBadgeLink } from "../components/race-badge";
 import { TagChip } from "../components/tag-chip";
-import { fullDate } from "../lib/date";
 import { client } from "../rpc/client";
 
 export const Route = createFileRoute("/_app/memos/$memoId")({
@@ -189,29 +189,7 @@ function MemoDetailPage() {
         <h1 className={h1}>{item.heading}</h1>
 
         <div className={meta}>
-          {item.race === null ? null : (
-            <Link
-              className={css({
-                bg: "accentWeak",
-                borderRadius: "5px",
-                color: "accent",
-                fontSize: "11.5px",
-                fontWeight: 600,
-                px: "8px",
-                py: "3px",
-                textDecoration: "none",
-              })}
-              params={{
-                date: item.race.date,
-                raceNumber: String(item.race.number),
-                venue: item.race.venue,
-              }}
-              to="/races/$date/$venue/$raceNumber"
-            >
-              {fullDate(item.race.date)} {item.race.venue} {item.race.number}R
-              {item.race.name === undefined ? "" : ` ${item.race.name}`}
-            </Link>
-          )}
+          {item.race === null ? null : <RaceBadgeLink race={item.race} />}
           {item.tags.map((tag) => (
             <TagChip key={tag.id} tag={tag} />
           ))}

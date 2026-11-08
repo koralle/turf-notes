@@ -1,12 +1,12 @@
-const parts = (ms: number): Record<string, string> => {
-  const formatter = new Intl.DateTimeFormat("ja-JP", {
-    day: "2-digit",
-    month: "2-digit",
-    timeZone: "Asia/Tokyo",
-    weekday: "short",
-    year: "numeric",
-  });
+const formatter = new Intl.DateTimeFormat("ja-JP", {
+  day: "2-digit",
+  month: "2-digit",
+  timeZone: "Asia/Tokyo",
+  weekday: "short",
+  year: "numeric",
+});
 
+const parts = (ms: number): Record<string, string> => {
   const entries = formatter
     .formatToParts(new Date(ms))
     .filter((part) => part.type !== "literal")
@@ -26,12 +26,12 @@ export const dateStamp = (ms: number) => {
   };
 };
 
-/** 2026/11/02（日）形式。 */
+/** 2026年11月2日（日）形式。 */
 export const fullDate = (isoDate: string): string => {
   const ms = Date.parse(`${isoDate}T00:00:00+09:00`);
   if (Number.isNaN(ms)) {
     return isoDate;
   }
   const p = parts(ms);
-  return `${p["year"]}/${p["month"]}/${p["day"]}（${p["weekday"]}）`;
+  return `${p["year"]}年${Number(p["month"])}月${Number(p["day"])}日（${p["weekday"]}）`;
 };
