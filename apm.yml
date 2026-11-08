@@ -1,0 +1,25 @@
+name: turf-notes
+version: 1.0.0
+description: Agent skills for turf-notes
+# .agents/skills に配置する（pi / Claude / Codex などが読む場所）
+targets:
+  - agent-skills
+dependencies:
+  apm:
+    - git: vercel-labs/agent-skills#1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62
+      skills:
+        - composition-patterns
+        - react-best-practices
+        - react-view-transitions
+        - web-design-guidelines
+    - git: mattpocock/skills#4ae2317ddb22b046e26455e4f9c9b3aaaf62212d
+      skills:
+        - domain-modeling
+        - grilling
+        - grill-with-docs
+    - git: cloudflare/security-audit-skill#c1c8a8c1471069fb0e188eeaff69b8e8db6564a8
+      skills:
+        - security-audit
+    - git: open-circle/agent-skills#ea150d8fc3a856801256308b3a83ed79cb3ff3a4
+      skills:
+        - valibot

@@ -1,15 +1,12 @@
 ---
+name: vercel-react-view-transitions
 description: Guide for implementing smooth, native-feeling animations using React's View Transition API (`<ViewTransition>` component, `addTransitionType`, and CSS view transition pseudo-elements). Use this skill whenever the user wants to add page transitions, animate route changes, create shared element animations, animate enter/exit of components, animate list reorder, implement directional (forward/back) navigation animations, or integrate view transitions in Next.js. Also use when the user mentions view transitions, `startViewTransition`, `ViewTransition`, transition types, or asks about animating between UI states in React without third-party animation libraries.
 license: MIT
 metadata:
-    author: vercel
-    github-path: skills/react-view-transitions
-    github-ref: refs/tags/agent-skills-1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62
-    github-repo: https://github.com/vercel-labs/agent-skills
-    github-tree-sha: b490379f71eee822cf207605ce4fceaff6e10330
-    version: 1.0.0
-name: vercel-react-view-transitions
+  author: vercel
+  version: "1.0.0"
 ---
+
 # React View Transitions
 
 Animate between UI states using the browser's native `document.startViewTransition`. Declare *what* with `<ViewTransition>`, trigger *when* with `startTransition` / `useDeferredValue` / `Suspense`, control *how* with CSS classes. Unsupported browsers skip animations gracefully.

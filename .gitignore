@@ -48,3 +48,6 @@ storybook-static
 
 # ローカルの pnpm ストア（クローン内で install したとき等）
 .pnpm-store/
+
+# APM の取得キャッシュ（apm install が .agents/skills に配置する）
+apm_modules/

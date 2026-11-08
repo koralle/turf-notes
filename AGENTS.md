@@ -32,6 +32,10 @@ Use the repository’s installed Intent. If it is unavailable, report the missin
 - `packages/db` — Drizzle スキーマとマイグレーション。**適用済みのマイグレーションは手で編集しない** （変更は CI の `migrations` ジョブが落とす。スキーマ変更は新しいマイグレーションを足す）
 - `packages/forge` — tsconfig / oxlint / oxfmt の共通設定。全パッケージに効かせたい lint 設定はここ
 
+## スキル
+
+`.agents/skills/` は APM が `apm.yml` から配置する生成物。手で編集しない。スキルの追加・削除は `apm.yml` を直して `apm install`、更新は `apm update`。npm パッケージ同梱のスキルは Intent が読む（`package.json` の `intent.skills`）。
+
 ## コマンド
 
 | コマンド                  | 説明                                          |
