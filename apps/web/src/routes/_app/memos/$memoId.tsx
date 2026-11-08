@@ -3,11 +3,11 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { css } from "styled-system/css";
 
-import { Markdown } from "../components/markdown";
-import { MobileHeader } from "../components/mobile-header";
-import { RaceBadgeLink } from "../components/race-badge";
-import { TagChip } from "../components/tag-chip";
-import { client } from "../rpc/client";
+import { Markdown } from "../../../components/markdown";
+import { MobileHeader } from "../../../components/mobile-header";
+import { RaceBadgeLink } from "../../../components/race-badge";
+import { TagChip } from "../../../components/tag-chip";
+import { client } from "../../../rpc/client";
 
 export const Route = createFileRoute("/_app/memos/$memoId")({
   component: MemoDetailPage,
