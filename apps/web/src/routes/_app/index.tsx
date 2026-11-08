@@ -222,6 +222,8 @@ function HomePage() {
   const create = useMutation({
     mutationFn: async (body: string) => await client.memos.create({ body }),
     // 再取得まで待って楽観的な行を本物に差し替える（待たずに捨てると一瞬行が消える）。
+    // shortcut: その間、同じ行が 1 コミットだけ二重になりうる（実測 10ms 未満）。
+    // 目に見えるようなら保存後に仮行を実 id で差し替える方式にする。
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["memos"] });
     },
