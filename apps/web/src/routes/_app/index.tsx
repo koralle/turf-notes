@@ -11,10 +11,10 @@ import type {
 import { useState } from "react";
 import { css } from "styled-system/css";
 
-import { EmptyState } from "../components/empty-state";
-import { CloseIcon, PlusIcon, SearchIcon } from "../components/icons";
-import { MemoRow, memoListStyle } from "../components/memo-row";
-import { client } from "../rpc/client";
+import { EmptyState } from "../../components/empty-state";
+import { CloseIcon, PlusIcon, SearchIcon } from "../../components/icons";
+import { MemoRow, memoListStyle } from "../../components/memo-row";
+import { client } from "../../rpc/client";
 
 export const Route = createFileRoute("/_app/")({
   component: HomePage,

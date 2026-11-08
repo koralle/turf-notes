@@ -3,11 +3,11 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { raceKey, raceKeyOf } from "@turf-notes/domain";
 import { css } from "styled-system/css";
 
-import { EmptyState } from "../components/empty-state";
-import { MemoRow, memoListStyle } from "../components/memo-row";
-import { MobileHeader } from "../components/mobile-header";
-import { fullDate } from "../lib/date";
-import { client } from "../rpc/client";
+import { EmptyState } from "../../../../../components/empty-state";
+import { MemoRow, memoListStyle } from "../../../../../components/memo-row";
+import { MobileHeader } from "../../../../../components/mobile-header";
+import { fullDate } from "../../../../../lib/date";
+import { client } from "../../../../../rpc/client";
 
 export const Route = createFileRoute("/_app/races/$date/$venue/$raceNumber")({
   component: RacePage,

@@ -2,11 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { css } from "styled-system/css";
 
-import { EmptyState } from "../components/empty-state";
-import { MemoRow, memoListStyle } from "../components/memo-row";
-import { MobileHeader } from "../components/mobile-header";
-import { kindLabels } from "../lib/tag-kind";
-import { client } from "../rpc/client";
+import { EmptyState } from "../../../components/empty-state";
+import { MemoRow, memoListStyle } from "../../../components/memo-row";
+import { MobileHeader } from "../../../components/mobile-header";
+import { kindLabels } from "../../../lib/tag-kind";
+import { client } from "../../../rpc/client";
 
 export const Route = createFileRoute("/_app/tags/$tagId")({
   component: TagPage,

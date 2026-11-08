@@ -5,8 +5,8 @@ import { useState } from "react";
 import { Button as RacButton } from "react-aria-components";
 import { css } from "styled-system/css";
 
-import { authClient } from "../features/auth/auth-client";
-import { client, errorCode } from "../rpc/client";
+import { authClient } from "../../features/auth/auth-client";
+import { client, errorCode } from "../../rpc/client";
 
 export const Route = createFileRoute("/_app/settings")({
   component: SettingsPage,

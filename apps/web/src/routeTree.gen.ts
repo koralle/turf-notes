@@ -9,18 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AppRouteImport } from './routes/_app'
+import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as SignInRouteImport } from './routes/sign-in'
-import { Route as AppIndexRouteImport } from './routes/_app.index'
-import { Route as AppSettingsRouteImport } from './routes/_app.settings'
-import { Route as AppMemosMemoIdRouteImport } from './routes/_app.memos.$memoId'
-import { Route as AppMemosNewRouteImport } from './routes/_app.memos.new'
-import { Route as AppTagsIndexRouteImport } from './routes/_app.tags.index'
-import { Route as AppTagsTagIdRouteImport } from './routes/_app.tags.$tagId'
-import { Route as AppMemosMemoIdEditRouteImport } from './routes/_app.memos.$memoId_.edit'
-import { Route as AppRacesDateVenueRaceNumberRouteImport } from './routes/_app.races.$date.$venue.$raceNumber'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppSettingsRouteImport } from './routes/_app/settings'
+import { Route as AppMemosMemoIdRouteImport } from './routes/_app/memos/$memoId'
+import { Route as AppMemosNewRouteImport } from './routes/_app/memos/new'
+import { Route as AppTagsIndexRouteImport } from './routes/_app/tags/index'
+import { Route as AppTagsTagIdRouteImport } from './routes/_app/tags/$tagId'
+import { Route as AppMemosMemoIdEditRouteImport } from './routes/_app/memos/$memoId_/edit'
+import { Route as AppRacesDateVenueRaceNumberRouteImport } from './routes/_app/races/$date/$venue/$raceNumber'
 
-const AppRoute = AppRouteImport.update({
+const AppRouteRoute = AppRouteRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
@@ -32,43 +32,43 @@ const SignInRoute = SignInRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AppRouteRoute,
 } as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AppRouteRoute,
 } as any)
 const AppMemosMemoIdRoute = AppMemosMemoIdRouteImport.update({
   id: '/memos/$memoId',
   path: '/memos/$memoId',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AppRouteRoute,
 } as any)
 const AppMemosNewRoute = AppMemosNewRouteImport.update({
   id: '/memos/new',
   path: '/memos/new',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AppRouteRoute,
 } as any)
 const AppTagsIndexRoute = AppTagsIndexRouteImport.update({
   id: '/tags/',
   path: '/tags/',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AppRouteRoute,
 } as any)
 const AppTagsTagIdRoute = AppTagsTagIdRouteImport.update({
   id: '/tags/$tagId',
   path: '/tags/$tagId',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AppRouteRoute,
 } as any)
 const AppMemosMemoIdEditRoute = AppMemosMemoIdEditRouteImport.update({
   id: '/memos/$memoId_/edit',
   path: '/memos/$memoId/edit',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AppRouteRoute,
 } as any)
 const AppRacesDateVenueRaceNumberRoute =
   AppRacesDateVenueRaceNumberRouteImport.update({
     id: '/races/$date/$venue/$raceNumber',
     path: '/races/$date/$venue/$raceNumber',
-    getParentRoute: () => AppRoute,
+    getParentRoute: () => AppRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -95,7 +95,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/_app': typeof AppRouteWithChildren
+  '/_app': typeof AppRouteRouteWithChildren
   '/sign-in': typeof SignInRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/': typeof AppIndexRoute
@@ -144,7 +144,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  AppRoute: typeof AppRouteWithChildren
+  AppRouteRoute: typeof AppRouteRouteWithChildren
   SignInRoute: typeof SignInRoute
 }
 
@@ -154,7 +154,7 @@ declare module '@tanstack/react-router' {
       id: '/_app'
       path: ''
       fullPath: '/'
-      preLoaderRoute: typeof AppRouteImport
+      preLoaderRoute: typeof AppRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sign-in': {
@@ -169,61 +169,61 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppRouteRoute
     }
     '/_app/settings': {
       id: '/_app/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AppSettingsRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppRouteRoute
     }
     '/_app/memos/$memoId': {
       id: '/_app/memos/$memoId'
       path: '/memos/$memoId'
       fullPath: '/memos/$memoId'
       preLoaderRoute: typeof AppMemosMemoIdRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppRouteRoute
     }
     '/_app/memos/new': {
       id: '/_app/memos/new'
       path: '/memos/new'
       fullPath: '/memos/new'
       preLoaderRoute: typeof AppMemosNewRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppRouteRoute
     }
     '/_app/tags/': {
       id: '/_app/tags/'
       path: '/tags'
       fullPath: '/tags/'
       preLoaderRoute: typeof AppTagsIndexRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppRouteRoute
     }
     '/_app/tags/$tagId': {
       id: '/_app/tags/$tagId'
       path: '/tags/$tagId'
       fullPath: '/tags/$tagId'
       preLoaderRoute: typeof AppTagsTagIdRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppRouteRoute
     }
     '/_app/memos/$memoId_/edit': {
       id: '/_app/memos/$memoId_/edit'
       path: '/memos/$memoId/edit'
       fullPath: '/memos/$memoId/edit'
       preLoaderRoute: typeof AppMemosMemoIdEditRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppRouteRoute
     }
     '/_app/races/$date/$venue/$raceNumber': {
       id: '/_app/races/$date/$venue/$raceNumber'
       path: '/races/$date/$venue/$raceNumber'
       fullPath: '/races/$date/$venue/$raceNumber'
       preLoaderRoute: typeof AppRacesDateVenueRaceNumberRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppRouteRoute
     }
   }
 }
 
-interface AppRouteChildren {
+interface AppRouteRouteChildren {
   AppSettingsRoute: typeof AppSettingsRoute
   AppIndexRoute: typeof AppIndexRoute
   AppMemosMemoIdRoute: typeof AppMemosMemoIdRoute
@@ -234,7 +234,7 @@ interface AppRouteChildren {
   AppRacesDateVenueRaceNumberRoute: typeof AppRacesDateVenueRaceNumberRoute
 }
 
-const AppRouteChildren: AppRouteChildren = {
+const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppSettingsRoute: AppSettingsRoute,
   AppIndexRoute: AppIndexRoute,
   AppMemosMemoIdRoute: AppMemosMemoIdRoute,
@@ -245,10 +245,12 @@ const AppRouteChildren: AppRouteChildren = {
   AppRacesDateVenueRaceNumberRoute: AppRacesDateVenueRaceNumberRoute,
 }
 
-const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
+  AppRouteRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
-  AppRoute: AppRouteWithChildren,
+  AppRouteRoute: AppRouteRouteWithChildren,
   SignInRoute: SignInRoute,
 }
 export const routeTree = rootRouteImport
