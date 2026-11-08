@@ -73,12 +73,19 @@ const refStyle = css({
   fontSize: { base: "10.5px", md: "11px" },
 });
 
-export const MemoRow = ({ memo }: { memo: MemoSummary }) => {
+export const MemoRow = ({
+  memo,
+  isPending = false,
+}: {
+  memo: MemoSummary;
+  /** 保存中で、まだリンク先のメモが無い。 */
+  isPending?: boolean;
+}) => {
   const stamp = dateStamp(memo.createdAt);
   const hasTagRow = memo.tags.length > 0 || memo.linkCount > 0;
 
-  return (
-    <Link className={row} params={{ memoId: memo.id }} to="/memos/$memoId">
+  const content = (
+    <>
       <div className={dateCol}>
         <span className={yearStyle}>{stamp.year}</span>
         <span className={dayStyle}>
@@ -104,6 +111,14 @@ export const MemoRow = ({ memo }: { memo: MemoSummary }) => {
           </div>
         )}
       </div>
+    </>
+  );
+
+  return isPending ? (
+    <div className={row}>{content}</div>
+  ) : (
+    <Link className={row} params={{ memoId: memo.id }} to="/memos/$memoId">
+      {content}
     </Link>
   );
 };

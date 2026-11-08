@@ -7,13 +7,16 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import type {
   MemoListInput,
   MemoListOutput,
+  MemoSummary,
 } from "@turf-notes/api-contract/schemas";
-import { useState } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import { css } from "styled-system/css";
 
 import { EmptyState } from "../../components/empty-state";
 import { CloseIcon, PlusIcon, SearchIcon } from "../../components/icons";
+import { InlineError } from "../../components/inline-error";
 import { MemoRow, memoListStyle } from "../../components/memo-row";
+import { pendingMemo } from "../../lib/pending-memo";
 import { client } from "../../rpc/client";
 
 export const Route = createFileRoute("/_app/")({
@@ -82,6 +85,12 @@ const saveButton = css({
   justifyContent: "center",
   px: "12px",
   py: { base: "0", md: "6px" },
+  _disabled: { cursor: "default", opacity: 0.5 },
+});
+
+const composerError = css({
+  mt: "6px",
+  px: { base: "18px", md: "32px" },
 });
 
 const toolbar = css({
@@ -187,6 +196,12 @@ function HomePage() {
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState("");
   const [query, setQuery] = useState("");
+  const [isSaving, startSaving] = useTransition();
+  // 保存中のメモは一覧の先頭に出す。保存が終わると本物の一覧に置き換わる。
+  const [pendingMemos, addPendingMemo] = useOptimistic(
+    [] as readonly MemoSummary[],
+    (pending: readonly MemoSummary[], next: MemoSummary) => [next, ...pending]
+  );
 
   const list = useInfiniteQuery({
     getNextPageParam: (last: MemoListOutput) => last.nextCursor ?? undefined,
@@ -205,19 +220,35 @@ function HomePage() {
   });
 
   const create = useMutation({
-    mutationFn: async () => await client.memos.create({ body: draft.trim() }),
+    mutationFn: async (body: string) => await client.memos.create({ body }),
+    // 再取得まで待って楽観的な行を本物に差し替える（待たずに捨てると一瞬行が消える）。
+    // shortcut: その間、同じ行が 1 コミットだけ二重になりうる（実測 10ms 未満）。
+    // 目に見えるようなら保存後に仮行を実 id で差し替える方式にする。
     onSuccess: async () => {
-      setDraft("");
       await queryClient.invalidateQueries({ queryKey: ["memos"] });
     },
   });
 
-  const items = (list.data?.pages ?? []).flatMap((page) => page.items);
+  const realItems = (list.data?.pages ?? []).flatMap((page) => page.items);
+  // 検索中は、検索に合うか分からない行を先頭に出さない。
+  const pendingRows = query.trim() === "" ? pendingMemos : [];
+  const items = [...pendingRows, ...realItems];
 
   const submitDraft = () => {
-    if (draft.trim() !== "" && !create.isPending) {
-      create.mutate();
+    const body = draft.trim();
+    if (body === "" || isSaving) {
+      return;
     }
+    startSaving(async () => {
+      addPendingMemo(pendingMemo(body));
+      try {
+        await create.mutateAsync(body);
+        // 保存中に入力された分は消さずに残す。
+        setDraft((current) => (current.trim() === body ? "" : current));
+      } catch {
+        // 保存できたときだけ下書きを消す。失敗は create.isError で表示する。
+      }
+    });
   };
 
   const renderList = () => {
@@ -233,7 +264,10 @@ function HomePage() {
     }
     return (
       <div className={memoListStyle}>
-        {items.map((memo) => (
+        {pendingRows.map((memo) => (
+          <MemoRow isPending key={memo.id} memo={memo} />
+        ))}
+        {realItems.map((memo) => (
           <MemoRow key={memo.id} memo={memo} />
         ))}
       </div>
@@ -278,10 +312,19 @@ function HomePage() {
           placeholder="思いついたことを書く…"
           value={draft}
         />
-        <button className={saveButton} onClick={submitDraft} type="button">
+        <button
+          className={saveButton}
+          disabled={isSaving}
+          onClick={submitDraft}
+          type="button"
+        >
           保存
         </button>
       </div>
+
+      {create.isError ? (
+        <InlineError className={composerError}>保存に失敗しました</InlineError>
+      ) : null}
 
       <div className={toolbar}>
         <div className={searchWrap}>

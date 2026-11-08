@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { canSetPasswordSignIn } from "@turf-notes/domain";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Button as RacButton } from "react-aria-components";
 import { css } from "styled-system/css";
 
+import { InlineError } from "../../components/inline-error";
 import { authClient } from "../../features/auth/auth-client";
 import { client, errorCode } from "../../rpc/client";
 
@@ -67,7 +68,7 @@ const row = css({
   py: "10px",
 });
 const muted = css({ color: "muted", fontSize: "12px" });
-const errorText = css({ color: "danger", fontSize: "11.5px", mt: "8px" });
+const errorSpacing = css({ mt: "8px" });
 const accountRow = css({
   alignItems: { base: "stretch", md: "center" },
   display: "flex",
@@ -116,7 +117,8 @@ function SettingsPage() {
   const [newPasskeyName, setNewPasskeyName] = useState("");
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [isExporting, startExport] = useTransition();
+  const [exportFailed, setExportFailed] = useState(false);
 
   const me = useQuery({
     queryFn: async () => await client.me(),
@@ -137,17 +139,20 @@ function SettingsPage() {
   };
 
   const addPasskey = useMutation({
-    mutationFn: async () =>
-      await authClient.passkey.addPasskey(
+    mutationFn: async () => {
+      const result = await authClient.passkey.addPasskey(
         newPasskeyName.trim() === "" ? {} : { name: newPasskeyName.trim() }
-      ),
-    onSuccess: async (result) => {
+      );
+      // Better Auth は失敗を返り値で返すので、他の mutation と同じく例外に揃える。
       if (result.error !== null && result.error !== undefined) {
-        setError("パスキーを登録できませんでした");
-        return;
+        throw new Error("passkey-add-failed");
       }
+      return result;
+    },
+    onSuccess: async () => {
       setNewPasskeyName("");
-      setError(null);
+      // パスキーが増えると「パスキーが無い」を理由にしたエラーは成り立たなくなる。
+      togglePassword.reset();
       await refresh();
     },
   });
@@ -172,15 +177,8 @@ function SettingsPage() {
   const togglePassword = useMutation({
     mutationFn: async (enabled: boolean) =>
       await client.settings.setPasswordSignIn({ enabled }),
-    onError: (mutationError: unknown) => {
-      setError(
-        errorCode(mutationError) === "no-passkey"
-          ? "パスキーを1つ登録するまで、パスワードサインインは無効化できません"
-          : "設定を保存できませんでした"
-      );
-    },
     onSuccess: async () => {
-      setError(null);
+      addPasskey.reset();
       await refresh();
     },
   });
@@ -194,20 +192,26 @@ function SettingsPage() {
     },
   });
 
-  const exportAll = useMutation({
-    mutationFn: async () => await client.exportAll(),
-    onSuccess: (data) => {
-      const blob = new Blob([JSON.stringify(data, null, 2)], {
-        type: "application/json",
-      });
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.download = `turf-notes-${new Date().toISOString().slice(0, 10)}.json`;
-      anchor.href = url;
-      anchor.click();
-      URL.revokeObjectURL(url);
-    },
-  });
+  // サーバーの状態を変えないので mutation ではない。保留状態だけ React に任せる。
+  const exportAll = () => {
+    setExportFailed(false);
+    startExport(async () => {
+      try {
+        const data = await client.exportAll();
+        const blob = new Blob([JSON.stringify(data, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.download = `turf-notes-${new Date().toISOString().slice(0, 10)}.json`;
+        anchor.href = url;
+        anchor.click();
+        URL.revokeObjectURL(url);
+      } catch {
+        setExportFailed(true);
+      }
+    });
+  };
 
   const passkeyList = passkeys.data?.data ?? [];
   const hasPasskey = passkeyList.length > 0;
@@ -430,17 +434,31 @@ function SettingsPage() {
           </div>
           <RacButton
             className={smallButton}
-            isDisabled={exportAll.isPending}
-            onPress={() => {
-              exportAll.mutate();
-            }}
+            isDisabled={isExporting}
+            onPress={exportAll}
           >
             エクスポート
           </RacButton>
         </div>
+        {exportFailed ? (
+          <InlineError className={errorSpacing}>
+            エクスポートに失敗しました
+          </InlineError>
+        ) : null}
       </div>
 
-      {error === null ? null : <div className={errorText}>{error}</div>}
+      {addPasskey.isError ? (
+        <InlineError className={errorSpacing}>
+          パスキーを登録できませんでした
+        </InlineError>
+      ) : null}
+      {togglePassword.isError ? (
+        <InlineError className={errorSpacing}>
+          {errorCode(togglePassword.error) === "no-passkey"
+            ? "パスキーを1つ登録するまで、パスワードサインインは無効化できません"
+            : "設定を保存できませんでした"}
+        </InlineError>
+      ) : null}
     </div>
   );
 }
