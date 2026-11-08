@@ -65,18 +65,21 @@ jobs:
           BASE_REF: origin/${{ github.base_ref || 'main' }}
         run: bash .github/scripts/forbid-existing-migration-changes.sh
 
-  # TODO: 有効化する。CI ランナーでの apm の用意がまだ未確認。
-  # skills:
-  #   name: Skills match apm.lock.yaml
-  #   runs-on: ubuntu-24.04
-  #   timeout-minutes: 10
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     # .agents/skills は apm の生成物。手で直すとロックとずれるので CI で検出する。
-  #     - name: Install apm
-  #       run: brew install apm
-  #     - name: Check deployed skills against apm.lock.yaml
-  #       run: apm audit --ci
+  skills:
+    name: Skills match apm.lock.yaml
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # .agents/skills は apm の生成物。手で直すとロックとずれるので CI で検出する。
+      # brew を挟まず、mise の `github:microsoft/apm` から apm を入れる。
+      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+        with:
+          mise_toml: |
+            [tools]
+            apm = "0.35.0"
+      - name: Check deployed skills against apm.lock.yaml
+        run: apm audit --ci
 
   build:
     name: Build
