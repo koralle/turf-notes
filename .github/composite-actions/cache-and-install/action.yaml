@@ -4,16 +4,11 @@ description: pnpm と Node を用意し、ロックファイルどおりに依�
 runs:
   using: composite
   steps:
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v4
-
-    - name: Setup Node
-      uses: actions/setup-node@v4
+    # devEngines.runtime は `>=24.0.0` なので、CI で使う Node を 24 に固定する。
+    # `--frozen-lockfile` と `--no-runtime` は require-lockfile / runtime の指定から付く。
+    - name: Setup pnpm and Node
+      uses: pnpm/setup@fa36a5ef7dcdefc3a7cb25655c122e00cf6e636e # v3.1.2
       with:
-        node-version: "24"
-        cache: pnpm
-
-    - name: Install dependencies
-      shell: bash
-      # `--no-runtime` で devEngines の Node ダウンロードを止める（CI の Node を使う）。
-      run: pnpm install --frozen-lockfile --no-runtime
+        runtime: node@24
+        cache: true
+        require-lockfile: true
