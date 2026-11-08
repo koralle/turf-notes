@@ -3,6 +3,7 @@ import type { MemoSummary } from "@turf-notes/api-contract/schemas";
 import { css } from "styled-system/css";
 
 import { dateStamp } from "../lib/date";
+import { RaceBadge } from "./race-badge";
 import { TagChip } from "./tag-chip";
 
 export const memoListStyle = css({ display: "flex", flexDirection: "column" });
@@ -54,22 +55,17 @@ const titleStyle = css({
 });
 
 const metaStyle = css({
+  display: "flex",
+  flexDirection: "column",
+  gap: { base: "4px", md: "6px" },
+  mt: { base: "3px", md: "7px" },
+});
+
+const tagRow = css({
   alignItems: "center",
   display: "flex",
   flexWrap: "wrap",
   gap: { base: "5px", md: "6px" },
-  mt: { base: "3px", md: "7px" },
-});
-
-const raceBadge = css({
-  bg: "accentWeak",
-  borderRadius: "4px",
-  color: "accent",
-  fontSize: "11px",
-  fontVariantNumeric: "tabular-nums",
-  fontWeight: 600,
-  px: "7px",
-  py: "2px",
 });
 
 const refStyle = css({
@@ -79,6 +75,7 @@ const refStyle = css({
 
 export const MemoRow = ({ memo }: { memo: MemoSummary }) => {
   const stamp = dateStamp(memo.createdAt);
+  const hasTagRow = memo.tags.length > 0 || memo.linkCount > 0;
 
   return (
     <Link className={row} params={{ memoId: memo.id }} to="/memos/$memoId">
@@ -91,19 +88,21 @@ export const MemoRow = ({ memo }: { memo: MemoSummary }) => {
       </div>
       <div className={css({ flex: 1, minWidth: 0 })}>
         <div className={`${titleStyle} memo-heading`}>{memo.heading}</div>
-        <div className={metaStyle}>
-          {memo.race === null ? null : (
-            <span className={raceBadge}>
-              {memo.race.venue} {memo.race.number}R
-            </span>
-          )}
-          {memo.tags.map((tag) => (
-            <TagChip key={tag.id} tag={tag} />
-          ))}
-          {memo.linkCount > 0 ? (
-            <span className={refStyle}>参照 {memo.linkCount}</span>
-          ) : null}
-        </div>
+        {memo.race === null && !hasTagRow ? null : (
+          <div className={metaStyle}>
+            {memo.race === null ? null : <RaceBadge race={memo.race} />}
+            {hasTagRow ? (
+              <div className={tagRow}>
+                {memo.tags.map((tag) => (
+                  <TagChip key={tag.id} tag={tag} />
+                ))}
+                {memo.linkCount > 0 ? (
+                  <span className={refStyle}>参照 {memo.linkCount}</span>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        )}
       </div>
     </Link>
   );

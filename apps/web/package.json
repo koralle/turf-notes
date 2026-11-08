@@ -10,6 +10,7 @@
     "panda:codegen": "panda codegen",
     "preview": "vite preview",
     "storybook": "panda codegen && storybook dev -p 6006",
+    "test": "vitest run",
     "typecheck": "panda codegen && tsrs"
   },
   "dependencies": {
@@ -46,6 +47,7 @@
     "storybook": "catalog:storybook",
     "tsrs": "catalog:typescript",
     "vite": "catalog:vite",
+    "vitest": "catalog:test",
     "wrangler": "catalog:cloudflare"
   }
 }
