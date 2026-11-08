@@ -7,6 +7,8 @@ import { defineConfig } from "@pandacss/dev";
 export default defineConfig({
   // v2 は preset を自動で追加しない。v1 の既定（base + panda）を明示する。
   presets: ["@pandacss/preset-base", "@pandacss/preset-panda"],
+  // リセットは `src/index.css` で読み込む kiso.css。ここを true に戻すと
+  // reset レイヤーで二重になり、kiso.css とどちらが勝つか分からなくなる。
   preflight: false,
   include: ["./src/**/*.{ts,tsx}"],
   exclude: [],

@@ -35,8 +35,9 @@ const config: KnipConfig = {
       // Storybook 専用の Vite 設定は main.ts からパス文字列で参照している
       entry: [".storybook/vite.config.ts", "src/**/*.stories.tsx"],
       ignoreDependencies: [
-        // src/index.css の @import で読み込むセルフホスト書体
+        // src/index.css の @import で読み込むセルフホスト書体とリセット CSS
         "@fontsource/noto-sans-jp",
+        "kiso.css",
       ],
     },
   },
