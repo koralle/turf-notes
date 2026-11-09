@@ -37,10 +37,16 @@ export const createMemosRouter = ({ impl, requireAuth }: RouterKit) => {
 
     create: memos.create
       .use(requireAuth)
-      .handler(
-        async ({ context, input }) =>
-          await createMemo(context.db, context.user.id, input)
-      ),
+      .handler(async ({ context, errors, input }) => {
+        const result = await createMemo(context.db, context.user.id, input);
+        if (result.kind === "tag-not-found") {
+          throw errors["tag-not-found"]();
+        }
+        if (result.kind === "link-not-found") {
+          throw errors["memo-not-found"]();
+        }
+        return { id: result.id };
+      }),
 
     update: memos.update
       .use(requireAuth)
@@ -51,6 +57,12 @@ export const createMemosRouter = ({ impl, requireAuth }: RouterKit) => {
         }
         if (result.kind === "conflict") {
           throw errors["memo-conflict"]();
+        }
+        if (result.kind === "tag-not-found") {
+          throw errors["tag-not-found"]();
+        }
+        if (result.kind === "link-not-found") {
+          throw errors["memo-not-found"]();
         }
         return { id: input.id };
       }),

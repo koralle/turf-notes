@@ -1,22 +1,18 @@
-import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import type { MemoListOutput } from "@turf-notes/api-contract/schemas";
 import { css } from "styled-system/css";
 
 import { EmptyState } from "../../../components/empty-state";
+import { LoadMore } from "../../../components/load-more";
 import { MemoList, MemoRow } from "../../../components/memo-row";
 import { MobileHeader } from "../../../components/mobile-header";
-import { kindLabels } from "../../../lib/tag-kind";
+import { kindLabels, tagDotOf } from "../../../lib/tag-kind";
 import { client } from "../../../rpc/client";
 
 export const Route = createFileRoute("/_app/tags/$tagId")({
   component: TagPage,
 });
-
-const dotOf = {
-  horse: css({ bg: "horse" }),
-  person: css({ bg: "person" }),
-  theme: css({ bg: "theme" }),
-} as const;
 
 const head = css({
   px: { base: "18px", md: "32px" },
@@ -42,18 +38,72 @@ const kindDot = css({ borderRadius: "999px", h: "6px", w: "6px" });
 function TagPage() {
   const { tagId } = Route.useParams();
   const id = Number(tagId);
+  const validId = Number.isInteger(id) && id >= 1;
   const navigate = useNavigate();
 
   const tags = useQuery({
     queryFn: async () => await client.tags.list(),
     queryKey: ["tags"],
   });
-  const memoList = useQuery({
-    queryFn: async () => await client.memos.list({ tagIds: [id] }),
+  const memoList = useInfiniteQuery({
+    enabled: validId,
+    getNextPageParam: (last: MemoListOutput) => last.nextCursor ?? undefined,
+    initialPageParam: undefined as string | undefined,
+    queryFn: async ({ pageParam }: { pageParam: string | undefined }) =>
+      await client.memos.list({
+        tagIds: [id],
+        ...(pageParam === undefined ? {} : { cursor: pageParam }),
+      }),
     queryKey: ["memos", "tag", id],
   });
 
+  const items = (memoList.data?.pages ?? []).flatMap((page) => page.items);
+
   const tag = (tags.data ?? []).find((item) => item.id === id);
+
+  // 数字でない id や、存在しないタグは空の一覧ではなく「見つからない」を出す。
+  if (!validId || (tags.isSuccess && tag === undefined)) {
+    return (
+      <>
+        <MobileHeader
+          onBack={() => void navigate({ to: "/tags" })}
+          title="タグ"
+        />
+        <div
+          className={css({ fontSize: "13px", p: { base: "18px", md: "32px" } })}
+        >
+          タグが見つかりません。{" "}
+          <Link
+            className={css({ color: "accent", textDecoration: "underline" })}
+            to="/tags"
+          >
+            タグ一覧へ戻る
+          </Link>
+        </div>
+      </>
+    );
+  }
+
+  const renderList = () => {
+    if (memoList.isPending) {
+      return null;
+    }
+    if (items.length === 0) {
+      return <EmptyState>このタグのメモはまだありません。</EmptyState>;
+    }
+    return (
+      <>
+        <MemoList>
+          {items.map((memo) => (
+            <MemoRow key={memo.id} memo={memo} />
+          ))}
+        </MemoList>
+        {memoList.hasNextPage ? (
+          <LoadMore onClick={() => void memoList.fetchNextPage()} />
+        ) : null}
+      </>
+    );
+  };
 
   return (
     <>
@@ -85,22 +135,12 @@ function TagPage() {
         </h1>
         {tag === undefined ? null : (
           <div className={kindLine}>
-            <span className={`${kindDot} ${dotOf[tag.kind]}`} />
+            <span className={`${kindDot} ${tagDotOf[tag.kind]}`} />
             {kindLabels[tag.kind]}
           </div>
         )}
       </div>
-      <div className={timeline}>
-        {(memoList.data?.items ?? []).length === 0 ? (
-          <EmptyState>このタグのメモはまだありません。</EmptyState>
-        ) : (
-          <MemoList>
-            {(memoList.data?.items ?? []).map((memo) => (
-              <MemoRow key={memo.id} memo={memo} />
-            ))}
-          </MemoList>
-        )}
-      </div>
+      <div className={timeline}>{renderList()}</div>
     </>
   );
 }

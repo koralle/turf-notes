@@ -13,8 +13,7 @@ type Story = StoryObj<typeof meta>;
 
 export const MemoList: Story = {
   args: {
-    children:
-      "まだメモがありません。上の欄に書くか「新規メモ」から始めてください。",
+    children: "まだメモがありません。新規メモから始めてください。",
   },
 };
 

@@ -1,6 +1,8 @@
 import type { TagSummary } from "@turf-notes/api-contract/schemas";
 import { css } from "styled-system/css";
 
+import { tagDotOf } from "../lib/tag-kind";
+
 const chip = css({
   alignItems: "center",
   bg: "chip",
@@ -15,12 +17,6 @@ const chip = css({
 
 const dot = css({ borderRadius: "999px", flex: "0 0 5px", h: "5px", w: "5px" });
 
-const dotOf = {
-  horse: css({ bg: "horse" }),
-  person: css({ bg: "person" }),
-  theme: css({ bg: "theme" }),
-} as const;
-
 export const TagChip = ({
   tag,
   onRemove,
@@ -29,7 +25,7 @@ export const TagChip = ({
   onRemove?: () => void;
 }) => (
   <span className={chip}>
-    <span className={`${dot} ${dotOf[tag.kind]}`} />
+    <span className={`${dot} ${tagDotOf[tag.kind]}`} />
     {tag.name}
     {onRemove === undefined ? null : (
       <button

@@ -1,22 +1,17 @@
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import type {
   MemoListInput,
   MemoListOutput,
-  MemoSummary,
 } from "@turf-notes/api-contract/schemas";
 import { Plus, Search, X } from "lucide-react";
-import { useOptimistic, useState, useTransition } from "react";
+import { useState } from "react";
 import { css } from "styled-system/css";
 
 import { EmptyState } from "../../components/empty-state";
-import { InlineError } from "../../components/inline-error";
+import { LoadMore } from "../../components/load-more";
 import { MemoList, MemoRow } from "../../components/memo-row";
-import { pendingMemo } from "../../lib/pending-memo";
+import { useDebouncedValue } from "../../hooks/use-debounced-value";
 import { client } from "../../rpc/client";
 
 export const Route = createFileRoute("/_app/")({
@@ -42,55 +37,6 @@ const newButton = css({
   px: "14px",
   py: "8px",
   textDecoration: "none",
-});
-
-const composer = css({
-  alignItems: "center",
-  bg: "panel",
-  borderColor: "line",
-  borderRadius: "9px",
-  borderStyle: "solid",
-  borderWidth: "1px",
-  display: "flex",
-  gap: "10px",
-  minH: { base: "54px", md: "auto" },
-  mx: { base: "18px", md: "32px" },
-  mt: { base: "10px", md: "16px" },
-  p: { base: "5px 5px 5px 14px", md: "10px 12px 10px 14px" },
-  _focusWithin: { borderColor: "accent" },
-});
-
-const composerInput = css({
-  border: "none",
-  flex: 1,
-  fontFamily: "inherit",
-  fontSize: { base: "16px", md: "13.5px" },
-  minWidth: 0,
-  outline: "none",
-  _placeholder: { color: "faint" },
-});
-
-const saveButton = css({
-  alignItems: "center",
-  bg: "accentWeak",
-  border: "none",
-  borderRadius: "6px",
-  color: "accent",
-  cursor: "pointer",
-  display: "flex",
-  flexShrink: 0,
-  fontSize: "12px",
-  fontWeight: 600,
-  h: { base: "44px", md: "auto" },
-  justifyContent: "center",
-  px: "12px",
-  py: { base: "0", md: "6px" },
-  _disabled: { cursor: "default", opacity: 0.5 },
-});
-
-const composerError = css({
-  mt: "6px",
-  px: { base: "18px", md: "32px" },
 });
 
 const toolbar = css({
@@ -162,20 +108,6 @@ const timeline = css({
   pt: "6px",
 });
 
-const loadMore = css({
-  bg: "panel",
-  borderColor: "line",
-  borderRadius: "8px",
-  borderStyle: "solid",
-  borderWidth: "1px",
-  cursor: "pointer",
-  fontSize: "12px",
-  minH: { base: "44px", md: "auto" },
-  mt: "16px",
-  p: "8px 14px",
-  w: "100%",
-});
-
 const fab = css({
   alignItems: "center",
   bg: "accent",
@@ -193,63 +125,27 @@ const fab = css({
 
 function HomePage() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const [draft, setDraft] = useState("");
   const [query, setQuery] = useState("");
-  const [isSaving, startSaving] = useTransition();
-  // 保存中のメモは一覧の先頭に出す。保存が終わると本物の一覧に置き換わる。
-  const [pendingMemos, addPendingMemo] = useOptimistic(
-    [] as readonly MemoSummary[],
-    (pending: readonly MemoSummary[], next: MemoSummary) => [next, ...pending]
-  );
+  // 1文字ごとに API を叩かないよう、入力が止まってから検索する。
+  const search = useDebouncedValue(query);
 
   const list = useInfiniteQuery({
     getNextPageParam: (last: MemoListOutput) => last.nextCursor ?? undefined,
     initialPageParam: undefined as string | undefined,
     queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
       const input: MemoListInput = {};
-      if (query.trim() !== "") {
-        input.q = query.trim();
+      if (search.trim() !== "") {
+        input.q = search.trim();
       }
       if (pageParam !== undefined) {
         input.cursor = pageParam;
       }
       return await client.memos.list(input);
     },
-    queryKey: ["memos", query],
+    queryKey: ["memos", search],
   });
 
-  const create = useMutation({
-    mutationFn: async (body: string) => await client.memos.create({ body }),
-    // 再取得まで待って楽観的な行を本物に差し替える（待たずに捨てると一瞬行が消える）。
-    // shortcut: その間、同じ行が 1 コミットだけ二重になりうる（実測 10ms 未満）。
-    // 目に見えるようなら保存後に仮行を実 id で差し替える方式にする。
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["memos"] });
-    },
-  });
-
-  const realItems = (list.data?.pages ?? []).flatMap((page) => page.items);
-  // 検索中は、検索に合うか分からない行を先頭に出さない。
-  const pendingRows = query.trim() === "" ? pendingMemos : [];
-  const items = [...pendingRows, ...realItems];
-
-  const submitDraft = () => {
-    const body = draft.trim();
-    if (body === "" || isSaving) {
-      return;
-    }
-    startSaving(async () => {
-      addPendingMemo(pendingMemo(body));
-      try {
-        await create.mutateAsync(body);
-        // 保存中に入力された分は消さずに残す。
-        setDraft((current) => (current.trim() === body ? "" : current));
-      } catch {
-        // 保存できたときだけ下書きを消す。失敗は create.isError で表示する。
-      }
-    });
-  };
+  const items = (list.data?.pages ?? []).flatMap((page) => page.items);
 
   const renderList = () => {
     if (list.isPending) {
@@ -258,16 +154,15 @@ function HomePage() {
     if (items.length === 0) {
       return (
         <EmptyState>
-          まだメモがありません。上の欄に書くか、新規メモから始めてください。
+          {search.trim() === ""
+            ? "まだメモがありません。新規メモから始めてください。"
+            : "見つかりませんでした。"}
         </EmptyState>
       );
     }
     return (
       <MemoList>
-        {pendingRows.map((memo) => (
-          <MemoRow isPending key={memo.id} memo={memo} />
-        ))}
-        {realItems.map((memo) => (
+        {items.map((memo) => (
           <MemoRow key={memo.id} memo={memo} />
         ))}
       </MemoList>
@@ -275,7 +170,7 @@ function HomePage() {
   };
 
   const showResultCount =
-    query.trim() !== "" && list.isSuccess && !list.hasNextPage;
+    search.trim() !== "" && list.isSuccess && !list.hasNextPage;
 
   return (
     <>
@@ -297,36 +192,6 @@ function HomePage() {
           新規メモ
         </button>
       </div>
-
-      <div className={composer}>
-        <input
-          aria-label="メモを書く"
-          name="draft"
-          className={composerInput}
-          onChange={(event) => {
-            setDraft(event.target.value);
-          }}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-              submitDraft();
-            }
-          }}
-          placeholder="思いついたことを書く…"
-          value={draft}
-        />
-        <button
-          className={saveButton}
-          disabled={isSaving}
-          onClick={submitDraft}
-          type="button"
-        >
-          保存
-        </button>
-      </div>
-
-      {create.isError ? (
-        <InlineError className={composerError}>保存に失敗しました</InlineError>
-      ) : null}
 
       <div className={toolbar}>
         <div className={searchWrap}>
@@ -360,7 +225,7 @@ function HomePage() {
 
       {showResultCount ? (
         <div className={resultNote}>
-          「{query.trim()}」の検索結果 {items.length}件
+          「{search.trim()}」の検索結果 {items.length}件
         </div>
       ) : null}
 
@@ -368,13 +233,7 @@ function HomePage() {
         {renderList()}
 
         {list.hasNextPage ? (
-          <button
-            className={loadMore}
-            onClick={() => void list.fetchNextPage()}
-            type="button"
-          >
-            もっと見る
-          </button>
+          <LoadMore onClick={() => void list.fetchNextPage()} />
         ) : null}
       </div>
 

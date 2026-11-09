@@ -4,7 +4,7 @@ import { tagKinds } from "@turf-notes/domain";
 import { css } from "styled-system/css";
 
 import { EmptyState } from "../../../components/empty-state";
-import { kindLabels } from "../../../lib/tag-kind";
+import { kindLabels, tagDotOf } from "../../../lib/tag-kind";
 import { client } from "../../../rpc/client";
 
 export const Route = createFileRoute("/_app/tags/")({
@@ -54,12 +54,6 @@ const dot = css({
   h: "6px",
   w: "6px",
 });
-
-const dotOf = {
-  horse: css({ bg: "horse" }),
-  person: css({ bg: "person" }),
-  theme: css({ bg: "theme" }),
-} as const;
 
 const name = css({
   flex: 1,
@@ -111,7 +105,7 @@ function TagsPage() {
                   params={{ tagId: String(tag.id) }}
                   to="/tags/$tagId"
                 >
-                  <span className={`${dot} ${dotOf[kind]}`} />
+                  <span className={`${dot} ${tagDotOf[kind]}`} />
                   <span className={name}>{tag.name}</span>
                   <span className={count}>{tag.memoCount}</span>
                 </Link>

@@ -1,5 +1,5 @@
 import { oc } from "@orpc/contract";
-import { memoIdSchema, tagIdSchema } from "@turf-notes/domain";
+import { memoIdSchema } from "@turf-notes/domain";
 import * as v from "valibot";
 
 import {
@@ -70,7 +70,6 @@ export const contract = {
   tags: {
     list: authed.output(v.array(tagWithCountSchema)),
     create: authed.input(tagCreateInputSchema).output(tagSummarySchema),
-    remove: authed.input(v.object({ id: tagIdSchema })).output(okSchema),
   },
 } as const;
 

@@ -44,6 +44,9 @@ export const exportAll = async (db: AppDb, user: User): Promise<ExportData> => {
       .where(and(eq(memos.userId, user.id), isNull(memos.deletedAt))),
   ]);
 
+  // 参照先が削除済みだと、書き出したメモに無い id が linkIds に残る。
+  const exportedIds = new Set(memoRows.map((row) => row.id));
+
   const tagIdsOf = new Map<MemoId, TagId[]>();
   for (const row of memoTagRows) {
     const list = tagIdsOf.get(row.memoId) ?? [];
@@ -64,7 +67,9 @@ export const exportAll = async (db: AppDb, user: User): Promise<ExportData> => {
       body: row.body,
       createdAt: row.createdAt.getTime(),
       id: row.id,
-      linkIds: linkIdsOf.get(row.id) ?? [],
+      linkIds: (linkIdsOf.get(row.id) ?? []).filter((id) =>
+        exportedIds.has(id)
+      ),
       race: toRace(row),
       tagIds: tagIdsOf.get(row.id) ?? [],
       title: row.title,

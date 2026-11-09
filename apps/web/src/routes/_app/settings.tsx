@@ -101,6 +101,7 @@ const dangerButton = css({
   display: "flex",
   fontSize: "12px",
   minH: { base: "40px", md: "auto" },
+  _disabled: { cursor: "default", opacity: 0.4 },
 });
 
 const formatDate = (value: unknown): string => {
@@ -178,6 +179,10 @@ const PasskeySection = () => {
     queryFn: async () => await authClient.passkey.listUserPasskeys(),
     queryKey: ["passkeys"],
   });
+  const methods = useQuery({
+    queryFn: async () => await client.auth.methods(),
+    queryKey: ["auth", "methods"],
+  });
 
   const refresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ["passkeys"] });
@@ -219,6 +224,9 @@ const PasskeySection = () => {
   });
 
   const passkeyList = passkeys.data?.data ?? [];
+  // パスワードサインインが無効なときに最後の1つを消すと、サインイン手段が無くなる。
+  const lastPasskeyLocked =
+    passkeyList.length === 1 && methods.data?.passwordSignInEnabled !== true;
 
   return (
     <div className={section}>
@@ -293,6 +301,7 @@ const PasskeySection = () => {
                   </button>
                   <button
                     className={dangerButton}
+                    disabled={lastPasskeyLocked}
                     onClick={() => {
                       deletePasskey.mutate(passkey.id);
                     }}
@@ -306,6 +315,12 @@ const PasskeySection = () => {
           </div>
         ))
       )}
+
+      {lastPasskeyLocked ? (
+        <div className={css({ color: "faint", fontSize: "11px", mt: "10px" })}>
+          パスワードサインインが無効なので、最後のパスキーは削除できません。先にパスキーを追加するか、パスワードサインインを有効にしてください。
+        </div>
+      ) : null}
 
       <div className={passkeyAdd}>
         <input

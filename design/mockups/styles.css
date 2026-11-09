@@ -106,21 +106,6 @@ main { flex: 1; min-width: 0; background: var(--bg); display: flex; flex-directi
   font-family: inherit;
 }
 
-.composer {
-  margin: 16px 32px 0;
-  display: flex; align-items: center; gap: 10px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 10px 12px 10px 14px;
-}
-.composer .placeholder { flex: 1; font-size: 13.5px; color: var(--muted); }
-.composer .btn-save {
-  border: 0; border-radius: 6px; padding: 6px 12px;
-  background: var(--accent-weak); color: var(--accent);
-  font-size: 12px; font-weight: 600; font-family: inherit;
-}
-
 .toolbar { display: flex; align-items: center; gap: 8px; padding: 14px 32px 6px; }
 .search {
   flex: 1; display: flex; align-items: center; gap: 8px;
@@ -194,7 +179,6 @@ main { flex: 1; min-width: 0; background: var(--bg); display: flex; flex-directi
 .theme-b .topbar h1 { color: #fff; font-size: 17px; }
 .theme-b .topbar .count { color: #a7c6b2; }
 .theme-b .btn-primary { background: #fbbf24; color: #3b2a05; }
-.theme-b .composer { margin-top: 18px; border-width: 1px; box-shadow: 0 1px 2px rgba(20, 60, 40, 0.06); }
 .theme-b .memo-row { border-bottom: 1px solid var(--line); }
 .theme-b .timeline { padding-top: 14px; }
 .theme-b .race { background: #fef3c7; color: #92400e; }
@@ -211,7 +195,6 @@ main { flex: 1; min-width: 0; background: var(--bg); display: flex; flex-directi
 .theme-c .topbar h1 { font-size: 20px; }
 .theme-c .memo-row { border-bottom: 1px solid var(--line); }
 .theme-c .memo-row .title { font-size: 14.5px; }
-.theme-c .composer { border-style: dashed; }
 .theme-c .race { background: transparent; border: 1px solid var(--line); color: var(--accent); }
 
 /* ========== mobile app (400px) ========== */
@@ -255,17 +238,6 @@ body:has(.shot:target) .shot:target .shot-cap { display: none; }
 .m-pad { padding: 6px 18px 26px; }
 
 /* ---------- ホーム ---------- */
-.m-composer {
-  align-items: center; background: var(--panel); border: 1px solid var(--line);
-  border-radius: 10px; display: flex; gap: 10px; margin: 0 18px;
-  min-height: 54px; padding: 5px 5px 5px 14px;
-}
-.m-composer .ph { color: var(--muted); flex: 1; font-size: 16px; }
-.m-save {
-  align-items: center; background: var(--accent-weak); border-radius: 8px;
-  color: var(--accent); display: flex; font-size: 13.5px; font-weight: 600;
-  height: 44px; padding: 0 16px;
-}
 .m-search {
   align-items: center; background: var(--panel); border: 1px solid var(--line);
   border-radius: 999px; color: var(--muted); display: flex; font-size: 16px;

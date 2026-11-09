@@ -9,7 +9,7 @@ import {
   tagDisplayName,
   tagSchema,
 } from "@turf-notes/domain";
-import type { TagId, TagKind, UserId } from "@turf-notes/domain";
+import type { TagKind, UserId } from "@turf-notes/domain";
 import { and, count, eq, isNull } from "drizzle-orm";
 import * as v from "valibot";
 
@@ -22,7 +22,8 @@ export const listTags = async (
       id: tags.id,
       name: tags.name,
       kind: tags.kind,
-      memoCount: count(memoTags.memoId),
+      // 削除済みメモは結合で NULL になるので、件数は結合相手で数える。
+      memoCount: count(memos.id),
     })
     .from(tags)
     .leftJoin(memoTags, eq(memoTags.tagId, tags.id))
@@ -74,17 +75,4 @@ export const createTag = async (
 
   // 書き込み境界。保存した名前が Tag の不変条件（表示形）を満たすことを確かめる。
   return v.parse(tagSchema, { id: row.id, name: row.name, kind: row.kind });
-};
-
-export const removeTag = async (
-  db: AppDb,
-  userId: UserId,
-  id: TagId
-): Promise<boolean> => {
-  const deleted = await db
-    .delete(tags)
-    .where(and(eq(tags.id, id), eq(tags.userId, userId)))
-    .returning({ id: tags.id });
-
-  return deleted.length > 0;
 };

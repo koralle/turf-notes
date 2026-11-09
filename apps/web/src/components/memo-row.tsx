@@ -78,14 +78,7 @@ export const MemoList = ({ children }: { children: React.ReactNode }) => (
   <div className={list}>{children}</div>
 );
 
-export const MemoRow = ({
-  memo,
-  isPending = false,
-}: {
-  memo: MemoSummary;
-  /** 保存中で、まだリンク先のメモが無い。 */
-  isPending?: boolean;
-}) => {
+export const MemoRow = ({ memo }: { memo: MemoSummary }) => {
   const stamp = dateStamp(memo.createdAt);
   const hasTagRow = memo.tags.length > 0 || memo.linkCount > 0;
 
@@ -119,9 +112,7 @@ export const MemoRow = ({
     </>
   );
 
-  return isPending ? (
-    <div className={row}>{content}</div>
-  ) : (
+  return (
     <Link className={row} params={{ memoId: memo.id }} to="/memos/$memoId">
       {content}
     </Link>

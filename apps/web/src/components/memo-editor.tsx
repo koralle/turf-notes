@@ -1,12 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useBlocker, useNavigate } from "@tanstack/react-router";
 import type { MemoDetail, MemoRef } from "@turf-notes/api-contract/schemas";
 import { defaultTagKind, tagKinds, venues } from "@turf-notes/domain";
 import type { TagId, TagKind } from "@turf-notes/domain";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button as RacButton } from "react-aria-components";
 import { css } from "styled-system/css";
 
+import { useDebouncedValue } from "../hooks/use-debounced-value";
 import { kindLabels } from "../lib/tag-kind";
 import { client, errorCode } from "../rpc/client";
 import { InlineError } from "./inline-error";
@@ -161,6 +162,18 @@ const primaryBtn = css({
   py: "8px",
 });
 
+const discardBar = css({
+  alignItems: "center",
+  bg: "panel",
+  borderBottomColor: "line",
+  borderBottomStyle: "solid",
+  borderBottomWidth: "1px",
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "10px",
+  p: "10px 16px",
+});
+
 const mobileBar = css({
   bg: "panel",
   borderTopColor: "line",
@@ -309,7 +322,9 @@ const RaceFields = ({
         value={name}
       />
     </div>
-    <div className={hint}>3つそろえるとレースページができます</div>
+    <div className={hint}>
+      3つそろえるとレースページができます。そろうまでレース名は保存されません
+    </div>
   </section>
 );
 
@@ -371,7 +386,6 @@ const TagSection = ({
       >
         {tagList
           .filter((tag) => !selectedIdSet.has(tag.id))
-          .slice(0, 12)
           .map((tag) => (
             <button
               className={css({ cursor: "pointer", opacity: 0.85 })}
@@ -439,11 +453,12 @@ const ReferenceSection = ({
   onRemove: (id: MemoRef["id"]) => void;
 }) => {
   const [refQuery, setRefQuery] = useState("");
+  const refSearch = useDebouncedValue(refQuery);
 
   const refCandidates = useQuery({
-    enabled: refQuery.trim().length > 0,
-    queryFn: async () => await client.memos.list({ q: refQuery.trim() }),
-    queryKey: ["memos", "ref", refQuery],
+    enabled: refSearch.trim().length > 0,
+    queryFn: async () => await client.memos.list({ q: refSearch.trim() }),
+    queryKey: ["memos", "ref", refSearch],
   });
 
   return (
@@ -517,6 +532,34 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
   );
   const [links, setLinks] = useState<MemoRef[]>(memo?.links ?? []);
 
+  // 入力が最初の状態から変わったか。保存せずに離れるときの確認に使う（FR-M3）。
+  const currentState = JSON.stringify({
+    links,
+    raceDate,
+    raceName,
+    raceNumber,
+    tagIds,
+    text,
+    title,
+    venue,
+  });
+  const initialState = useRef(currentState).current;
+  const isDirty = currentState !== initialState;
+
+  const dirty = useRef(false);
+  useEffect(() => {
+    dirty.current = isDirty;
+  }, [isDirty]);
+
+  // 保存に成功したあとの遷移は確認しない。
+  const saved = useRef(false);
+
+  const blocker = useBlocker({
+    enableBeforeUnload: () => dirty.current && !saved.current,
+    shouldBlockFn: () => dirty.current && !saved.current,
+    withResolver: true,
+  });
+
   const save = useMutation({
     mutationFn: async () => {
       // 3つ組がそろっているかだけを見る。値の検証は契約（サーバー）に任せる。
@@ -546,6 +589,7 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
           });
     },
     onSuccess: async (result) => {
+      saved.current = true;
       await queryClient.invalidateQueries({ queryKey: ["memos"] });
       await queryClient.invalidateQueries({ queryKey: ["tags"] });
       await navigate({ params: { memoId: result.id }, to: "/memos/$memoId" });
@@ -573,6 +617,37 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
 
   return (
     <div className={root}>
+      {blocker.status === "blocked" ? (
+        <div className={discardBar}>
+          <span className={css({ flex: 1, fontSize: "12.5px" })}>
+            保存していない変更があります。
+          </span>
+          <RacButton
+            className={primaryBtn}
+            onPress={() => {
+              blocker.proceed();
+            }}
+          >
+            破棄して移動
+          </RacButton>
+          <button
+            // 何も起きていないように見えないよう、安全側の選択肢にフォーカスを移す。
+            autoFocus
+            className={css({
+              color: "muted",
+              cursor: "pointer",
+              fontSize: "12.5px",
+              p: "8px",
+            })}
+            onClick={() => {
+              blocker.reset();
+            }}
+            type="button"
+          >
+            編集を続ける
+          </button>
+        </div>
+      ) : null}
       <MobileHeader
         onBack={() => void navigate({ to: "/" })}
         title={memo === undefined ? "新規メモ" : "メモを編集"}

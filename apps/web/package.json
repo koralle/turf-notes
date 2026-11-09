@@ -50,7 +50,6 @@
     "react-doctor": "catalog:tooling",
     "storybook": "catalog:storybook",
     "tsrs": "catalog:typescript",
-    "valibot": "catalog:validation",
     "vite": "catalog:vite",
     "vitest": "catalog:test",
     "wrangler": "catalog:cloudflare"
