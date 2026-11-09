@@ -95,6 +95,7 @@ catalogs:
     "@pandacss/preset-base": 2.5.0
     "@pandacss/preset-panda": 2.5.0
     kiso.css: 1.2.4
+    lucide-react: 1.70.0
     markdown-it: 15.0.3
     postcss: 8.5.32
     react-aria-components: 1.22.1

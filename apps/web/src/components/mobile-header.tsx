@@ -1,7 +1,6 @@
+import { ChevronLeft } from "lucide-react";
 import type { ReactNode } from "react";
 import { css } from "styled-system/css";
-
-import { ChevronLeftIcon } from "./icons";
 
 const headerStyle = css({
   alignItems: "center",
@@ -75,7 +74,7 @@ export const MobileHeader = ({
         onClick={onBack}
         type="button"
       >
-        <ChevronLeftIcon size={21} />
+        <ChevronLeft size={21} />
       </button>
       <span className={titleStyle}>{title}</span>
       {trailing}

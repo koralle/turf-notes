@@ -137,6 +137,15 @@ body {
   }
 }
 
+/* アイコンは lucide-react。線幅 1.7 はデザインの指定なので、各呼び出し箇所ではなく
+   ここで一度だけ決める。プレゼンテーション属性（stroke-width="2"）より CSS が優先される。
+   別の太さにしたいときは Panda の utilities（後段のレイヤー）で上書きする。 */
+@layer base {
+  .lucide {
+    stroke-width: 1.7;
+  }
+}
+
 /* react-aria-components は無効時に data-disabled を付ける */
 @layer base {
   [data-disabled] {

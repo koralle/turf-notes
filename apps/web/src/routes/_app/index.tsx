@@ -9,11 +9,11 @@ import type {
   MemoListOutput,
   MemoSummary,
 } from "@turf-notes/api-contract/schemas";
+import { Plus, Search, X } from "lucide-react";
 import { useOptimistic, useState, useTransition } from "react";
 import { css } from "styled-system/css";
 
 import { EmptyState } from "../../components/empty-state";
-import { CloseIcon, PlusIcon, SearchIcon } from "../../components/icons";
 import { InlineError } from "../../components/inline-error";
 import { MemoList, MemoRow } from "../../components/memo-row";
 import { pendingMemo } from "../../lib/pending-memo";
@@ -331,7 +331,7 @@ function HomePage() {
       <div className={toolbar}>
         <div className={searchWrap}>
           <span className={searchIcon}>
-            <SearchIcon size={17} />
+            <Search size={17} />
           </span>
           <input
             aria-label="メモを検索"
@@ -352,7 +352,7 @@ function HomePage() {
               }}
               type="button"
             >
-              <CloseIcon size={15} />
+              <X size={15} />
             </button>
           )}
         </div>
@@ -384,7 +384,7 @@ function HomePage() {
         style={{ bottom: "calc(76px + env(safe-area-inset-bottom))" }}
         to="/memos/new"
       >
-        <PlusIcon size={22} />
+        <Plus size={22} />
       </Link>
     </>
   );
