@@ -1,23 +1,42 @@
 {
   "mcpServers": {
-    "chrome-devtools": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "chrome-devtools-mcp@1.9.0"
-      ]
+    "better-auth": {
+      "url": "https://mcp.better-auth.com/mcp",
+      "protocolVersion": "auth"
     },
     "cloudflare": {
       "url": "https://mcp.cloudflare.com/mcp",
       "protocolVersion": "auto"
     },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@1.12.0",
+        "--no-usage-statistics",
+        "--allowed-url-pattern=http://localhost:*/*",
+        "--allowed-url-pattern=http://127.0.0.1:*/*",
+        "--allowed-url-pattern=https://*.localhost/*",
+        "--isolated",
+        "--file-navigations=false",
+        "--no-performance-crux",
+        "--redact-network-headers",
+        "--screenshot-format=webp",
+        "--screenshot-max-width=1280"
+      ]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@0.0.84",
+        "--sandbox",
+        "--isolated"
+      ]
+    },
     "valibot": {
       "url": "https://valibot.dev/mcp",
       "protocolVersion": "auto"
-    },
-    "better-auth": {
-      "url": "https://mcp.better-auth.com/mcp",
-      "protocolVersion": "auth"
     }
   }
 }
