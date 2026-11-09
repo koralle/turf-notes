@@ -1,9 +1,5 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import type {
-  MemoListInput,
-  MemoListOutput,
-} from "@turf-notes/api-contract/schemas";
 import { Plus, Search, X } from "lucide-react";
 import { useState } from "react";
 import { css } from "styled-system/css";
@@ -12,9 +8,12 @@ import { EmptyState } from "../../components/empty-state";
 import { LoadMore } from "../../components/load-more";
 import { MemoList, MemoRow } from "../../components/memo-row";
 import { useDebouncedValue } from "../../hooks/use-debounced-value";
-import { client } from "../../rpc/client";
+import { memoListQuery } from "../../rpc/queries";
 
 export const Route = createFileRoute("/_app/")({
+  // 検索語は画面の state なので、温めるのは検索なしの1ページ目だけ。
+  loader: async ({ context }) =>
+    await context.queryClient.infiniteQuery(memoListQuery("")),
   component: HomePage,
 });
 
@@ -127,23 +126,9 @@ function HomePage() {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   // 1文字ごとに API を叩かないよう、入力が止まってから検索する。
-  const search = useDebouncedValue(query);
+  const search = useDebouncedValue(query).trim();
 
-  const list = useInfiniteQuery({
-    getNextPageParam: (last: MemoListOutput) => last.nextCursor ?? undefined,
-    initialPageParam: undefined as string | undefined,
-    queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
-      const input: MemoListInput = {};
-      if (search.trim() !== "") {
-        input.q = search.trim();
-      }
-      if (pageParam !== undefined) {
-        input.cursor = pageParam;
-      }
-      return await client.memos.list(input);
-    },
-    queryKey: ["memos", search],
-  });
+  const list = useInfiniteQuery(memoListQuery(search));
 
   const items = (list.data?.pages ?? []).flatMap((page) => page.items);
 
@@ -154,7 +139,7 @@ function HomePage() {
     if (items.length === 0) {
       return (
         <EmptyState>
-          {search.trim() === ""
+          {search === ""
             ? "まだメモがありません。新規メモから始めてください。"
             : "見つかりませんでした。"}
         </EmptyState>
@@ -169,8 +154,7 @@ function HomePage() {
     );
   };
 
-  const showResultCount =
-    search.trim() !== "" && list.isSuccess && !list.hasNextPage;
+  const showResultCount = search !== "" && list.isSuccess && !list.hasNextPage;
 
   return (
     <>
@@ -225,7 +209,7 @@ function HomePage() {
 
       {showResultCount ? (
         <div className={resultNote}>
-          「{search.trim()}」の検索結果 {items.length}件
+          「{search}」の検索結果 {items.length}件
         </div>
       ) : null}
 

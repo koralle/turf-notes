@@ -5,7 +5,7 @@ import { Button as RacButton } from "react-aria-components";
 import { css } from "styled-system/css";
 
 import { authClient } from "../features/auth/auth-client";
-import { client } from "../rpc/client";
+import { authMethodsQuery } from "../rpc/queries";
 
 export const Route = createFileRoute("/sign-in")({
   component: SignInPage,
@@ -124,11 +124,8 @@ function SignInPage() {
   const [pending, setPending] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const methods = useQuery({
-    queryFn: async () => await client.auth.methods(),
-    queryKey: ["auth", "methods"],
-    staleTime: 0,
-  });
+  // SSR の対象だが、`/rpc` はブラウザからしか叩けないのでここは client の取得になる。
+  const methods = useQuery(authMethodsQuery);
 
   const hasPasskey = methods.data?.hasPasskey ?? false;
   const passwordEnabled = methods.data?.passwordSignInEnabled ?? true;

@@ -7,9 +7,23 @@ import { css } from "styled-system/css";
 
 import { InlineError } from "../../components/inline-error";
 import { authClient } from "../../features/auth/auth-client";
-import { client, errorCode } from "../../rpc/client";
+import { passkeysQuery } from "../../features/auth/queries";
+import { client, errorCode, orpc } from "../../rpc/client";
+import { authMethodsQuery, meQuery } from "../../rpc/queries";
 
 export const Route = createFileRoute("/_app/settings")({
+  loader: async ({ context }) => {
+    // 画面ごとに出すセクションが違うので、両方を温めてから描く。
+    // 片方がコケても設定画面は出す（各セクションは既定値で描ける。エラーはキャッシュに残る）。
+    try {
+      await Promise.all([
+        context.queryClient.query(passkeysQuery),
+        context.queryClient.query(authMethodsQuery),
+      ]);
+    } catch {
+      // ここでは投げない。
+    }
+  },
   component: SettingsPage,
 });
 
@@ -115,16 +129,14 @@ const formatDate = (value: unknown): string => {
 const AccountSection = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const me = useQuery({
-    queryFn: async () => await client.me(),
-    queryKey: ["me"],
-  });
+  const me = useQuery(meQuery);
   const signOut = useMutation({
     mutationFn: async () => await authClient.signOut(),
     onSuccess: async () => {
+      // 先に画面を離れる。キャッシュを消すと画面が読み直し、認証なしで 401 になる。
+      await navigate({ to: "/sign-in" });
       // サインアウト後に前のユーザーのキャッシュが残らないようにする
       queryClient.clear();
-      await navigate({ to: "/sign-in" });
     },
   });
 
@@ -175,18 +187,12 @@ const PasskeySection = () => {
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
 
-  const passkeys = useQuery({
-    queryFn: async () => await authClient.passkey.listUserPasskeys(),
-    queryKey: ["passkeys"],
-  });
-  const methods = useQuery({
-    queryFn: async () => await client.auth.methods(),
-    queryKey: ["auth", "methods"],
-  });
+  const passkeys = useQuery(passkeysQuery);
+  const methods = useQuery(authMethodsQuery);
 
   const refresh = async () => {
-    await queryClient.invalidateQueries({ queryKey: ["passkeys"] });
-    await queryClient.invalidateQueries({ queryKey: ["auth", "methods"] });
+    await queryClient.invalidateQueries({ queryKey: passkeysQuery.queryKey });
+    await queryClient.invalidateQueries({ queryKey: orpc.auth.methods.key() });
   };
 
   const addPasskey = useMutation({
@@ -356,21 +362,17 @@ const PasskeySection = () => {
 
 const PasswordSection = () => {
   const queryClient = useQueryClient();
-  const methods = useQuery({
-    queryFn: async () => await client.auth.methods(),
-    queryKey: ["auth", "methods"],
-  });
+  const methods = useQuery(authMethodsQuery);
   // 無効化にはパスキーが要るので、同じキャッシュを読んで登録有無を見る。
-  const passkeys = useQuery({
-    queryFn: async () => await authClient.passkey.listUserPasskeys(),
-    queryKey: ["passkeys"],
-  });
+  const passkeys = useQuery(passkeysQuery);
   const togglePassword = useMutation({
     mutationFn: async (enabled: boolean) =>
       await client.settings.setPasswordSignIn({ enabled }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["passkeys"] });
-      await queryClient.invalidateQueries({ queryKey: ["auth", "methods"] });
+      await queryClient.invalidateQueries({ queryKey: passkeysQuery.queryKey });
+      await queryClient.invalidateQueries({
+        queryKey: orpc.auth.methods.key(),
+      });
     },
   });
 

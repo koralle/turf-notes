@@ -5,7 +5,7 @@ import { css } from "styled-system/css";
 
 import { EmptyState } from "../../../components/empty-state";
 import { kindLabels, tagDotOf } from "../../../lib/tag-kind";
-import { client } from "../../../rpc/client";
+import { tagsQuery } from "../../../rpc/queries";
 
 export const Route = createFileRoute("/_app/tags/")({
   component: TagsPage,
@@ -70,11 +70,8 @@ const count = css({
 });
 
 function TagsPage() {
-  const tags = useQuery({
-    queryFn: async () => await client.tags.list(),
-    queryKey: ["tags"],
-    staleTime: 30_000,
-  });
+  // `/_app` の loader が温めている。ここは読むだけ。
+  const tags = useQuery(tagsQuery);
 
   if (tags.isPending || tags.isError) {
     return null;

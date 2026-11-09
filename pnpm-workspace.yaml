@@ -56,6 +56,7 @@ catalogs:
   rpc:
     "@orpc/client": 1.16.2
     "@orpc/contract": 1.16.2
+    "@orpc/react-query": 1.16.2
     "@orpc/server": 1.16.2
     hono: 4.13.16
 

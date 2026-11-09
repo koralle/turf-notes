@@ -9,7 +9,7 @@ React 19 の公式 API（`useTransition` / `useOptimistic` / `useActionState`）
 ## Considered Options
 
 - **全部 React の公式 API にする**: mutation ごとに `useState` と `useTransition` を組み、`invalidateQueries` を自分で呼ぶ。行数は減らず、8 箇所で同じ状態機械が重複する。
-- **読み取りも Router の loader に移す**: `@tanstack/react-query` を依存から消せて一貫するが、読み取り側の移行（SSR・preload・params 連動）が別途必要で、mutation 側の利益は小さい。
+- **読み取りも Router の loader に移す**: `@tanstack/react-query` を依存から消せて一貫するが、読み取り側の移行（SSR・preload・params 連動）が別途必要で、mutation 側の利益は小さい。取得の置き場所は `docs/adr/0004-router-warms-query-cache.md` で決め直した（loader で温め、画面は `useQuery` で読む）。
 - **現状のまま**: サーバー状態を変えないエクスポートまで mutation 扱いになり、mutation という言葉の意味が濁る。
 
 ## Consequences

@@ -25,6 +25,12 @@ export type TagId = v.InferOutput<typeof tagIdSchema>;
 /** 数値から TagId を作る。DB 行や URL など外から来た id はこれを通す。 */
 export const tagId = (value: number): TagId => v.parse(tagIdSchema, value);
 
+/** 文字列から TagId を作る（URL パラメータなど）。整数でなければ null。 */
+export const tagIdOf = (raw: string): TagId | null => {
+  const parsed = v.safeParse(tagIdSchema, Number(raw));
+  return parsed.success ? parsed.output : null;
+};
+
 /** 表示形。NFC にし、前後と連続する空白を畳む。DB の name 列に入る形。 */
 export const tagDisplayName = (name: string): string =>
   name.normalize("NFC").trim().replaceAll(/\s+/g, " ");

@@ -7,9 +7,17 @@ import { Markdown } from "../../../components/markdown";
 import { MobileHeader } from "../../../components/mobile-header";
 import { RaceBadgeLink } from "../../../components/race-badge";
 import { TagChip } from "../../../components/tag-chip";
-import { client } from "../../../rpc/client";
+import { client, orpc } from "../../../rpc/client";
+import { memoQuery } from "../../../rpc/queries";
 
 export const Route = createFileRoute("/_app/memos/$memoId")({
+  loader: async ({ context, params }) => {
+    try {
+      await context.queryClient.query(memoQuery(params.memoId));
+    } catch {
+      // 見つからない・取れないはここで投げず、画面の「メモが見つかりません」に任せる。
+    }
+  },
   component: MemoDetailPage,
 });
 
@@ -103,19 +111,17 @@ function MemoDetailPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const memo = useQuery({
-    queryFn: async () => await client.memos.detail({ id: memoId }),
-    queryKey: ["memo", memoId],
-  });
+  const memo = useQuery(memoQuery(memoId));
 
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   const remove = useMutation({
     mutationFn: async () => await client.memos.delete({ id: memoId }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["memos"] });
+      // 削除したメモはもう取れないので、無効化ではなく捨てる（取り直すと 404 になる）。
+      queryClient.removeQueries({ queryKey: orpc.memos.key() });
       // タグの件数はタグ一覧・サイドバーが出している。
-      await queryClient.invalidateQueries({ queryKey: ["tags"] });
+      await queryClient.invalidateQueries({ queryKey: orpc.tags.key() });
       await navigate({ to: "/" });
     },
   });

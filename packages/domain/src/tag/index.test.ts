@@ -5,6 +5,7 @@ import {
   normalizeTagName,
   tagDisplayName,
   tagId,
+  tagIdOf,
   tagIdSchema,
   tagNameSchema,
   tagSchema,
@@ -34,6 +35,20 @@ describe("tagIdSchema / tagId", () => {
     // @ts-expect-error brand されていない number は TagId として扱えない
     const branded: TagId = plain;
     expect(tagId(branded)).toBe(12);
+  });
+});
+
+describe("tagIdOf", () => {
+  test("URL の文字列を TagId にする", () => {
+    expect(tagIdOf("12")).toBe(12);
+  });
+
+  test("数値にならない文字列と 1 未満は null", () => {
+    expect(tagIdOf("abc")).toBeNull();
+    expect(tagIdOf("")).toBeNull();
+    expect(tagIdOf("0")).toBeNull();
+    expect(tagIdOf("-1")).toBeNull();
+    expect(tagIdOf("1.5")).toBeNull();
   });
 });
 

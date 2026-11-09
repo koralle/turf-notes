@@ -1,15 +1,25 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { raceKey, raceKeyOf } from "@turf-notes/domain";
+import { raceKeyOf } from "@turf-notes/domain";
 import { css } from "styled-system/css";
 
 import { EmptyState } from "../../../../../components/empty-state";
 import { MemoList, MemoRow } from "../../../../../components/memo-row";
 import { MobileHeader } from "../../../../../components/mobile-header";
 import { fullDate } from "../../../../../lib/date";
-import { client } from "../../../../../rpc/client";
+import { raceMemosQuery } from "../../../../../rpc/queries";
 
 export const Route = createFileRoute("/_app/races/$date/$venue/$raceNumber")({
+  loader: async ({ context, params }) => {
+    const race = raceKeyOf({
+      date: params.date,
+      number: params.raceNumber,
+      venue: params.venue,
+    });
+    if (race !== null) {
+      await context.queryClient.query(raceMemosQuery(race));
+    }
+  },
   component: RacePage,
 });
 
@@ -28,11 +38,7 @@ function RacePage() {
   const race = raceKeyOf({ date, number: raceNumber, venue });
   const navigate = useNavigate();
 
-  const memoList = useQuery({
-    queryFn: async () =>
-      race === null ? { items: [] } : await client.memos.forRace(race),
-    queryKey: ["memos", "race", race === null ? null : raceKey(race)],
-  });
+  const memoList = useQuery(raceMemosQuery(race));
 
   const items = memoList.data?.items ?? [];
   const raceName = items.find((item) => item.race?.name !== undefined)?.race

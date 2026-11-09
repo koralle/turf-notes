@@ -9,7 +9,8 @@ import { css } from "styled-system/css";
 
 import { useDebouncedValue } from "../hooks/use-debounced-value";
 import { kindLabels } from "../lib/tag-kind";
-import { client, errorCode } from "../rpc/client";
+import { client, errorCode, orpc } from "../rpc/client";
+import { memoRefSearchQuery, tagsQuery } from "../rpc/queries";
 import { InlineError } from "./inline-error";
 import { MobileHeader } from "./mobile-header";
 import { TagChip } from "./tag-chip";
@@ -342,10 +343,7 @@ const TagSection = ({
   const [newTagName, setNewTagName] = useState("");
   const [newTagKind, setNewTagKind] = useState<TagKind>(defaultTagKind);
 
-  const tags = useQuery({
-    queryFn: async () => await client.tags.list(),
-    queryKey: ["tags"],
-  });
+  const tags = useQuery(tagsQuery);
 
   const createTag = useMutation({
     mutationFn: async () =>
@@ -353,7 +351,7 @@ const TagSection = ({
     onSuccess: async (tag) => {
       setNewTagName("");
       onAdd(tag.id);
-      await queryClient.invalidateQueries({ queryKey: ["tags"] });
+      await queryClient.invalidateQueries({ queryKey: orpc.tags.key() });
     },
   });
 
@@ -455,11 +453,7 @@ const ReferenceSection = ({
   const [refQuery, setRefQuery] = useState("");
   const refSearch = useDebouncedValue(refQuery);
 
-  const refCandidates = useQuery({
-    enabled: refSearch.trim().length > 0,
-    queryFn: async () => await client.memos.list({ q: refSearch.trim() }),
-    queryKey: ["memos", "ref", refSearch],
-  });
+  const refCandidates = useQuery(memoRefSearchQuery(refSearch.trim()));
 
   return (
     <section>
@@ -590,8 +584,8 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
     },
     onSuccess: async (result) => {
       saved.current = true;
-      await queryClient.invalidateQueries({ queryKey: ["memos"] });
-      await queryClient.invalidateQueries({ queryKey: ["tags"] });
+      await queryClient.invalidateQueries({ queryKey: orpc.memos.key() });
+      await queryClient.invalidateQueries({ queryKey: orpc.tags.key() });
       await navigate({ params: { memoId: result.id }, to: "/memos/$memoId" });
     },
   });

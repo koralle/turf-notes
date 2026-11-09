@@ -19,6 +19,7 @@
     "@fontsource/noto-sans-jp": "catalog:ui",
     "@orpc/client": "catalog:rpc",
     "@orpc/contract": "catalog:rpc",
+    "@orpc/react-query": "catalog:rpc",
     "@tanstack/react-query": "catalog:tanstack",
     "@tanstack/react-router": "catalog:tanstack",
     "@tanstack/react-router-ssr-query": "catalog:tanstack",
