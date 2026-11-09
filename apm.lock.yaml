@@ -6,7 +6,7 @@ dependencies:
   host: github.com
   resolved_commit: c1c8a8c1471069fb0e188eeaff69b8e8db6564a8
   resolved_ref: c1c8a8c1471069fb0e188eeaff69b8e8db6564a8
-  version: 0.0.0
+  version: unknown
   package_type: skill_bundle
   deployed_files:
   - .agents/skills/security-audit
@@ -54,6 +54,21 @@ dependencies:
   content_hash: sha256:414184860d72fa1d44fbdf8267672fec765ddab1f2e7c12f8c859122e2223adb
   skill_subset:
   - security-audit
+- repo_url: honojs/skills
+  name: 5e585be2e9b61ce3
+  host: github.com
+  resolved_commit: e54ce51f6effaeb574ebd2629e89e086e14a2db3
+  resolved_ref: e54ce51f6effaeb574ebd2629e89e086e14a2db3
+  version: e54ce51
+  package_type: skill_bundle
+  deployed_files:
+  - .agents/skills/hono
+  - .agents/skills/hono/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/hono/SKILL.md: sha256:bd09f39234ff6004b44788991b1208027b2ae132a6cc306a58d7cca087fb8c6c
+  content_hash: sha256:39a11804a5918fbdd3fcb2ede832d55b29fa521409ff92c4c0b84f8727d4a0a6
+  skill_subset:
+  - hono
 - repo_url: mattpocock/skills
   name: mattpocock-skills
   host: github.com
@@ -110,7 +125,7 @@ dependencies:
   host: github.com
   resolved_commit: 1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62
   resolved_ref: 1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62
-  version: 0.0.0
+  version: unknown
   package_type: skill_bundle
   deployed_files:
   - .agents/skills/composition-patterns
@@ -559,6 +574,24 @@ deployments:
   - mattpocock/skills
   active_owner: mattpocock/skills
   content_hash: sha256:1411d7df7d99b7e621a1ff8283c8133cc2464be63d064e52d8ce169c6800ee9b
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/hono
+  runtime: null
+  scope: project
+  owners:
+  - honojs/skills
+  active_owner: honojs/skills
+  content_hash: null
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/hono/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - honojs/skills
+  active_owner: honojs/skills
+  content_hash: sha256:bd09f39234ff6004b44788991b1208027b2ae132a6cc306a58d7cca087fb8c6c
 - kind: project-relative
   target: agent-skills
   value: .agents/skills/react-best-practices
