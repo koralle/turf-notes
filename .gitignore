@@ -33,6 +33,9 @@ logs
 # スクリーンショット用の一時ディレクトリ（モックアップの PNG はコミットする）
 .tmp/
 
+# Playwright MCP の出力（スクリーンショット・session 情報）
+.playwright-mcp/
+
 # Panda
 styled-system
 
