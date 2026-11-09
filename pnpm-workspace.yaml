@@ -11,6 +11,11 @@ allowBuilds:
   esbuild: true
   lefthook: true
   workerd: true
+  # testcontainers の任意依存。ローカルの Docker ソケットしか使わないので
+  # ネイティブビルド（cpu-features）も CLI 生成（protobufjs）も要らない。
+  cpu-features: false
+  protobufjs: false
+  ssh2: false
 
 # 依存パッケージ同梱スキルの agent への受け渡しは @tanstack/intent に一本化する。
 # pnpm の自動リンク（12.11+）は直接依存の 1 階層しか見ないため使わない。
@@ -67,6 +72,7 @@ catalogs:
     "@tanstack/react-start": 1.169.4
 
   test:
+    testcontainers: 12.2.1
     vitest: 5.1.0
 
   tooling:

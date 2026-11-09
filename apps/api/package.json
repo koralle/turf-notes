@@ -30,6 +30,7 @@
     "@hono/cli": "catalog:tooling",
     "@turf-notes/forge": "workspace:*",
     "@types/node": "catalog:typescript",
+    "testcontainers": "catalog:test",
     "tsrs": "catalog:typescript",
     "tsx": "catalog:tooling",
     "vite": "catalog:vite",
