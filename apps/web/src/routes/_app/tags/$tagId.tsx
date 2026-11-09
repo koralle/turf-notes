@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import type { MemoListOutput } from "@turf-notes/api-contract/schemas";
+import { tagIdOf } from "@turf-notes/domain";
 import { css } from "styled-system/css";
 
 import { EmptyState } from "../../../components/empty-state";
@@ -8,9 +8,15 @@ import { LoadMore } from "../../../components/load-more";
 import { MemoList, MemoRow } from "../../../components/memo-row";
 import { MobileHeader } from "../../../components/mobile-header";
 import { kindLabels, tagDotOf } from "../../../lib/tag-kind";
-import { client } from "../../../rpc/client";
+import { tagMemosQuery, tagsQuery } from "../../../rpc/queries";
 
 export const Route = createFileRoute("/_app/tags/$tagId")({
+  loader: async ({ context, params }) => {
+    const id = tagIdOf(params.tagId);
+    if (id !== null) {
+      await context.queryClient.infiniteQuery(tagMemosQuery(id));
+    }
+  },
   component: TagPage,
 });
 
@@ -37,32 +43,19 @@ const kindDot = css({ borderRadius: "999px", h: "6px", w: "6px" });
 
 function TagPage() {
   const { tagId } = Route.useParams();
-  const id = Number(tagId);
-  const validId = Number.isInteger(id) && id >= 1;
+  const id = tagIdOf(tagId);
   const navigate = useNavigate();
 
-  const tags = useQuery({
-    queryFn: async () => await client.tags.list(),
-    queryKey: ["tags"],
-  });
-  const memoList = useInfiniteQuery({
-    enabled: validId,
-    getNextPageParam: (last: MemoListOutput) => last.nextCursor ?? undefined,
-    initialPageParam: undefined as string | undefined,
-    queryFn: async ({ pageParam }: { pageParam: string | undefined }) =>
-      await client.memos.list({
-        tagIds: [id],
-        ...(pageParam === undefined ? {} : { cursor: pageParam }),
-      }),
-    queryKey: ["memos", "tag", id],
-  });
+  // `/_app` の loader が温めている。ここは読むだけ。
+  const tags = useQuery(tagsQuery);
+  const memoList = useInfiniteQuery(tagMemosQuery(id));
 
   const items = (memoList.data?.pages ?? []).flatMap((page) => page.items);
 
   const tag = (tags.data ?? []).find((item) => item.id === id);
 
   // 数字でない id や、存在しないタグは空の一覧ではなく「見つからない」を出す。
-  if (!validId || (tags.isSuccess && tag === undefined)) {
+  if (id === null || (tags.isSuccess && tag === undefined)) {
     return (
       <>
         <MobileHeader

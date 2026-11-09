@@ -1,14 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import type { TagWithCount } from "@turf-notes/api-contract/schemas";
 import { tagKinds } from "@turf-notes/domain";
 import { Home, SlidersHorizontal, Tag } from "lucide-react";
-import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { css } from "styled-system/css";
 
 import { kindLabels, tagDotOf } from "../lib/tag-kind";
-import { client } from "../rpc/client";
+import { tagsQuery } from "../rpc/queries";
 
 const shell = css({
   display: "flex",
@@ -104,11 +103,8 @@ const mainCol = css({
 });
 
 const Sidebar = () => {
-  const tags = useQuery({
-    queryFn: async () => await client.tags.list(),
-    queryKey: ["tags"],
-    staleTime: 30_000,
-  });
+  // `/_app` の loader が温めている。ここは読むだけ。
+  const tags = useQuery(tagsQuery);
 
   const grouped = (tags.data ?? []).reduce<Record<string, TagWithCount[]>>(
     (acc, tag) => {
@@ -233,40 +229,4 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
       {isTopLevel ? <MobileTabs pathname={pathname} /> : null}
     </div>
   );
-};
-
-/**
- * サインイン必須の画面を包む。`/sign-in` は対象外。
- * SSR 中は何も描かない（データ取得はクライアントで始まる）。
- */
-export const RequireSession = ({ children }: { children: ReactNode }) => {
-  const navigate = useNavigate();
-  const pathname = useRouterState({
-    select: (state) => state.location.pathname,
-  });
-  const isSignIn = pathname.startsWith("/sign-in");
-
-  const session = useQuery({
-    enabled: !isSignIn,
-    queryFn: async () => await client.me(),
-    queryKey: ["me"],
-    retry: false,
-    staleTime: Infinity,
-  });
-
-  useEffect(() => {
-    if (!isSignIn && session.error !== null) {
-      void navigate({ to: "/sign-in" });
-    }
-  }, [isSignIn, navigate, session.error]);
-
-  if (isSignIn) {
-    return <>{children}</>;
-  }
-
-  if (session.isPending || session.error !== null) {
-    return null;
-  }
-
-  return <>{children}</>;
 };

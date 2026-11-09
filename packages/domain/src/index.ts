@@ -33,6 +33,7 @@ export {
   normalizeTagName,
   tagDisplayName,
   tagId,
+  tagIdOf,
   tagIdSchema,
   tagKindSchema,
   tagKinds,
