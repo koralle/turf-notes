@@ -6,7 +6,7 @@ import { dateStamp } from "../lib/date";
 import { RaceBadge } from "./race-badge";
 import { TagChip } from "./tag-chip";
 
-export const memoListStyle = css({ display: "flex", flexDirection: "column" });
+const list = css({ display: "flex", flexDirection: "column" });
 
 const row = css({
   borderBottomColor: "line",
@@ -72,6 +72,11 @@ const refStyle = css({
   color: "faint",
   fontSize: { base: "10.5px", md: "11px" },
 });
+
+/** メモを縦に並べる。一覧・タグ・レースの各画面で同じ余白にするため共通化する。 */
+export const MemoList = ({ children }: { children: React.ReactNode }) => (
+  <div className={list}>{children}</div>
+);
 
 export const MemoRow = ({
   memo,

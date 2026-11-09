@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { css } from "styled-system/css";
 
 import { EmptyState } from "../../../components/empty-state";
-import { MemoRow, memoListStyle } from "../../../components/memo-row";
+import { MemoList, MemoRow } from "../../../components/memo-row";
 import { MobileHeader } from "../../../components/mobile-header";
 import { kindLabels } from "../../../lib/tag-kind";
 import { client } from "../../../rpc/client";
@@ -94,11 +94,11 @@ function TagPage() {
         {(memoList.data?.items ?? []).length === 0 ? (
           <EmptyState>このタグのメモはまだありません。</EmptyState>
         ) : (
-          <div className={memoListStyle}>
+          <MemoList>
             {(memoList.data?.items ?? []).map((memo) => (
               <MemoRow key={memo.id} memo={memo} />
             ))}
-          </div>
+          </MemoList>
         )}
       </div>
     </>

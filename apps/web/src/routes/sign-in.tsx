@@ -136,15 +136,18 @@ function SignInPage() {
   const handlePasskey = async () => {
     setPending(true);
     setError(null);
-    const result = await authClient.signIn.passkey();
-    setPending(false);
+    try {
+      const result = await authClient.signIn.passkey();
 
-    if (result.error !== null && result.error !== undefined) {
-      setError("パスキーでサインインできませんでした");
-      return;
+      if (result.error !== null && result.error !== undefined) {
+        setError("パスキーでサインインできませんでした");
+        return;
+      }
+
+      await navigate({ to: "/" });
+    } finally {
+      setPending(false);
     }
-
-    await navigate({ to: "/" });
   };
 
   const handlePassword = async (event: React.FormEvent) => {
@@ -152,15 +155,18 @@ function SignInPage() {
     setPending(true);
     setError(null);
 
-    const result = await authClient.signIn.email({ email, password });
+    try {
+      const result = await authClient.signIn.email({ email, password });
 
-    setPending(false);
-    if (result.error !== null && result.error !== undefined) {
-      setError("メールアドレスかパスワードが違います");
-      return;
+      if (result.error !== null && result.error !== undefined) {
+        setError("メールアドレスかパスワードが違います");
+        return;
+      }
+
+      await navigate({ to: "/" });
+    } finally {
+      setPending(false);
     }
-
-    await navigate({ to: "/" });
   };
 
   return (
