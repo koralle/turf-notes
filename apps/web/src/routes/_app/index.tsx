@@ -301,6 +301,7 @@ function HomePage() {
       <div className={composer}>
         <input
           aria-label="メモを書く"
+          name="draft"
           className={composerInput}
           onChange={(event) => {
             setDraft(event.target.value);
@@ -334,6 +335,7 @@ function HomePage() {
           </span>
           <input
             aria-label="メモを検索"
+            name="q"
             className={searchInput}
             onChange={(event) => {
               setQuery(event.target.value);

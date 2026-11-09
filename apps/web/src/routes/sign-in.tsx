@@ -145,6 +145,8 @@ function SignInPage() {
       }
 
       await navigate({ to: "/" });
+    } catch {
+      setError("パスキーでサインインできませんでした");
     } finally {
       setPending(false);
     }
@@ -164,6 +166,8 @@ function SignInPage() {
       }
 
       await navigate({ to: "/" });
+    } catch {
+      setError("サインインできませんでした。通信を確認してください");
     } finally {
       setPending(false);
     }
@@ -246,6 +250,7 @@ function SignInPage() {
               <input
                 autoComplete="email"
                 className={field}
+                name="email"
                 onChange={(event) => {
                   setEmail(event.target.value);
                 }}
@@ -265,6 +270,7 @@ function SignInPage() {
               <input
                 autoComplete="current-password"
                 className={field}
+                name="password"
                 onChange={(event) => {
                   setPassword(event.target.value);
                 }}

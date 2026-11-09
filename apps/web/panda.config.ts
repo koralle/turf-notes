@@ -21,8 +21,9 @@ export default defineConfig({
           bg: { value: "#fbfbfb" },
           panel: { value: "#ffffff" },
           ink: { value: "#18181b" },
-          muted: { value: "#71717a" },
-          faint: { value: "#a1a1aa" },
+          // 補助テキストは小さく（10〜12px）出すので、WCAG AA の 4.5:1 を満たす濃さにする。
+          muted: { value: "#52525b" },
+          faint: { value: "#71717a" },
           line: { value: "#e7e7ea" },
           accent: { value: "#15803d" },
           accentWeak: { value: "#ecfdf3" },

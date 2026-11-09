@@ -256,6 +256,7 @@ const RaceFields = ({
     <div className={fieldStack}>
       <input
         aria-label="開催日"
+        name="raceDate"
         className={field}
         onChange={(event) => {
           onDateChange(event.target.value);
@@ -266,6 +267,7 @@ const RaceFields = ({
       <div className={raceKeyGrid}>
         <select
           aria-label="競馬場"
+          name="venue"
           className={field}
           onChange={(event) => {
             onVenueChange(event.target.value);
@@ -281,6 +283,7 @@ const RaceFields = ({
         </select>
         <select
           aria-label="レース番号"
+          name="raceNumber"
           className={field}
           onChange={(event) => {
             onNumberChange(event.target.value);
@@ -297,6 +300,7 @@ const RaceFields = ({
       </div>
       <input
         aria-label="レース名"
+        name="raceName"
         className={field}
         onChange={(event) => {
           onNameChange(event.target.value);
@@ -384,6 +388,7 @@ const TagSection = ({
       <div className={css({ display: "flex", gap: "4px", mt: "10px" })}>
         <input
           aria-label="新しいタグ名"
+          name="newTagName"
           className={field}
           onChange={(event) => {
             setNewTagName(event.target.value);
@@ -393,6 +398,7 @@ const TagSection = ({
         />
         <select
           aria-label="タグの種類"
+          name="tagKind"
           className={field}
           onChange={(event) => {
             setNewTagKind(event.target.value as TagKind);
@@ -463,6 +469,7 @@ const ReferenceSection = ({
       </div>
       <input
         aria-label="参照するメモを検索"
+        name="refQuery"
         className={field}
         onChange={(event) => {
           setRefQuery(event.target.value);
@@ -600,6 +607,7 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
           <div className={editorCol}>
             <input
               aria-label="タイトル"
+              name="title"
               className={titleInput}
               onChange={(event) => {
                 setTitle(event.target.value);
@@ -614,6 +622,7 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
             </div>
             <textarea
               aria-label="本文"
+              name="body"
               className={bodyArea}
               onChange={(event) => {
                 setText(event.target.value);

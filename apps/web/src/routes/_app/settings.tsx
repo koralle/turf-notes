@@ -238,6 +238,7 @@ const PasskeySection = () => {
               <>
                 <input
                   aria-label="パスキーの名前"
+                  name="passkeyName"
                   className={`${field} ${renameInput}`}
                   onChange={(event) => {
                     setRenameValue(event.target.value);
@@ -309,6 +310,7 @@ const PasskeySection = () => {
       <div className={passkeyAdd}>
         <input
           aria-label="パスキーに付ける名前"
+          name="newPasskeyName"
           className={field}
           onChange={(event) => {
             setNewPasskeyName(event.target.value);
