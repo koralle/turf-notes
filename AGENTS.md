@@ -57,6 +57,8 @@ Use the repository’s installed Intent. If it is unavailable, report the missin
 
 `docker compose -f apps/api/compose.yaml up -d` で libSQL サーバーを起動し、 `pnpm --filter @turf-notes/db migrate` でスキーマを適用する。接続先は `apps/api/.dev.vars`。
 
+テストも同じく実 libSQL を使う（モック DB は使わない）。Vitest の `globalSetup`（`apps/api/src/test-global-setup.ts`）が Testcontainers でコンテナを立て、開発用の `turso`（8080）とは別の使い捨て DB になる。テストは各ケースの前に全テーブルを消す。
+
 ## UI
 
 デザインの正本は `design/mockups/` の HTML と `design/screens/` の PNG。色は Panda のトークン（`apps/web/panda.config.ts`）にだけ定義し、生の色値をコンポーネントに書かない。

@@ -1,20 +1,9 @@
-import path from "node:path";
-
-import { createDb } from "@turf-notes/db";
-import type { AppDb } from "@turf-notes/db";
 import { accounts, users } from "@turf-notes/db/schema";
 import { hashPassword } from "better-auth/crypto";
-import { migrate } from "drizzle-orm/libsql/migrator";
-import {
-  afterAll,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  test,
-} from "vitest";
+import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 
 import { createApp } from "../app";
+import { resetTestDb, testDb } from "../test-db";
 import { createAuth } from "./create-auth";
 import type { Auth } from "./create-auth";
 import { cookieSessionAuthenticator } from "./session";
@@ -29,8 +18,8 @@ const contentTypes = [json, form] as const;
 
 type ContentType = (typeof contentTypes)[number];
 
-let db: AppDb;
 let app: ReturnType<typeof createApp>;
+let passwordHash = "";
 
 const signIn = async (email: string, contentType: ContentType) => {
   const body =
@@ -49,16 +38,16 @@ const signIn = async (email: string, contentType: ContentType) => {
 
 const seedUser = async (email: string, enabled: boolean) => {
   const id = `user-${email}`;
-  await db.insert(users).values({
+  await testDb.insert(users).values({
     email,
     id,
     name: "Owner",
     passwordSignInEnabled: enabled,
   });
-  await db.insert(accounts).values({
+  await testDb.insert(accounts).values({
     accountId: id,
     id: `account-${email}`,
-    password: await hashPassword(password),
+    password: passwordHash,
     providerId: "credential",
     userId: id,
   });
@@ -74,29 +63,21 @@ const expectRejected = async (response: Response) => {
 };
 
 beforeAll(async () => {
-  db = createDb({ url: ":memory:" });
-  await migrate(db, {
-    migrationsFolder: path.join(
-      import.meta.dirname,
-      "../../../../packages/db/drizzle"
-    ),
-  });
-  await seedUser("disabled@example.com", false);
-  await seedUser("enabled@example.com", true);
+  passwordHash = await hashPassword(password);
 });
 
-beforeEach(() => {
+beforeEach(async () => {
+  await resetTestDb();
+  await seedUser("disabled@example.com", false);
+  await seedUser("enabled@example.com", true);
+
   // rate limit のメモリ状態をテスト間で共有しないよう、毎回作り直す。
-  const auth: Auth = createAuth({ baseURL, db, secret });
+  const auth: Auth = createAuth({ baseURL, db: testDb, secret });
   app = createApp({
     authenticate: cookieSessionAuthenticator(auth),
     auth,
-    db: () => db,
+    db: () => testDb,
   });
-});
-
-afterAll(() => {
-  db.$client.close();
 });
 
 describe("パスワードサインインのゲート", () => {
