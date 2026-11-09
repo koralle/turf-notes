@@ -42,12 +42,13 @@ Use the repository’s installed Intent. If it is unavailable, report the missin
 | ------------------------- | --------------------------------------------- |
 | `pnpm dev`                | web(3000) + api（auxiliary worker）を同時起動 |
 | `pnpm check` / `pnpm fix` | Ultracite（Oxlint + Oxfmt）                   |
+| `pnpm doctor`             | React Doctor（apps/web の React 診断）        |
 | `pnpm typecheck`          | ルート + 全パッケージの型検査                 |
 | `pnpm test`               | Vitest                                        |
 | `pnpm knip`               | 未使用依存・export の検出                     |
 | `pnpm build`              | 全パッケージのビルド                          |
 
-コードを変更したら、完了前に `pnpm check && pnpm typecheck && pnpm test && pnpm knip && pnpm build` を通す。CI はこれに Storybook のビルドとマイグレーションの追記チェックを足したものを回す。
+コードを変更したら、完了前に `pnpm check && pnpm typecheck && pnpm test && pnpm knip && pnpm doctor && pnpm build` を通す。CI はこれに Storybook のビルドとマイグレーションの追記チェックを足したものを回す。
 
 ## 認証の復旧
 
