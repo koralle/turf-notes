@@ -17,9 +17,13 @@ dependencies:
         - domain-modeling
         - grilling
         - grill-with-docs
-    - git: cloudflare/security-audit-skill#c1c8a8c1471069fb0e188eeaff69b8e8db6564a8
+    - git: cloudflare/security-audit-skill
+      ref: c1c8a8c1471069fb0e188eeaff69b8e8db6564a8
       skills:
         - security-audit
     - git: open-circle/agent-skills#ea150d8fc3a856801256308b3a83ed79cb3ff3a4
       skills:
         - valibot
+    - git: honojs/skills#e54ce51f6effaeb574ebd2629e89e086e14a2db3
+      skills:
+        - hono

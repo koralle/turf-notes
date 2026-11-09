@@ -27,6 +27,8 @@ const config: KnipConfig = {
     },
     "apps/api": {
       vitest: { config: ["vitest.config.ts"] },
+      // エージェントが `hono request` で使う CLI。コードからは import しない。
+      ignoreDependencies: ["@hono/cli"],
     },
     "packages/domain": {
       vitest: { config: ["vitest.config.ts"] },
