@@ -4,7 +4,7 @@ React 19 の公式 API（`useTransition` / `useOptimistic` / `useActionState`）
 
 - サーバーの状態を変える操作（作成・更新・削除・設定変更）は `useMutation` とし、成功時は `queryClient` を無効化する。
 - サーバーの状態を変えない非同期処理（JSON エクスポートなど）は mutation にしない。保留状態は `useTransition` で持つ。
-- 画面の見え方（保存中の行、削除予定の行など）は `useOptimistic` に任せ、キャッシュには仮のデータを入れない。
+- 画面の見え方（確定前の行など）は `useOptimistic` に任せ、キャッシュには仮のデータを入れない。
 
 ## Considered Options
 
@@ -15,6 +15,5 @@ React 19 の公式 API（`useTransition` / `useOptimistic` / `useActionState`）
 ## Consequences
 
 - mutation のエラーは `.error` から導出し、`useState` に写さない（表示の二重管理をしない）。Better Auth のように失敗を返り値で返す API は、`mutationFn` の中で例外に揃える。
-- `useOptimistic` の仮データは保存中だけ有効で、保存後にサーバーのデータで置き換わる。仮の id は保存が終わるまでリンク先を持たない。
-- 楽観行の仮データは契約（`memoSummarySchema`）を満たすことをテストで確認する（`apps/web/src/lib/pending-memo.test.ts`）。
+- `useOptimistic` の仮データは操作が終わるまでだけ有効で、終わったらサーバーのデータで置き換わる。仮の id は確定するまでリンク先を持たない。
 - 読み取りを loader に移して `@tanstack/react-query` を外す判断をしたとき、この分担は見直す。

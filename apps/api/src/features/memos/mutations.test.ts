@@ -1,11 +1,12 @@
-import { memos, users } from "@turf-notes/db/schema";
+import type { MemoCreateInput } from "@turf-notes/api-contract/schemas";
+import { memos, tags, users } from "@turf-notes/db/schema";
 import { memoId, userId } from "@turf-notes/domain";
 import type { MemoId } from "@turf-notes/domain";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { resetTestDb, testDb } from "../../test-db";
-import { createMemo, updateMemo } from "./mutations";
+import { createMemo, softDeleteMemo, updateMemo } from "./mutations";
 
 const owner = userId("user-owner");
 const stranger = userId("user-stranger");
@@ -19,6 +20,15 @@ const rowOf = async (id: MemoId) => {
   return rows[0];
 };
 
+/** 作成に成功したときの id を取り出す。 */
+const createOk = async (input: MemoCreateInput): Promise<MemoId> => {
+  const result = await createMemo(testDb, owner, input);
+  if (result.kind !== "ok") {
+    throw new Error(`createMemo failed: ${result.kind}`);
+  }
+  return result.id;
+};
+
 beforeEach(async () => {
   await resetTestDb();
   await testDb.insert(users).values([
@@ -29,9 +39,7 @@ beforeEach(async () => {
 
 describe("updateMemo", () => {
   test("読み込んだ版番号と一致すれば保存でき、版番号が1増える", async () => {
-    const { id } = await createMemo(testDb, owner, {
-      body: "道中で力みが出た。",
-    });
+    const id = await createOk({ body: "道中で力みが出た。" });
     expect(await rowOf(id)).toStrictEqual({
       body: "道中で力みが出た。",
       version: 0,
@@ -51,7 +59,7 @@ describe("updateMemo", () => {
   });
 
   test("古い版番号では保存せず conflict を返す", async () => {
-    const { id } = await createMemo(testDb, owner, { body: "一回目" });
+    const id = await createOk({ body: "一回目" });
     await updateMemo(testDb, owner, { body: "二回目", id, version: 0 });
 
     expect(
@@ -70,12 +78,51 @@ describe("updateMemo", () => {
     ).toStrictEqual({ kind: "not-found" });
   });
 
+  test("削除済みのメモは not-found（別タブで削除された場合）", async () => {
+    const id = await createOk({ body: "削除される" });
+    await softDeleteMemo(testDb, owner, id);
+
+    expect(
+      await updateMemo(testDb, owner, { body: "あとから保存", id, version: 0 })
+    ).toStrictEqual({ kind: "not-found" });
+  });
+
   test("他のユーザーのメモは not-found（版番号が合っていても書けない）", async () => {
-    const { id } = await createMemo(testDb, owner, { body: "持ち主のメモ" });
+    const id = await createOk({ body: "持ち主のメモ" });
 
     expect(
       await updateMemo(testDb, stranger, { body: "横取り", id, version: 0 })
     ).toStrictEqual({ kind: "not-found" });
     expect(await rowOf(id)).toStrictEqual({ body: "持ち主のメモ", version: 0 });
+  });
+});
+
+describe("createMemo", () => {
+  test("自分が持っていないタグは付けられない", async () => {
+    const [foreign] = await testDb
+      .insert(tags)
+      .values({
+        kind: "horse",
+        name: "他人のタグ",
+        normalizedName: "他人のタグ",
+        userId: stranger,
+      })
+      .returning();
+    if (foreign === undefined) {
+      throw new Error("tag insert failed");
+    }
+
+    expect(
+      await createMemo(testDb, owner, { body: "本文", tagIds: [foreign.id] })
+    ).toStrictEqual({ kind: "tag-not-found" });
+  });
+
+  test("削除済みのメモは参照先にできない", async () => {
+    const id = await createOk({ body: "参照先" });
+    await softDeleteMemo(testDb, owner, id);
+
+    expect(
+      await createMemo(testDb, owner, { body: "参照元", linkIds: [id] })
+    ).toStrictEqual({ kind: "link-not-found" });
   });
 });

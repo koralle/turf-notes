@@ -2,6 +2,10 @@
   "extends": "@turf-notes/forge/tsconfig/base.json",
   "compilerOptions": {
     "lib": ["es2024", "dom", "dom.iterable"],
+    // base.json と同じ値。エディタの TS サーバーは workspace パッケージの extends を
+    // 解決できず、ここに書かないと node10 の解決に落ちる。
+    "module": "preserve",
+    "moduleResolution": "bundler",
     "jsx": "react-jsx",
     "types": ["vite/client"],
     "paths": {

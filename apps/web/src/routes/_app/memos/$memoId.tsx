@@ -114,6 +114,8 @@ function MemoDetailPage() {
     mutationFn: async () => await client.memos.delete({ id: memoId }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["memos"] });
+      // タグの件数はタグ一覧・サイドバーが出している。
+      await queryClient.invalidateQueries({ queryKey: ["tags"] });
       await navigate({ to: "/" });
     },
   });

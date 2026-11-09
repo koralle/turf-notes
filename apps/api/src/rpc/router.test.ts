@@ -151,3 +151,76 @@ describe("メモ", () => {
     expect((error as Error).message).toContain("Input validation failed");
   });
 });
+
+describe("検索", () => {
+  test("タグ名でもメモを探せる（FR-L3）", async () => {
+    const client = await rpc(owner.email);
+    const tag = await client.tags.create({ kind: "horse", name: "ソダシ" });
+    const { id } = await client.memos.create({
+      body: "本文に馬名はない",
+      tagIds: [tag.id],
+    });
+
+    expect(
+      (await client.memos.list({ q: "ソダシ" })).items.map((item) => item.id)
+    ).toStrictEqual([id]);
+  });
+
+  test("検索語の % はワイルドカードにならない", async () => {
+    const client = await rpc(owner.email);
+    await client.memos.create({ body: "100% 的中させる" });
+    await client.memos.create({ body: "ふつうの本文" });
+
+    expect((await client.memos.list({ q: "%" })).items).toHaveLength(1);
+  });
+});
+
+describe("タグ", () => {
+  test("メモを削除するとタグの件数が減る", async () => {
+    const client = await rpc(owner.email);
+    const tag = await client.tags.create({ kind: "theme", name: "展開" });
+    const { id } = await client.memos.create({
+      body: "本文",
+      tagIds: [tag.id],
+    });
+
+    const countOf = async () =>
+      (await client.tags.list()).find((item) => item.id === tag.id)?.memoCount;
+
+    expect(await countOf()).toBe(1);
+    await client.memos.delete({ id });
+    expect(await countOf()).toBe(0);
+  });
+
+  test("他人のタグは付けられない（tag-not-found）", async () => {
+    const theirs = await rpc(stranger.email);
+    const foreign = await theirs.tags.create({
+      kind: "horse",
+      name: "他人の馬",
+    });
+
+    const mine = await rpc(owner.email);
+    const error = await mine.memos
+      .create({ body: "本文", tagIds: [foreign.id] })
+      .catch((error_: unknown) => error_);
+
+    expect((error as ORPCError<string, unknown>).code).toBe("tag-not-found");
+  });
+});
+
+describe("エクスポート", () => {
+  test("参照先を削除すると linkIds から消える", async () => {
+    const client = await rpc(owner.email);
+    const target = await client.memos.create({ body: "参照先" });
+    const source = await client.memos.create({
+      body: "参照元",
+      linkIds: [target.id],
+    });
+    await client.memos.delete({ id: target.id });
+
+    const dump = await client.exportAll();
+    expect(
+      dump.memos.find((memo) => memo.id === source.id)?.linkIds
+    ).toStrictEqual([]);
+  });
+});

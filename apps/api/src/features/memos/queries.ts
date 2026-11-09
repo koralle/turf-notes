@@ -10,8 +10,18 @@ import type { AppDb } from "@turf-notes/db";
 import { memoLinks, memos, memoTags, tags } from "@turf-notes/db/schema";
 import { excerptOf, headingOf, memoIdSchema } from "@turf-notes/domain";
 import type { MemoId, UserId } from "@turf-notes/domain";
-import { and, desc, eq, inArray, isNull, like, lt, or } from "drizzle-orm";
-import type { SQL } from "drizzle-orm";
+import {
+  and,
+  desc,
+  eq,
+  exists,
+  inArray,
+  isNull,
+  lt,
+  or,
+  sql,
+} from "drizzle-orm";
+import type { SQL, SQLWrapper } from "drizzle-orm";
 import * as v from "valibot";
 
 import { toRace } from "../../lib/race";
@@ -42,6 +52,15 @@ const memoColumns = {
   createdAt: memos.createdAt,
   deletedAt: memos.deletedAt,
   version: memos.version,
+};
+
+/**
+ * LIKE の部分一致。`%` と `_` はメタ文字なので、検索語の中では打ち消す
+ * （`ESCAPE '\'` を付けないと、`%` を含む検索語が全件ヒットになる）。
+ */
+const likeContains = (column: SQLWrapper, q: string): SQL => {
+  const pattern = `%${q.replaceAll(/[%_\\]/gu, (char) => `\\${char}`)}%`;
+  return sql`${column} like ${pattern} escape '\\'`;
 };
 
 const encodeCursor = (createdAt: Date, id: MemoId): string =>
@@ -133,8 +152,17 @@ export const listMemos = async (
   if (q.length > 0) {
     // SQLite の LIKE は ASCII に対しては大文字小文字を区別しない。
     // 日本語の表記揺れまでは吸収しないが、部分一致としては十分（要件 FR-L3）。
-    const pattern = `%${q}%`;
-    const search = or(like(memos.body, pattern), like(memos.title, pattern));
+    // 対象は本文・タイトル・タグ名（FR-L3）。
+    const tagged = db
+      .select({ one: sql`1` })
+      .from(memoTags)
+      .innerJoin(tags, eq(tags.id, memoTags.tagId))
+      .where(and(eq(memoTags.memoId, memos.id), likeContains(tags.name, q)));
+    const search = or(
+      likeContains(memos.body, q),
+      likeContains(memos.title, q),
+      exists(tagged)
+    );
     if (search !== undefined) {
       conditions.push(search);
     }

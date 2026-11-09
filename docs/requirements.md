@@ -150,10 +150,10 @@ pantry とほぼ同じ構成を踏襲する。
 | --- | --- |
 | フロントエンド | TanStack Start + TanStack Router + TanStack Query、React 19 |
 | スタイル | Panda CSS（PostCSS プラグイン）、react-aria-components、lucide-react |
-| フォーム | Conform + Valibot |
+| フォーム | 手書きの controlled input + Valibot（保存時の契約） |
 | API | Hono + oRPC（contract-first）、`apps/api` を別 Worker にして Service Binding で接続 |
 | DB | Drizzle ORM + libSQL/Turso。スキーマとマイグレーションは `packages/db` |
-| 認証 | Better Auth（メール+パスワード、パスキー）＋ admin プラグイン |
+| 認証 | Better Auth（メール+パスワード、パスキー） |
 | ID | Memo は UUID v7。Tag は整数の自動採番 |
 | ツール | tsrs（TypeScript 7 互換のコンパイラ）、oxlint/oxfmt（Ultracite）、knip、lefthook |
 

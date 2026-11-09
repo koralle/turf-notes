@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { css } from "styled-system/css";
 
-import { kindLabels } from "../lib/tag-kind";
+import { kindLabels, tagDotOf } from "../lib/tag-kind";
 import { client } from "../rpc/client";
 
 const shell = css({
@@ -91,12 +91,6 @@ const dotBase = css({
   h: "6px",
   w: "6px",
 });
-const dotOf = {
-  horse: css({ bg: "horse" }),
-  person: css({ bg: "person" }),
-  theme: css({ bg: "theme" }),
-} as const;
-
 const countStyle = css({ color: "faint", fontSize: "11px", ml: "auto" });
 
 const mainCol = css({
@@ -151,7 +145,7 @@ const Sidebar = () => {
                 params={{ tagId: String(tag.id) }}
                 to="/tags/$tagId"
               >
-                <span className={`${dotBase} ${dotOf[kind]}`} />
+                <span className={`${dotBase} ${tagDotOf[kind]}`} />
                 {tag.name}
                 <span className={countStyle}>{tag.memoCount}</span>
               </Link>

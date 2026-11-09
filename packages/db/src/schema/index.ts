@@ -142,29 +142,40 @@ export const tags = sqliteTable(
  * Memo が指すレース。独立したテーブルを持たず、
  * 開催日・競馬場・レース番号の3つ組で同定する（ADR-0001）。
  */
-export const memos = sqliteTable("memos", {
-  id: text("id").primaryKey().$type<MemoId>(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" })
-    .$type<UserId>(),
-  /** 任意の表題。未入力なら本文の1行目を見出しに使う。 */
-  title: text("title"),
-  body: text("body").notNull(),
-  /** 開催日（YYYY-MM-DD）。レース情報は3項目そろって初めて意味を持つ。 */
-  raceDate: text("race_date"),
-  venue: text("venue"),
-  raceNumber: integer("race_number"),
-  /** 任意の表示名。平場では条件を書く。同定には使わない。 */
-  raceName: text("race_name"),
-  /**
-   * 楽観ロック用の版番号。読み込んだ値と一致しない更新はアプリ層で拒否する。
-   * 更新のたびに1増える。
-   */
-  version: integer("version").notNull().default(0),
-  ...timestamps,
-  deletedAt: integer("deleted_at", { mode: "timestamp_ms" }),
-});
+export const memos = sqliteTable(
+  "memos",
+  {
+    id: text("id").primaryKey().$type<MemoId>(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" })
+      .$type<UserId>(),
+    /** 任意の表題。未入力なら本文の1行目を見出しに使う。 */
+    title: text("title"),
+    body: text("body").notNull(),
+    /** 開催日（YYYY-MM-DD）。レース情報は3項目そろって初めて意味を持つ。 */
+    raceDate: text("race_date"),
+    venue: text("venue"),
+    raceNumber: integer("race_number"),
+    /** 任意の表示名。平場では条件を書く。同定には使わない。 */
+    raceName: text("race_name"),
+    /**
+     * 楽観ロック用の版番号。読み込んだ値と一致しない更新はアプリ層で拒否する。
+     * 更新のたびに1増える。
+     */
+    version: integer("version").notNull().default(0),
+    ...timestamps,
+    deletedAt: integer("deleted_at", { mode: "timestamp_ms" }),
+  },
+  (table) => [
+    // 一覧は「ユーザーの、削除されていないメモを新しい順」で引く。
+    index("memos_user_deleted_created").on(
+      table.userId,
+      table.deletedAt,
+      table.createdAt
+    ),
+  ]
+);
 
 export const memoTags = sqliteTable(
   "memo_tags",
