@@ -2,13 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import type { TagWithCount } from "@turf-notes/api-contract/schemas";
 import { tagKinds } from "@turf-notes/domain";
+import { Home, SlidersHorizontal, Tag } from "lucide-react";
 import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { css } from "styled-system/css";
 
 import { kindLabels } from "../lib/tag-kind";
 import { client } from "../rpc/client";
-import { HomeIcon, SettingsIcon, TagIcon } from "./icons";
 
 const shell = css({
   display: "flex",
@@ -203,7 +203,7 @@ const MobileTabs = ({ pathname }: { pathname: string }) => (
       className={`${tab} ${pathname === "/" ? tabActive : ""}`}
       to="/"
     >
-      <HomeIcon size={20} />
+      <Home size={20} />
       ホーム
     </Link>
     <Link
@@ -211,7 +211,7 @@ const MobileTabs = ({ pathname }: { pathname: string }) => (
       className={`${tab} ${pathname === "/tags" ? tabActive : ""}`}
       to="/tags"
     >
-      <TagIcon size={20} />
+      <Tag size={20} />
       タグ
     </Link>
     <Link
@@ -219,7 +219,7 @@ const MobileTabs = ({ pathname }: { pathname: string }) => (
       className={`${tab} ${pathname === "/settings" ? tabActive : ""}`}
       to="/settings"
     >
-      <SettingsIcon size={20} />
+      <SlidersHorizontal size={20} />
       設定
     </Link>
   </nav>

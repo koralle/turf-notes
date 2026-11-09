@@ -27,6 +27,7 @@
     "@turf-notes/domain": "workspace:*",
     "better-auth": "catalog:auth",
     "kiso.css": "catalog:ui",
+    "lucide-react": "catalog:ui",
     "markdown-it": "catalog:ui",
     "react": "catalog:react",
     "react-aria-components": "catalog:ui",
