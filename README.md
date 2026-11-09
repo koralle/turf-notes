@@ -140,7 +140,7 @@ pnpm run deploy
 ## 補足
 
 - ローカル DB は libSQL の HTTP サーバー（`apps/api/compose.yaml`）。本番は Turso を想定している。
-- テストは Testcontainers で使い捨ての libSQL コンテナを立てる。`pnpm test` に Docker 以外の準備は要らない（モック DB は使わない）。
+- テストは Testcontainers で使い捨ての libSQL コンテナを立てる。`pnpm test` に Docker 以外の準備は要らない（モック DB は使わない）。方式の図: `docs/test-strategy.png`
 - `XDG_CONFIG_HOME` をワークスペース内に向けると、wrangler が `~/.config` に書けない環境でも動く。
   ```sh
   XDG_CONFIG_HOME=$PWD/.tmp/xdg pnpm dev
