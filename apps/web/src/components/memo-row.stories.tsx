@@ -9,7 +9,7 @@ import type { MemoSummary } from "@turf-notes/api-contract/schemas";
 import { memoId, raceOf, tagId } from "@turf-notes/domain";
 import { css } from "styled-system/css";
 
-import { MemoRow, memoListStyle } from "./memo-row";
+import { MemoList, MemoRow } from "./memo-row";
 
 const withRouter = (memo: MemoSummary) => {
   const router = createRouter({
@@ -17,9 +17,9 @@ const withRouter = (memo: MemoSummary) => {
     routeTree: createRootRoute({
       component: () => (
         <div className={css({ maxWidth: "900px", px: "24px", py: "16px" })}>
-          <div className={memoListStyle}>
+          <MemoList>
             <MemoRow memo={memo} />
-          </div>
+          </MemoList>
         </div>
       ),
     }),

@@ -4,7 +4,7 @@ import { raceKey, raceKeyOf } from "@turf-notes/domain";
 import { css } from "styled-system/css";
 
 import { EmptyState } from "../../../../../components/empty-state";
-import { MemoRow, memoListStyle } from "../../../../../components/memo-row";
+import { MemoList, MemoRow } from "../../../../../components/memo-row";
 import { MobileHeader } from "../../../../../components/mobile-header";
 import { fullDate } from "../../../../../lib/date";
 import { client } from "../../../../../rpc/client";
@@ -78,11 +78,11 @@ function RacePage() {
         {items.length === 0 ? (
           <EmptyState>このレースのメモはまだありません。</EmptyState>
         ) : (
-          <div className={memoListStyle}>
+          <MemoList>
             {items.map((memo) => (
               <MemoRow key={memo.id} memo={memo} />
             ))}
-          </div>
+          </MemoList>
         )}
       </div>
     </>

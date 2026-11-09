@@ -15,7 +15,7 @@ import { css } from "styled-system/css";
 import { EmptyState } from "../../components/empty-state";
 import { CloseIcon, PlusIcon, SearchIcon } from "../../components/icons";
 import { InlineError } from "../../components/inline-error";
-import { MemoRow, memoListStyle } from "../../components/memo-row";
+import { MemoList, MemoRow } from "../../components/memo-row";
 import { pendingMemo } from "../../lib/pending-memo";
 import { client } from "../../rpc/client";
 
@@ -263,14 +263,14 @@ function HomePage() {
       );
     }
     return (
-      <div className={memoListStyle}>
+      <MemoList>
         {pendingRows.map((memo) => (
           <MemoRow isPending key={memo.id} memo={memo} />
         ))}
         {realItems.map((memo) => (
           <MemoRow key={memo.id} memo={memo} />
         ))}
-      </div>
+      </MemoList>
     );
   };
 
@@ -300,6 +300,8 @@ function HomePage() {
 
       <div className={composer}>
         <input
+          aria-label="メモを書く"
+          name="draft"
           className={composerInput}
           onChange={(event) => {
             setDraft(event.target.value);
@@ -332,6 +334,8 @@ function HomePage() {
             <SearchIcon size={17} />
           </span>
           <input
+            aria-label="メモを検索"
+            name="q"
             className={searchInput}
             onChange={(event) => {
               setQuery(event.target.value);

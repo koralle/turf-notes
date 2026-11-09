@@ -111,23 +111,69 @@ const formatDate = (value: unknown): string => {
   return new Date(ms).toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" });
 };
 
-function SettingsPage() {
+const AccountSection = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [newPasskeyName, setNewPasskeyName] = useState("");
-  const [renamingId, setRenamingId] = useState<string | null>(null);
-  const [renameValue, setRenameValue] = useState("");
-  const [isExporting, startExport] = useTransition();
-  const [exportFailed, setExportFailed] = useState(false);
-
   const me = useQuery({
     queryFn: async () => await client.me(),
     queryKey: ["me"],
   });
-  const methods = useQuery({
-    queryFn: async () => await client.auth.methods(),
-    queryKey: ["auth", "methods"],
+  const signOut = useMutation({
+    mutationFn: async () => await authClient.signOut(),
+    onSuccess: async () => {
+      // サインアウト後に前のユーザーのキャッシュが残らないようにする
+      queryClient.clear();
+      await navigate({ to: "/sign-in" });
+    },
   });
+
+  return (
+    <div className={section}>
+      <div className={label}>アカウント</div>
+      <div className={accountRow}>
+        <div className={css({ flex: 1, minWidth: 0 })}>
+          <div className={css({ fontSize: "13px" })}>
+            {me.data?.name ?? "…"}
+          </div>
+          <div className={muted}>{me.data?.email ?? ""}</div>
+        </div>
+        <RacButton
+          className={css({
+            alignItems: "center",
+            borderColor: "line",
+            borderRadius: "7px",
+            borderStyle: "solid",
+            borderWidth: "1px",
+            color: "danger",
+            cursor: "pointer",
+            display: "inline-flex",
+            flexShrink: 0,
+            fontSize: "12px",
+            fontWeight: 600,
+            justifyContent: "center",
+            minH: { base: "44px", md: "auto" },
+            px: "11px",
+            py: "6px",
+            w: { base: "100%", md: "auto" },
+          })}
+          isDisabled={signOut.isPending}
+          onPress={() => {
+            signOut.mutate();
+          }}
+        >
+          サインアウト
+        </RacButton>
+      </div>
+    </div>
+  );
+};
+
+const PasskeySection = () => {
+  const queryClient = useQueryClient();
+  const [newPasskeyName, setNewPasskeyName] = useState("");
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState("");
+
   const passkeys = useQuery({
     queryFn: async () => await authClient.passkey.listUserPasskeys(),
     queryKey: ["passkeys"],
@@ -151,8 +197,6 @@ function SettingsPage() {
     },
     onSuccess: async () => {
       setNewPasskeyName("");
-      // パスキーが増えると「パスキーが無い」を理由にしたエラーは成り立たなくなる。
-      togglePassword.reset();
       await refresh();
     },
   });
@@ -174,23 +218,207 @@ function SettingsPage() {
     },
   });
 
+  const passkeyList = passkeys.data?.data ?? [];
+
+  return (
+    <div className={section}>
+      <div className={label}>パスキー</div>
+      <div className={css({ color: "muted", fontSize: "12px", mt: "6px" })}>
+        パスキーは端末の生体認証やセキュリティキーでサインインする手段です。
+      </div>
+
+      {passkeyList.length === 0 ? (
+        <div className={css({ color: "faint", fontSize: "12px", mt: "12px" })}>
+          まだ登録されていません。
+        </div>
+      ) : (
+        passkeyList.map((passkey) => (
+          <div className={row} key={passkey.id}>
+            {renamingId === passkey.id ? (
+              <>
+                <input
+                  aria-label="パスキーの名前"
+                  name="passkeyName"
+                  className={`${field} ${renameInput}`}
+                  onChange={(event) => {
+                    setRenameValue(event.target.value);
+                  }}
+                  value={renameValue}
+                />
+                <div className={passkeyActions}>
+                  <button
+                    className={smallButton}
+                    onClick={() => {
+                      renamePasskey.mutate({
+                        id: passkey.id,
+                        name: renameValue,
+                      });
+                    }}
+                    type="button"
+                  >
+                    保存
+                  </button>
+                  <button
+                    className={mutedButton}
+                    onClick={() => {
+                      setRenamingId(null);
+                    }}
+                    type="button"
+                  >
+                    やめる
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className={css({ flex: 1, minWidth: 0 })}>
+                  <div className={css({ fontSize: "13px" })}>
+                    {passkey.name ?? "パスキー"}
+                  </div>
+                  <div className={css({ color: "faint", fontSize: "11px" })}>
+                    {formatDate(passkey.createdAt)} 登録
+                    {passkey.backedUp ? " ・ バックアップ済み" : ""}
+                  </div>
+                </div>
+                <div className={passkeyActions}>
+                  <button
+                    className={smallButton}
+                    onClick={() => {
+                      setRenamingId(passkey.id);
+                      setRenameValue(passkey.name ?? "");
+                    }}
+                    type="button"
+                  >
+                    名前を変更
+                  </button>
+                  <button
+                    className={dangerButton}
+                    onClick={() => {
+                      deletePasskey.mutate(passkey.id);
+                    }}
+                    type="button"
+                  >
+                    削除
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        ))
+      )}
+
+      <div className={passkeyAdd}>
+        <input
+          aria-label="パスキーに付ける名前"
+          name="newPasskeyName"
+          className={field}
+          onChange={(event) => {
+            setNewPasskeyName(event.target.value);
+          }}
+          placeholder="パスキーに付ける名前（任意）"
+          style={{ flex: 1 }}
+          value={newPasskeyName}
+        />
+        <RacButton
+          className={smallButton}
+          isDisabled={addPasskey.isPending}
+          onPress={() => {
+            addPasskey.mutate();
+          }}
+        >
+          パスキーを追加
+        </RacButton>
+      </div>
+
+      {addPasskey.isError ? (
+        <InlineError className={errorSpacing}>
+          パスキーを登録できませんでした
+        </InlineError>
+      ) : null}
+    </div>
+  );
+};
+
+const PasswordSection = () => {
+  const queryClient = useQueryClient();
+  const methods = useQuery({
+    queryFn: async () => await client.auth.methods(),
+    queryKey: ["auth", "methods"],
+  });
+  // 無効化にはパスキーが要るので、同じキャッシュを読んで登録有無を見る。
+  const passkeys = useQuery({
+    queryFn: async () => await authClient.passkey.listUserPasskeys(),
+    queryKey: ["passkeys"],
+  });
   const togglePassword = useMutation({
     mutationFn: async (enabled: boolean) =>
       await client.settings.setPasswordSignIn({ enabled }),
     onSuccess: async () => {
-      addPasskey.reset();
-      await refresh();
+      await queryClient.invalidateQueries({ queryKey: ["passkeys"] });
+      await queryClient.invalidateQueries({ queryKey: ["auth", "methods"] });
     },
   });
 
-  const signOut = useMutation({
-    mutationFn: async () => await authClient.signOut(),
-    onSuccess: async () => {
-      // サインアウト後に前のユーザーのキャッシュが残らないようにする
-      queryClient.clear();
-      await navigate({ to: "/sign-in" });
-    },
-  });
+  const hasPasskey = (passkeys.data?.data ?? []).length > 0;
+  const passwordEnabled = methods.data?.passwordSignInEnabled ?? true;
+  const toggleErrorCode = errorCode(togglePassword.error);
+  // パスキーを登録し直したら「パスキーが無い」を理由にしたエラーは成り立たない。
+  const staleNoPasskeyError = toggleErrorCode === "no-passkey" && hasPasskey;
+
+  return (
+    <div className={section}>
+      <div className={label}>パスワードサインイン</div>
+      <div
+        className={css({
+          alignItems: "center",
+          display: "flex",
+          gap: "12px",
+          mt: "10px",
+        })}
+      >
+        <div className={css({ flex: 1 })}>
+          <div className={css({ fontSize: "13px" })}>
+            {passwordEnabled ? "有効" : "無効"}
+          </div>
+          <div className={muted}>
+            無効にすると、パスキーだけがサインイン手段になります。
+            {hasPasskey ? "" : "先にパスキーを登録してください。"}
+          </div>
+        </div>
+        <RacButton
+          className={smallButton}
+          isDisabled={
+            !canSetPasswordSignIn({
+              hasPasskey,
+              nextEnabled: !passwordEnabled,
+            }) || togglePassword.isPending
+          }
+          onPress={() => {
+            togglePassword.mutate(!passwordEnabled);
+          }}
+        >
+          {passwordEnabled ? "無効にする" : "有効にする"}
+        </RacButton>
+      </div>
+      <div className={css({ color: "faint", fontSize: "11px", mt: "10px" })}>
+        パスキーを全部失った場合は、サーバー上で
+        <code> pnpm --filter @turf-notes/api enable-password </code>
+        を実行すると戻せます。
+      </div>
+      {togglePassword.isError && !staleNoPasskeyError ? (
+        <InlineError className={errorSpacing}>
+          {toggleErrorCode === "no-passkey"
+            ? "パスキーを1つ登録するまで、パスワードサインインは無効化できません"
+            : "設定を保存できませんでした"}
+        </InlineError>
+      ) : null}
+    </div>
+  );
+};
+
+const DataSection = () => {
+  const [isExporting, startExport] = useTransition();
+  const [exportFailed, setExportFailed] = useState(false);
 
   // サーバーの状態を変えないので mutation ではない。保留状態だけ React に任せる。
   const exportAll = () => {
@@ -213,10 +441,41 @@ function SettingsPage() {
     });
   };
 
-  const passkeyList = passkeys.data?.data ?? [];
-  const hasPasskey = passkeyList.length > 0;
-  const passwordEnabled = methods.data?.passwordSignInEnabled ?? true;
+  return (
+    <div className={section}>
+      <div className={label}>データ</div>
+      <div
+        className={css({
+          alignItems: "center",
+          display: "flex",
+          gap: "12px",
+          mt: "10px",
+        })}
+      >
+        <div className={css({ flex: 1 })}>
+          <div className={css({ fontSize: "13px" })}>JSON エクスポート</div>
+          <div className={muted}>
+            メモ・タグ・参照をすべて1つのファイルに書き出します。
+          </div>
+        </div>
+        <RacButton
+          className={smallButton}
+          isDisabled={isExporting}
+          onPress={exportAll}
+        >
+          エクスポート
+        </RacButton>
+      </div>
+      {exportFailed ? (
+        <InlineError className={errorSpacing}>
+          エクスポートに失敗しました
+        </InlineError>
+      ) : null}
+    </div>
+  );
+};
 
+function SettingsPage() {
   return (
     <div className={wrap}>
       <h1
@@ -228,237 +487,10 @@ function SettingsPage() {
       >
         設定
       </h1>
-
-      <div className={section}>
-        <div className={label}>アカウント</div>
-        <div className={accountRow}>
-          <div className={css({ flex: 1, minWidth: 0 })}>
-            <div className={css({ fontSize: "13px" })}>
-              {me.data?.name ?? "…"}
-            </div>
-            <div className={muted}>{me.data?.email ?? ""}</div>
-          </div>
-          <RacButton
-            className={css({
-              alignItems: "center",
-              borderColor: "line",
-              borderRadius: "7px",
-              borderStyle: "solid",
-              borderWidth: "1px",
-              color: "danger",
-              cursor: "pointer",
-              display: "inline-flex",
-              flexShrink: 0,
-              fontSize: "12px",
-              fontWeight: 600,
-              justifyContent: "center",
-              minH: { base: "44px", md: "auto" },
-              px: "11px",
-              py: "6px",
-              w: { base: "100%", md: "auto" },
-            })}
-            isDisabled={signOut.isPending}
-            onPress={() => {
-              signOut.mutate();
-            }}
-          >
-            サインアウト
-          </RacButton>
-        </div>
-      </div>
-
-      <div className={section}>
-        <div className={label}>パスキー</div>
-        <div className={css({ color: "muted", fontSize: "12px", mt: "6px" })}>
-          パスキーは端末の生体認証やセキュリティキーでサインインする手段です。
-        </div>
-
-        {passkeyList.length === 0 ? (
-          <div
-            className={css({ color: "faint", fontSize: "12px", mt: "12px" })}
-          >
-            まだ登録されていません。
-          </div>
-        ) : (
-          passkeyList.map((passkey) => (
-            <div className={row} key={passkey.id}>
-              {renamingId === passkey.id ? (
-                <>
-                  <input
-                    className={`${field} ${renameInput}`}
-                    onChange={(event) => {
-                      setRenameValue(event.target.value);
-                    }}
-                    value={renameValue}
-                  />
-                  <div className={passkeyActions}>
-                    <button
-                      className={smallButton}
-                      onClick={() => {
-                        renamePasskey.mutate({
-                          id: passkey.id,
-                          name: renameValue,
-                        });
-                      }}
-                      type="button"
-                    >
-                      保存
-                    </button>
-                    <button
-                      className={mutedButton}
-                      onClick={() => {
-                        setRenamingId(null);
-                      }}
-                      type="button"
-                    >
-                      やめる
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className={css({ flex: 1, minWidth: 0 })}>
-                    <div className={css({ fontSize: "13px" })}>
-                      {passkey.name ?? "パスキー"}
-                    </div>
-                    <div className={css({ color: "faint", fontSize: "11px" })}>
-                      {formatDate(passkey.createdAt)} 登録
-                      {passkey.backedUp ? " ・ バックアップ済み" : ""}
-                    </div>
-                  </div>
-                  <div className={passkeyActions}>
-                    <button
-                      className={smallButton}
-                      onClick={() => {
-                        setRenamingId(passkey.id);
-                        setRenameValue(passkey.name ?? "");
-                      }}
-                      type="button"
-                    >
-                      名前を変更
-                    </button>
-                    <button
-                      className={dangerButton}
-                      onClick={() => {
-                        deletePasskey.mutate(passkey.id);
-                      }}
-                      type="button"
-                    >
-                      削除
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          ))
-        )}
-
-        <div className={passkeyAdd}>
-          <input
-            className={field}
-            onChange={(event) => {
-              setNewPasskeyName(event.target.value);
-            }}
-            placeholder="パスキーに付ける名前（任意）"
-            style={{ flex: 1 }}
-            value={newPasskeyName}
-          />
-          <RacButton
-            className={smallButton}
-            isDisabled={addPasskey.isPending}
-            onPress={() => {
-              addPasskey.mutate();
-            }}
-          >
-            パスキーを追加
-          </RacButton>
-        </div>
-      </div>
-
-      <div className={section}>
-        <div className={label}>パスワードサインイン</div>
-        <div
-          className={css({
-            alignItems: "center",
-            display: "flex",
-            gap: "12px",
-            mt: "10px",
-          })}
-        >
-          <div className={css({ flex: 1 })}>
-            <div className={css({ fontSize: "13px" })}>
-              {passwordEnabled ? "有効" : "無効"}
-            </div>
-            <div className={muted}>
-              無効にすると、パスキーだけがサインイン手段になります。
-              {hasPasskey ? "" : "先にパスキーを登録してください。"}
-            </div>
-          </div>
-          <RacButton
-            className={smallButton}
-            isDisabled={
-              !canSetPasswordSignIn({
-                hasPasskey,
-                nextEnabled: !passwordEnabled,
-              }) || togglePassword.isPending
-            }
-            onPress={() => {
-              togglePassword.mutate(!passwordEnabled);
-            }}
-          >
-            {passwordEnabled ? "無効にする" : "有効にする"}
-          </RacButton>
-        </div>
-        <div className={css({ color: "faint", fontSize: "11px", mt: "10px" })}>
-          パスキーを全部失った場合は、サーバー上で
-          <code> pnpm --filter @turf-notes/api enable-password </code>
-          を実行すると戻せます。
-        </div>
-      </div>
-
-      <div className={section}>
-        <div className={label}>データ</div>
-        <div
-          className={css({
-            alignItems: "center",
-            display: "flex",
-            gap: "12px",
-            mt: "10px",
-          })}
-        >
-          <div className={css({ flex: 1 })}>
-            <div className={css({ fontSize: "13px" })}>JSON エクスポート</div>
-            <div className={muted}>
-              メモ・タグ・参照をすべて1つのファイルに書き出します。
-            </div>
-          </div>
-          <RacButton
-            className={smallButton}
-            isDisabled={isExporting}
-            onPress={exportAll}
-          >
-            エクスポート
-          </RacButton>
-        </div>
-        {exportFailed ? (
-          <InlineError className={errorSpacing}>
-            エクスポートに失敗しました
-          </InlineError>
-        ) : null}
-      </div>
-
-      {addPasskey.isError ? (
-        <InlineError className={errorSpacing}>
-          パスキーを登録できませんでした
-        </InlineError>
-      ) : null}
-      {togglePassword.isError ? (
-        <InlineError className={errorSpacing}>
-          {errorCode(togglePassword.error) === "no-passkey"
-            ? "パスキーを1つ登録するまで、パスワードサインインは無効化できません"
-            : "設定を保存できませんでした"}
-        </InlineError>
-      ) : null}
+      <AccountSection />
+      <PasskeySection />
+      <PasswordSection />
+      <DataSection />
     </div>
   );
 }

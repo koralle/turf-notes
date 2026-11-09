@@ -78,6 +78,8 @@ const label = css({
   textTransform: "uppercase",
 });
 
+const hint = css({ color: "faint", fontSize: "10.5px", mt: "6px" });
+
 const field = css({
   borderColor: "line",
   borderRadius: "6px",
@@ -90,6 +92,14 @@ const field = css({
   p: "7px 9px",
   w: "100%",
 });
+
+const raceKeyGrid = css({
+  display: "grid",
+  gap: "6px",
+  gridTemplateColumns: "minmax(0, 1fr) minmax(0, 64px)",
+});
+
+const fieldStack = css({ display: "grid", gap: "6px" });
 
 const titleInput = css({
   bg: "bg",
@@ -212,6 +222,284 @@ const refRemove = css({
   w: { base: "32px", md: "auto" },
 });
 
+const tagAddButton = css({
+  color: "accent",
+  cursor: "pointer",
+  flexShrink: 0,
+  fontSize: "12px",
+  minH: { base: "44px", md: "auto" },
+  px: { base: "4px", md: "0" },
+});
+
+/** レースの3つ組とレース名。3つそろったときだけレースページができる。 */
+const RaceFields = ({
+  date,
+  name,
+  number,
+  onDateChange,
+  onNameChange,
+  onNumberChange,
+  onVenueChange,
+  venue,
+}: {
+  date: string;
+  name: string;
+  number: string;
+  onDateChange: (value: string) => void;
+  onNameChange: (value: string) => void;
+  onNumberChange: (value: string) => void;
+  onVenueChange: (value: string) => void;
+  venue: string;
+}) => (
+  <section>
+    <div className={label}>レース</div>
+    <div className={fieldStack}>
+      <input
+        aria-label="開催日"
+        name="raceDate"
+        className={field}
+        onChange={(event) => {
+          onDateChange(event.target.value);
+        }}
+        type="date"
+        value={date}
+      />
+      <div className={raceKeyGrid}>
+        <select
+          aria-label="競馬場"
+          name="venue"
+          className={field}
+          onChange={(event) => {
+            onVenueChange(event.target.value);
+          }}
+          value={venue}
+        >
+          <option value="">競馬場</option>
+          {venues.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
+          ))}
+        </select>
+        <select
+          aria-label="レース番号"
+          name="raceNumber"
+          className={field}
+          onChange={(event) => {
+            onNumberChange(event.target.value);
+          }}
+          value={number}
+        >
+          <option value="">R</option>
+          {Array.from({ length: 12 }, (_, index) => index + 1).map((item) => (
+            <option key={item} value={String(item)}>
+              {item}R
+            </option>
+          ))}
+        </select>
+      </div>
+      <input
+        aria-label="レース名"
+        name="raceName"
+        className={field}
+        onChange={(event) => {
+          onNameChange(event.target.value);
+        }}
+        placeholder="レース名（任意）"
+        value={name}
+      />
+    </div>
+    <div className={hint}>3つそろえるとレースページができます</div>
+  </section>
+);
+
+/** タグの選択と新規作成。選択状態は保存に使うので親が持つ。 */
+const TagSection = ({
+  onAdd,
+  onRemove,
+  selectedIds,
+}: {
+  onAdd: (id: TagId) => void;
+  onRemove: (id: TagId) => void;
+  selectedIds: TagId[];
+}) => {
+  const queryClient = useQueryClient();
+  const [newTagName, setNewTagName] = useState("");
+  const [newTagKind, setNewTagKind] = useState<TagKind>(defaultTagKind);
+
+  const tags = useQuery({
+    queryFn: async () => await client.tags.list(),
+    queryKey: ["tags"],
+  });
+
+  const createTag = useMutation({
+    mutationFn: async () =>
+      await client.tags.create({ kind: newTagKind, name: newTagName.trim() }),
+    onSuccess: async (tag) => {
+      setNewTagName("");
+      onAdd(tag.id);
+      await queryClient.invalidateQueries({ queryKey: ["tags"] });
+    },
+  });
+
+  const tagList = tags.data ?? [];
+  const selectedIdSet = new Set(selectedIds);
+
+  return (
+    <section>
+      <div className={label}>タグ</div>
+      <div className={chipWrap}>
+        {tagList
+          .filter((tag) => selectedIdSet.has(tag.id))
+          .map((tag) => (
+            <TagChip
+              key={tag.id}
+              onRemove={() => {
+                onRemove(tag.id);
+              }}
+              tag={tag}
+            />
+          ))}
+      </div>
+      <div
+        className={css({
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "4px",
+          mt: "10px",
+        })}
+      >
+        {tagList
+          .filter((tag) => !selectedIdSet.has(tag.id))
+          .slice(0, 12)
+          .map((tag) => (
+            <button
+              className={css({ cursor: "pointer", opacity: 0.85 })}
+              key={tag.id}
+              onClick={() => {
+                onAdd(tag.id);
+              }}
+              type="button"
+            >
+              <TagChip tag={tag} />
+            </button>
+          ))}
+      </div>
+      <div className={css({ display: "flex", gap: "4px", mt: "10px" })}>
+        <input
+          aria-label="新しいタグ名"
+          name="newTagName"
+          className={field}
+          onChange={(event) => {
+            setNewTagName(event.target.value);
+          }}
+          placeholder="新しいタグ"
+          value={newTagName}
+        />
+        <select
+          aria-label="タグの種類"
+          name="tagKind"
+          className={field}
+          onChange={(event) => {
+            setNewTagKind(event.target.value as TagKind);
+          }}
+          value={newTagKind}
+        >
+          {tagKinds.map((kind) => (
+            <option key={kind} value={kind}>
+              {kindLabels[kind]}
+            </option>
+          ))}
+        </select>
+        <button
+          className={tagAddButton}
+          disabled={newTagName.trim() === "" || createTag.isPending}
+          onClick={() => {
+            createTag.mutate();
+          }}
+          type="button"
+        >
+          追加
+        </button>
+      </div>
+    </section>
+  );
+};
+
+/** 参照するメモの検索と選択。選択済みの参照は保存に使うので親が持つ。 */
+const ReferenceSection = ({
+  links,
+  memoId,
+  onAdd,
+  onRemove,
+}: {
+  links: MemoRef[];
+  memoId: string | undefined;
+  onAdd: (link: MemoRef) => void;
+  onRemove: (id: MemoRef["id"]) => void;
+}) => {
+  const [refQuery, setRefQuery] = useState("");
+
+  const refCandidates = useQuery({
+    enabled: refQuery.trim().length > 0,
+    queryFn: async () => await client.memos.list({ q: refQuery.trim() }),
+    queryKey: ["memos", "ref", refQuery],
+  });
+
+  return (
+    <section>
+      <div className={label}>参照</div>
+      <div className={css({ display: "flex", flexDirection: "column" })}>
+        {links.map((link) => (
+          <div className={refItem} key={link.id}>
+            <span className={refArrow}>→</span>
+            <span className={refName}>{link.heading}</span>
+            <button
+              aria-label={`${link.heading} を外す`}
+              className={refRemove}
+              onClick={() => {
+                onRemove(link.id);
+              }}
+              type="button"
+            >
+              ×
+            </button>
+          </div>
+        ))}
+      </div>
+      <input
+        aria-label="参照するメモを検索"
+        name="refQuery"
+        className={field}
+        onChange={(event) => {
+          setRefQuery(event.target.value);
+        }}
+        placeholder="メモを検索して参照を追加"
+        value={refQuery}
+      />
+      {(refCandidates.data?.items ?? [])
+        .filter(
+          (item) =>
+            item.id !== memoId && !links.some((link) => link.id === item.id)
+        )
+        .slice(0, 5)
+        .map((item) => (
+          <button
+            className={actionLink}
+            key={item.id}
+            onClick={() => {
+              onAdd({ heading: item.heading, id: item.id });
+              setRefQuery("");
+            }}
+            type="button"
+          >
+            ＋ {item.heading}
+          </button>
+        ))}
+    </section>
+  );
+};
+
 export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -221,37 +509,13 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
   const [raceDate, setRaceDate] = useState(memo?.race?.date ?? "");
   const [venue, setVenue] = useState(memo?.race?.venue ?? "");
   const [raceNumber, setRaceNumber] = useState(
-    memo?.race?.number.toString() ?? ""
+    () => memo?.race?.number.toString() ?? ""
   );
   const [raceName, setRaceName] = useState(memo?.race?.name ?? "");
   const [tagIds, setTagIds] = useState<TagId[]>(
-    memo?.tags.map((tag) => tag.id) ?? []
+    () => memo?.tags.map((tag) => tag.id) ?? []
   );
   const [links, setLinks] = useState<MemoRef[]>(memo?.links ?? []);
-
-  const [newTagName, setNewTagName] = useState("");
-  const [newTagKind, setNewTagKind] = useState<TagKind>(defaultTagKind);
-  const [refQuery, setRefQuery] = useState("");
-
-  const tags = useQuery({
-    queryFn: async () => await client.tags.list(),
-    queryKey: ["tags"],
-  });
-  const refCandidates = useQuery({
-    enabled: refQuery.trim().length > 0,
-    queryFn: async () => await client.memos.list({ q: refQuery.trim() }),
-    queryKey: ["memos", "ref", refQuery],
-  });
-
-  const createTag = useMutation({
-    mutationFn: async () =>
-      await client.tags.create({ kind: newTagKind, name: newTagName.trim() }),
-    onSuccess: async (tag) => {
-      setNewTagName("");
-      setTagIds((prev) => [...new Set([...prev, tag.id])]);
-      await queryClient.invalidateQueries({ queryKey: ["tags"] });
-    },
-  });
 
   const save = useMutation({
     mutationFn: async () => {
@@ -288,8 +552,19 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
     },
   });
 
-  const tagList = tags.data ?? [];
-  const selectedTags = tagList.filter((tag) => tagIds.includes(tag.id));
+  const addTag = (id: TagId) => {
+    setTagIds((prev) => [...new Set([...prev, id])]);
+  };
+  const removeTag = (id: TagId) => {
+    setTagIds((prev) => prev.filter((item) => item !== id));
+  };
+  const addLink = (link: MemoRef) => {
+    setLinks((prev) => [...prev, link]);
+  };
+  const removeLink = (id: MemoRef["id"]) => {
+    setLinks((prev) => prev.filter((item) => item.id !== id));
+  };
+
   // 他の画面で先に保存されていたら、こちらの内容は上書きせずに知らせる。
   const saveErrorMessage =
     errorCode(save.error) === "memo-conflict"
@@ -331,6 +606,8 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
         <div className={body}>
           <div className={editorCol}>
             <input
+              aria-label="タイトル"
+              name="title"
               className={titleInput}
               onChange={(event) => {
                 setTitle(event.target.value);
@@ -344,6 +621,8 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
               本文は Markdown。タイトルが空なら本文の1行目が見出しになる
             </div>
             <textarea
+              aria-label="本文"
+              name="body"
               className={bodyArea}
               onChange={(event) => {
                 setText(event.target.value);
@@ -354,214 +633,27 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
           </div>
 
           <aside className={rail}>
-            <section>
-              <div className={label}>レース</div>
-              <div className={css({ display: "grid", gap: "6px" })}>
-                <input
-                  className={field}
-                  onChange={(event) => {
-                    setRaceDate(event.target.value);
-                  }}
-                  type="date"
-                  value={raceDate}
-                />
-                <div
-                  className={css({
-                    display: "grid",
-                    gap: "6px",
-                    gridTemplateColumns: "minmax(0, 1fr) minmax(0, 64px)",
-                  })}
-                >
-                  <select
-                    className={field}
-                    onChange={(event) => {
-                      setVenue(event.target.value);
-                    }}
-                    value={venue}
-                  >
-                    <option value="">競馬場</option>
-                    {venues.map((item) => (
-                      <option key={item} value={item}>
-                        {item}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    className={field}
-                    onChange={(event) => {
-                      setRaceNumber(event.target.value);
-                    }}
-                    value={raceNumber}
-                  >
-                    <option value="">R</option>
-                    {Array.from({ length: 12 }, (_, index) => index + 1).map(
-                      (number) => (
-                        <option key={number} value={String(number)}>
-                          {number}R
-                        </option>
-                      )
-                    )}
-                  </select>
-                </div>
-                <input
-                  className={field}
-                  onChange={(event) => {
-                    setRaceName(event.target.value);
-                  }}
-                  placeholder="レース名（任意）"
-                  value={raceName}
-                />
-              </div>
-              <div
-                className={css({
-                  color: "faint",
-                  fontSize: "10.5px",
-                  mt: "6px",
-                })}
-              >
-                3つそろえるとレースページができます
-              </div>
-            </section>
-
-            <section>
-              <div className={label}>タグ</div>
-              <div className={chipWrap}>
-                {selectedTags.map((tag) => (
-                  <TagChip
-                    key={tag.id}
-                    onRemove={() => {
-                      setTagIds((prev) => prev.filter((id) => id !== tag.id));
-                    }}
-                    tag={tag}
-                  />
-                ))}
-              </div>
-              <div
-                className={css({
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "4px",
-                  mt: "10px",
-                })}
-              >
-                {tagList
-                  .filter((tag) => !tagIds.includes(tag.id))
-                  .slice(0, 12)
-                  .map((tag) => (
-                    <button
-                      className={css({ cursor: "pointer", opacity: 0.85 })}
-                      key={tag.id}
-                      onClick={() => {
-                        setTagIds((prev) => [...prev, tag.id]);
-                      }}
-                      type="button"
-                    >
-                      <TagChip tag={tag} />
-                    </button>
-                  ))}
-              </div>
-              <div className={css({ display: "flex", gap: "4px", mt: "10px" })}>
-                <input
-                  className={field}
-                  onChange={(event) => {
-                    setNewTagName(event.target.value);
-                  }}
-                  placeholder="新しいタグ"
-                  value={newTagName}
-                />
-                <select
-                  className={field}
-                  onChange={(event) => {
-                    setNewTagKind(event.target.value as TagKind);
-                  }}
-                  value={newTagKind}
-                >
-                  {tagKinds.map((kind) => (
-                    <option key={kind} value={kind}>
-                      {kindLabels[kind]}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  className={css({
-                    color: "accent",
-                    cursor: "pointer",
-                    flexShrink: 0,
-                    fontSize: "12px",
-                    minH: { base: "44px", md: "auto" },
-                    px: { base: "4px", md: "0" },
-                  })}
-                  disabled={newTagName.trim() === "" || createTag.isPending}
-                  onClick={() => {
-                    createTag.mutate();
-                  }}
-                  type="button"
-                >
-                  追加
-                </button>
-              </div>
-            </section>
-
-            <section>
-              <div className={label}>参照</div>
-              <div
-                className={css({
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0px",
-                })}
-              >
-                {links.map((link) => (
-                  <div className={refItem} key={link.id}>
-                    <span className={refArrow}>→</span>
-                    <span className={refName}>{link.heading}</span>
-                    <button
-                      aria-label={`${link.heading} を外す`}
-                      className={refRemove}
-                      onClick={() => {
-                        setLinks((prev) =>
-                          prev.filter((item) => item.id !== link.id)
-                        );
-                      }}
-                      type="button"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <input
-                className={field}
-                onChange={(event) => {
-                  setRefQuery(event.target.value);
-                }}
-                placeholder="メモを検索して参照を追加"
-                value={refQuery}
-              />
-              {(refCandidates.data?.items ?? [])
-                .filter(
-                  (item) =>
-                    item.id !== memo?.id &&
-                    !links.some((link) => link.id === item.id)
-                )
-                .slice(0, 5)
-                .map((item) => (
-                  <button
-                    className={actionLink}
-                    key={item.id}
-                    onClick={() => {
-                      setLinks((prev) => [
-                        ...prev,
-                        { heading: item.heading, id: item.id },
-                      ]);
-                      setRefQuery("");
-                    }}
-                    type="button"
-                  >
-                    ＋ {item.heading}
-                  </button>
-                ))}
-            </section>
+            <RaceFields
+              date={raceDate}
+              name={raceName}
+              number={raceNumber}
+              onDateChange={setRaceDate}
+              onNameChange={setRaceName}
+              onNumberChange={setRaceNumber}
+              onVenueChange={setVenue}
+              venue={venue}
+            />
+            <TagSection
+              onAdd={addTag}
+              onRemove={removeTag}
+              selectedIds={tagIds}
+            />
+            <ReferenceSection
+              links={links}
+              memoId={memo?.id}
+              onAdd={addLink}
+              onRemove={removeLink}
+            />
 
             {memo === undefined ? null : (
               <div className={css({ mt: "auto" })}>

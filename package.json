@@ -9,6 +9,7 @@
     "deploy:api": "pnpm --filter @turf-notes/api run deploy",
     "deploy:web": "pnpm --filter @turf-notes/web run deploy",
     "dev": "pnpm --filter @turf-notes/web run dev",
+    "doctor": "pnpm --filter @turf-notes/web run doctor",
     "fix": "ultracite fix --type-aware --no-error-on-unmatched-pattern",
     "knip": "knip",
     "test": "pnpm -r run test",

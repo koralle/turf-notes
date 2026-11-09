@@ -136,15 +136,20 @@ function SignInPage() {
   const handlePasskey = async () => {
     setPending(true);
     setError(null);
-    const result = await authClient.signIn.passkey();
-    setPending(false);
+    try {
+      const result = await authClient.signIn.passkey();
 
-    if (result.error !== null && result.error !== undefined) {
+      if (result.error !== null && result.error !== undefined) {
+        setError("パスキーでサインインできませんでした");
+        return;
+      }
+
+      await navigate({ to: "/" });
+    } catch {
       setError("パスキーでサインインできませんでした");
-      return;
+    } finally {
+      setPending(false);
     }
-
-    await navigate({ to: "/" });
   };
 
   const handlePassword = async (event: React.FormEvent) => {
@@ -152,15 +157,20 @@ function SignInPage() {
     setPending(true);
     setError(null);
 
-    const result = await authClient.signIn.email({ email, password });
+    try {
+      const result = await authClient.signIn.email({ email, password });
 
-    setPending(false);
-    if (result.error !== null && result.error !== undefined) {
-      setError("メールアドレスかパスワードが違います");
-      return;
+      if (result.error !== null && result.error !== undefined) {
+        setError("メールアドレスかパスワードが違います");
+        return;
+      }
+
+      await navigate({ to: "/" });
+    } catch {
+      setError("サインインできませんでした。通信を確認してください");
+    } finally {
+      setPending(false);
     }
-
-    await navigate({ to: "/" });
   };
 
   return (
@@ -240,6 +250,7 @@ function SignInPage() {
               <input
                 autoComplete="email"
                 className={field}
+                name="email"
                 onChange={(event) => {
                   setEmail(event.target.value);
                 }}
@@ -259,6 +270,7 @@ function SignInPage() {
               <input
                 autoComplete="current-password"
                 className={field}
+                name="password"
                 onChange={(event) => {
                   setPassword(event.target.value);
                 }}

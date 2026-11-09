@@ -22,6 +22,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           name="viewport"
         />
         <title>Turf Notes</title>
+        <meta
+          content="競馬についてのメモを書き溜める個人用アプリ。"
+          name="description"
+        />
         <HeadContent />
       </head>
       <body>
