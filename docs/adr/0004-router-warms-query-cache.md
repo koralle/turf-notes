@@ -17,6 +17,8 @@ loader と画面が同じ `staleTime` を見るので、温めた直後に画面
 
 ## なぜ SSR しないか
 
+> 更新: この節の判断は ADR-0005 で覆した（全画面 SSR が既定）。下記は `ssr: false` にした時点の理由。
+
 `/_app` は `ssr: false` にした。ブラウザからの `/rpc` は `src/server.ts` が Service Binding で `apps/api` へ流すが、**Worker の中から同じ URL を fetch することはできない**（本番は自ゾーンへの fetch が禁止、開発も `localhost:3000` は Worker の外）。つまり SSR 中に loader を走らせると API に届かない。
 
 `ssr: true` にするなら、サーバー側専用の oRPC クライアント（`env.API.fetch` を transport にし、`getRequestHeaders()` で cookie を渡す）を足すことになる。サインイン必須の画面は現状どれも SSR する中身を持たないため、そこまではしない。SSR したくなったときの追加はこの1点で済む。

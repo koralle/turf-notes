@@ -1,17 +1,19 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
 import { AppShell } from "../../components/shell";
+import { errorCode } from "../../rpc/client";
 import { meQuery, tagsQuery } from "../../rpc/queries";
 
 export const Route = createFileRoute("/_app")({
-  // ブラウザからの `/rpc` だけが API Worker に届く（SSR 中に同じ URL は叩けない）。
-  // サインイン必須の画面はどれも SSR する中身を持たないので、ここから下は client で描く。
-  ssr: false,
   beforeLoad: async ({ context }) => {
     // セッションを先に確かめる。未サインインなら後続の loader は走らない。
     try {
       await context.queryClient.query(meQuery);
-    } catch {
+    } catch (error) {
+      // サインアウト以外（API 障害など）はサインインへ飛ばさず、エラー画面に任せる。
+      if (errorCode(error) !== "UNAUTHORIZED") {
+        throw error;
+      }
       throw redirect({ to: "/sign-in" });
     }
   },

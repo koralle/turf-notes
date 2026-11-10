@@ -20,6 +20,16 @@ const notFound = css({
   textAlign: "center",
 });
 const notFoundLink = css({ color: "accent", textDecoration: "underline" });
+const retryButton = css({
+  bg: "transparent",
+  border: "none",
+  color: "accent",
+  cursor: "pointer",
+  fontFamily: "inherit",
+  fontSize: "inherit",
+  p: 0,
+  textDecoration: "underline",
+});
 
 /** ルートに一致しなかったときの表示。既定の `<p>Not Found</p>` だけだと行き止まりになる。 */
 const NotFound = () => (
@@ -28,6 +38,26 @@ const NotFound = () => (
     <Link className={notFoundLink} to="/">
       ホームへ戻る
     </Link>
+  </div>
+);
+
+/**
+ * loader が投げたときの表示。既定は英語の "Something went wrong!" で、
+ * この画面は API の障害で出るので、日本語で何が起きたかと再試行を出す。
+ * 再試行はページを開き直す（`reset` は beforeLoad の失敗をやり直さず、無反応になる）。
+ */
+const LoadFailed = () => (
+  <div className={notFound}>
+    読み込みに失敗しました。{" "}
+    <button
+      className={retryButton}
+      onClick={() => {
+        window.location.reload();
+      }}
+      type="button"
+    >
+      もう一度読み込む
+    </button>
   </div>
 );
 
@@ -44,7 +74,11 @@ export const getRouter = () => {
     },
     queryCache: new QueryCache({
       onError: (error) => {
-        if (errorCode(error) === "UNAUTHORIZED") {
+        // SSR 中の 401 は `/_app` の beforeLoad がリダイレクトで処理する。
+        if (
+          typeof window !== "undefined" &&
+          errorCode(error) === "UNAUTHORIZED"
+        ) {
           void leaveForSignIn();
         }
       },
@@ -53,6 +87,7 @@ export const getRouter = () => {
 
   const router = createTanStackRouter({
     context: { queryClient },
+    defaultErrorComponent: LoadFailed,
     defaultNotFoundComponent: NotFound,
     defaultPreload: "intent",
     defaultPreloadStaleTime: 0,
