@@ -8,6 +8,15 @@ import { authClient } from "../features/auth/auth-client";
 import { authMethodsQuery } from "../rpc/queries";
 
 export const Route = createFileRoute("/sign-in")({
+  // 温めないと、SSR した HTML がパスワード入力欄だけの仮の姿になり、
+  // ハイドレートでパスキーボタンに差し替わる。
+  loader: async ({ context }) => {
+    try {
+      await context.queryClient.query(authMethodsQuery);
+    } catch {
+      // 取れなくても画面は出す（パスワードの既定表示になるだけ）。
+    }
+  },
   component: SignInPage,
 });
 
@@ -124,7 +133,6 @@ function SignInPage() {
   const [pending, setPending] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // SSR の対象だが、`/rpc` はブラウザからしか叩けないのでここは client の取得になる。
   const methods = useQuery(authMethodsQuery);
 
   const hasPasskey = methods.data?.hasPasskey ?? false;
