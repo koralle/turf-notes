@@ -27,3 +27,5 @@ dependencies:
     - git: honojs/skills#e54ce51f6effaeb574ebd2629e89e086e14a2db3
       skills:
         - hono
+    # Agent Plugins (plugin.json) 形式の repo なので、skill ディレクトリを直接指定する
+    - git: GoogleChrome/modern-web-guidance/skills/modern-web-guidance#v1.0.0
