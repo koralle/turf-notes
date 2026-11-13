@@ -99,6 +99,6 @@ describe("cancelledPasskeyErrorCodes", () => {
   test("better-auth の catch-all は無言にしない", () => {
     // AUTH_CANCELLED は WebAuthnError 以外の throw と検証 fetch の失敗を畳んだもの
     // （@better-auth/passkey の client 実装）。黙ると通信失敗が見えなくなる。
-    expect(cancelledPasskeyErrorCodes.has("AUTH_CANCELLED")).toBe(false);
+    expect(cancelledPasskeyErrorCodes.has("AUTH_CANCELLED")).toBeFalsy();
   });
 });
