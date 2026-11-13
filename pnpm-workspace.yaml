@@ -63,7 +63,7 @@ catalogs:
   storybook:
     "@storybook/addon-docs": 10.6.6
     "@storybook/builder-vite": 10.6.6
-    "@storybook/react-vite": 10.6.6
+    "@storybook/tanstack-react": 10.6.6
     storybook: 10.6.6
 
   tanstack:

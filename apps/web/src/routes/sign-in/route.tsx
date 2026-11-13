@@ -69,6 +69,7 @@ function SignInPage() {
         onTogglePassword={() => {
           setShowPassword((prev) => !prev);
         }}
+        passwordExpanded={showPassword}
         passwordEnabled={passwordEnabled}
       />
 

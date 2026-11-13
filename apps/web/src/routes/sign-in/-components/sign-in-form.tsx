@@ -65,10 +65,12 @@ export const SignInForm = ({ onSignIn, onSuccessSignIn }: SignInFormProps) => {
         <input
           aria-describedby={fields.email.ariaDescribedBy}
           aria-invalid={fields.email.ariaInvalid}
-          autoComplete="email"
+          autoComplete="username"
           className={field}
           id={fields.email.id}
           name={fields.email.name}
+          required
+          spellCheck={false}
           type="email"
         />
       </label>
@@ -93,6 +95,7 @@ export const SignInForm = ({ onSignIn, onSuccessSignIn }: SignInFormProps) => {
           className={field}
           id={fields.password.id}
           name={fields.password.name}
+          required
           type="password"
         />
       </label>
