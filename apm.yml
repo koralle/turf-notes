@@ -29,3 +29,20 @@ dependencies:
         - hono
     # Agent Plugins (plugin.json) 形式の repo なので、skill ディレクトリを直接指定する
     - git: GoogleChrome/modern-web-guidance/skills/modern-web-guidance#v1.0.0
+    # 同様に plugin.json 形式なのでスキルを個別指定する
+    - git: ChromeDevTools/chrome-devtools-mcp/skills/a11y-debugging
+      ref: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+    - git: ChromeDevTools/chrome-devtools-mcp/skills/chrome-devtools
+      ref: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+    - git: ChromeDevTools/chrome-devtools-mcp/skills/chrome-devtools-cli
+      ref: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+    - git: ChromeDevTools/chrome-devtools-mcp/skills/cookie-debugging
+      ref: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+    - git: ChromeDevTools/chrome-devtools-mcp/skills/debug-optimize-lcp
+      ref: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+    - git: ChromeDevTools/chrome-devtools-mcp/skills/inspect-in-devtools
+      ref: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+    - git: ChromeDevTools/chrome-devtools-mcp/skills/memory-leak-debugging
+      ref: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+    - git: ChromeDevTools/chrome-devtools-mcp/skills/troubleshooting
+      ref: 8ba2ac945ebaf1adb92208c29f3a30e73a920956

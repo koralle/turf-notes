@@ -18,6 +18,7 @@
   "devDependencies": {
     "@tanstack/intent": "catalog:tooling",
     "@turf-notes/forge": "workspace:*",
+    "chrome-devtools-mcp": "catalog:tooling",
     "knip": "catalog:tooling",
     "lefthook": "catalog:tooling",
     "oxfmt": "catalog:lint",

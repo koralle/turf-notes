@@ -23,7 +23,11 @@ const config: KnipConfig = {
   workspaces: {
     ".": {
       // エージェントが `pnpm intent` で使う CLI。コードからは import しない。
-      ignoreDependencies: ["lefthook", "@tanstack/intent"],
+      ignoreDependencies: [
+        "lefthook",
+        "@tanstack/intent",
+        "chrome-devtools-mcp",
+      ],
     },
     "apps/api": {
       vitest: { config: ["vitest.config.ts"] },

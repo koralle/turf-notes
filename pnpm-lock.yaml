@@ -279,6 +279,9 @@ catalogs:
     '@tanstack/intent':
       specifier: 0.5.6
       version: 0.5.6
+    chrome-devtools-mcp:
+      specifier: 1.13.0
+      version: 1.13.0
     knip:
       specifier: 6.44.1
       version: 6.44.1
@@ -357,6 +360,9 @@ importers:
       '@turf-notes/forge':
         specifier: workspace:*
         version: link:packages/forge
+      chrome-devtools-mcp:
+        specifier: catalog:tooling
+        version: 1.13.0
       knip:
         specifier: catalog:tooling
         version: 6.44.1
@@ -4092,6 +4098,19 @@ packages:
 
   chownr@1.1.4:
     resolution: {integrity: sha512-jJ0bqzaylmJtVnNgzTeSOs8DPavpbYgEr/b0YL8/2GO3xJEhInFmhKMUnEJQjZumK7KXGFhUy89PrsJWlakBVg==}
+
+  chrome-devtools-mcp@1.13.0:
+    resolution: {integrity: sha512-Yf4qhS0+2oo7c+gOySMDHQt4ZL/yKXG2Mxxzjk0gcArINtcQ3tLiQVzAW6g2nsyQzAGhkcLwWWBAtlx3Bg+Spg==}
+    engines: {node: ^20.19.0 || ^22.12.0 || >=23}
+    hasBin: true
+    peerDependencies:
+      '@blackwell-systems/gcf': ^2.2.2
+      '@toon-format/toon': ^4.1.0
+    peerDependenciesMeta:
+      '@blackwell-systems/gcf':
+        optional: true
+      '@toon-format/toon':
+        optional: true
 
   citty@0.2.2:
     resolution: {integrity: sha512-+6vJA3L98yv+IdfKGZHBNiGW5KHn22e/JwID0Strsz8h4S/csAu/OuICwxrg44k5MRiZHWIo8XXuJgQTriRP4w==}
@@ -9129,6 +9148,8 @@ snapshots:
       readdirp: 5.1.1
 
   chownr@1.1.4: {}
+
+  chrome-devtools-mcp@1.13.0: {}
 
   citty@0.2.2: {}
 

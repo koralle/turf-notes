@@ -1,6 +1,148 @@
 lockfile_version: '1'
 apm_version: 0.35.0
 dependencies:
+- repo_url: chromedevtools/chrome-devtools-mcp
+  materialization_repo_url: ChromeDevTools/chrome-devtools-mcp
+  name: a11y-debugging
+  host: github.com
+  resolved_commit: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+  resolved_ref: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+  version: unknown
+  virtual_path: skills/a11y-debugging
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/a11y-debugging
+  - .agents/skills/a11y-debugging/SKILL.md
+  - .agents/skills/a11y-debugging/references/a11y-snippets.md
+  deployed_file_hashes:
+    .agents/skills/a11y-debugging/SKILL.md: sha256:e6e1620e4c1d54bef04c3de1bdabb327602b62b7b3db703557865eac84b871b1
+    .agents/skills/a11y-debugging/references/a11y-snippets.md: sha256:93a02d8889738300461b63da77c1647d4d0156fd9b75107574fbed0a931c20ab
+  content_hash: sha256:07bb9e826ffde084e4e91ea14ad10569f346a7af539866428af3db6586dd53e5
+- repo_url: chromedevtools/chrome-devtools-mcp
+  materialization_repo_url: ChromeDevTools/chrome-devtools-mcp
+  name: chrome-devtools
+  host: github.com
+  resolved_commit: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+  resolved_ref: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+  version: unknown
+  virtual_path: skills/chrome-devtools
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/chrome-devtools
+  - .agents/skills/chrome-devtools/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/chrome-devtools/SKILL.md: sha256:d5f7a3272f1f233397aa6340e9f61b63a973970b78ae1563c80bc60dd5668756
+  content_hash: sha256:f7369e51fa2a0346c6bcf5c5f04912610f56cb3d285fef109d62cc0477161c15
+- repo_url: chromedevtools/chrome-devtools-mcp
+  materialization_repo_url: ChromeDevTools/chrome-devtools-mcp
+  name: chrome-devtools-cli
+  host: github.com
+  resolved_commit: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+  resolved_ref: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+  version: unknown
+  virtual_path: skills/chrome-devtools-cli
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/chrome-devtools-cli
+  - .agents/skills/chrome-devtools-cli/SKILL.md
+  - .agents/skills/chrome-devtools-cli/references/installation.md
+  deployed_file_hashes:
+    .agents/skills/chrome-devtools-cli/SKILL.md: sha256:3544faec2e9d27ffd4e1f134d7b77e823c913ceae7cdf4e26f7f8418dd27d80f
+    .agents/skills/chrome-devtools-cli/references/installation.md: sha256:e1517c49bfd8f22117fcd2cfb2193e082d0e8d0f96d0675619c346f48a1b6e32
+  content_hash: sha256:0d3ff9124f02f302a7467104e1907bac0e17c83c7de5585baef7deb0d983f634
+- repo_url: chromedevtools/chrome-devtools-mcp
+  materialization_repo_url: ChromeDevTools/chrome-devtools-mcp
+  name: cookie-debugging
+  host: github.com
+  resolved_commit: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+  resolved_ref: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+  version: unknown
+  virtual_path: skills/cookie-debugging
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/cookie-debugging
+  - .agents/skills/cookie-debugging/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/cookie-debugging/SKILL.md: sha256:f0f0daa1d75def39492c7430ccd5d98e7ff54ba370f3677147dd3b93b0712e05
+  content_hash: sha256:edb4878f712e41e6fb7bccf901839fbb884857bf5c8f38b7ca7931f97e1a90d5
+- repo_url: chromedevtools/chrome-devtools-mcp
+  materialization_repo_url: ChromeDevTools/chrome-devtools-mcp
+  name: debug-optimize-lcp
+  host: github.com
+  resolved_commit: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+  resolved_ref: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+  version: unknown
+  virtual_path: skills/debug-optimize-lcp
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/debug-optimize-lcp
+  - .agents/skills/debug-optimize-lcp/SKILL.md
+  - .agents/skills/debug-optimize-lcp/references/elements-and-size.md
+  - .agents/skills/debug-optimize-lcp/references/lcp-breakdown.md
+  - .agents/skills/debug-optimize-lcp/references/lcp-snippets.md
+  - .agents/skills/debug-optimize-lcp/references/optimization-strategies.md
+  deployed_file_hashes:
+    .agents/skills/debug-optimize-lcp/SKILL.md: sha256:d6486b728d7c891ed67280d05880dc396499242b02f3041d9e62c8e83c1ba5f3
+    .agents/skills/debug-optimize-lcp/references/elements-and-size.md: sha256:a99e9e5f93ad2e5b5b65e84abd2bb220e0560be66cc87059361f1d5f7ef2aed7
+    .agents/skills/debug-optimize-lcp/references/lcp-breakdown.md: sha256:c63bb071fa465c41464446100f4afc069118eab9092cbec0b284dd452404a947
+    .agents/skills/debug-optimize-lcp/references/lcp-snippets.md: sha256:b54d0c26e9df7eea1e58cc118bbbe1ef2037d097a146603ef31c17fe47a6b8b8
+    .agents/skills/debug-optimize-lcp/references/optimization-strategies.md: sha256:786691daf6216f1aacb0e2bafdc08ef8450067a392ab26814337ac9837c048c1
+  content_hash: sha256:866ba7dfce49120db148ffd30538b37034a329281e4070abfb82b86f6da9c7e2
+- repo_url: chromedevtools/chrome-devtools-mcp
+  materialization_repo_url: ChromeDevTools/chrome-devtools-mcp
+  name: inspect-in-devtools
+  host: github.com
+  resolved_commit: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+  resolved_ref: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+  version: unknown
+  virtual_path: skills/inspect-in-devtools
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/inspect-in-devtools
+  - .agents/skills/inspect-in-devtools/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/inspect-in-devtools/SKILL.md: sha256:8db63e9a5dd93a1f77df31c786c5d0815614533a5321de0904eff9887f7c5f18
+  content_hash: sha256:efa54a61f079d8df674c56bc8a6979c476e40a05941d101c72ea9c6712338a47
+- repo_url: chromedevtools/chrome-devtools-mcp
+  materialization_repo_url: ChromeDevTools/chrome-devtools-mcp
+  name: memory-leak-debugging
+  host: github.com
+  resolved_commit: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+  resolved_ref: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+  version: unknown
+  virtual_path: skills/memory-leak-debugging
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/memory-leak-debugging
+  - .agents/skills/memory-leak-debugging/SKILL.md
+  - .agents/skills/memory-leak-debugging/references/common-leaks.md
+  deployed_file_hashes:
+    .agents/skills/memory-leak-debugging/SKILL.md: sha256:895127ac55a3f2c4e0ca9be496e84165eee6408637c2bcc5516d69170a8de80e
+    .agents/skills/memory-leak-debugging/references/common-leaks.md: sha256:2d41e075d8d22e69bc420a9eb4bc180eb2466669ffd0939c201723d80b2673a1
+  content_hash: sha256:121a89fbacf7fc039db1dc5a57cba94cbefe7683165eedd3a9f8841c93655d76
+- repo_url: chromedevtools/chrome-devtools-mcp
+  materialization_repo_url: ChromeDevTools/chrome-devtools-mcp
+  name: troubleshooting
+  host: github.com
+  resolved_commit: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+  resolved_ref: 8ba2ac945ebaf1adb92208c29f3a30e73a920956
+  version: unknown
+  virtual_path: skills/troubleshooting
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/troubleshooting
+  - .agents/skills/troubleshooting/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/troubleshooting/SKILL.md: sha256:80357d865f9604c12403b9754c1a513d4ee8afcfda84423c7a0e62a246c472f7
+  content_hash: sha256:60ddc666681fcc8b95ba1e3b04ab39eba9455b60fc66d0931331ecb996180cf4
 - repo_url: cloudflare/security-audit-skill
   name: security-audit-skill
   host: github.com
@@ -776,6 +918,78 @@ dependencies:
 deployments:
 - kind: project-relative
   target: agent-skills
+  value: .agents/skills/a11y-debugging
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/a11y-debugging
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/a11y-debugging
+  content_hash: null
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/a11y-debugging/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/a11y-debugging
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/a11y-debugging
+  content_hash: sha256:e6e1620e4c1d54bef04c3de1bdabb327602b62b7b3db703557865eac84b871b1
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/a11y-debugging/references/a11y-snippets.md
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/a11y-debugging
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/a11y-debugging
+  content_hash: sha256:93a02d8889738300461b63da77c1647d4d0156fd9b75107574fbed0a931c20ab
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/chrome-devtools
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/chrome-devtools
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/chrome-devtools
+  content_hash: null
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/chrome-devtools-cli
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/chrome-devtools-cli
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/chrome-devtools-cli
+  content_hash: null
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/chrome-devtools-cli/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/chrome-devtools-cli
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/chrome-devtools-cli
+  content_hash: sha256:3544faec2e9d27ffd4e1f134d7b77e823c913ceae7cdf4e26f7f8418dd27d80f
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/chrome-devtools-cli/references/installation.md
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/chrome-devtools-cli
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/chrome-devtools-cli
+  content_hash: sha256:e1517c49bfd8f22117fcd2cfb2193e082d0e8d0f96d0675619c346f48a1b6e32
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/chrome-devtools/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/chrome-devtools
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/chrome-devtools
+  content_hash: sha256:d5f7a3272f1f233397aa6340e9f61b63a973970b78ae1563c80bc60dd5668756
+- kind: project-relative
+  target: agent-skills
   value: .agents/skills/composition-patterns
   runtime: null
   scope: project
@@ -911,6 +1125,78 @@ deployments:
   content_hash: sha256:74c54038a6c554c748fe31cec673b80861b5d920b7553cf78cdf10d18b4b759b
 - kind: project-relative
   target: agent-skills
+  value: .agents/skills/cookie-debugging
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/cookie-debugging
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/cookie-debugging
+  content_hash: null
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/cookie-debugging/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/cookie-debugging
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/cookie-debugging
+  content_hash: sha256:f0f0daa1d75def39492c7430ccd5d98e7ff54ba370f3677147dd3b93b0712e05
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/debug-optimize-lcp
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/debug-optimize-lcp
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/debug-optimize-lcp
+  content_hash: null
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/debug-optimize-lcp/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/debug-optimize-lcp
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/debug-optimize-lcp
+  content_hash: sha256:d6486b728d7c891ed67280d05880dc396499242b02f3041d9e62c8e83c1ba5f3
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/debug-optimize-lcp/references/elements-and-size.md
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/debug-optimize-lcp
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/debug-optimize-lcp
+  content_hash: sha256:a99e9e5f93ad2e5b5b65e84abd2bb220e0560be66cc87059361f1d5f7ef2aed7
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/debug-optimize-lcp/references/lcp-breakdown.md
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/debug-optimize-lcp
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/debug-optimize-lcp
+  content_hash: sha256:c63bb071fa465c41464446100f4afc069118eab9092cbec0b284dd452404a947
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/debug-optimize-lcp/references/lcp-snippets.md
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/debug-optimize-lcp
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/debug-optimize-lcp
+  content_hash: sha256:b54d0c26e9df7eea1e58cc118bbbe1ef2037d097a146603ef31c17fe47a6b8b8
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/debug-optimize-lcp/references/optimization-strategies.md
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/debug-optimize-lcp
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/debug-optimize-lcp
+  content_hash: sha256:786691daf6216f1aacb0e2bafdc08ef8450067a392ab26814337ac9837c048c1
+- kind: project-relative
+  target: agent-skills
   value: .agents/skills/domain-modeling
   runtime: null
   scope: project
@@ -1026,6 +1312,51 @@ deployments:
   - honojs/skills
   active_owner: honojs/skills
   content_hash: sha256:bd09f39234ff6004b44788991b1208027b2ae132a6cc306a58d7cca087fb8c6c
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/inspect-in-devtools
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/inspect-in-devtools
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/inspect-in-devtools
+  content_hash: null
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/inspect-in-devtools/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/inspect-in-devtools
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/inspect-in-devtools
+  content_hash: sha256:8db63e9a5dd93a1f77df31c786c5d0815614533a5321de0904eff9887f7c5f18
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/memory-leak-debugging
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/memory-leak-debugging
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/memory-leak-debugging
+  content_hash: null
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/memory-leak-debugging/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/memory-leak-debugging
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/memory-leak-debugging
+  content_hash: sha256:895127ac55a3f2c4e0ca9be496e84165eee6408637c2bcc5516d69170a8de80e
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/memory-leak-debugging/references/common-leaks.md
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/memory-leak-debugging
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/memory-leak-debugging
+  content_hash: sha256:2d41e075d8d22e69bc420a9eb4bc180eb2466669ffd0939c201723d80b2673a1
 - kind: project-relative
   target: agent-skills
   value: .agents/skills/modern-web-guidance
@@ -3897,6 +4228,24 @@ deployments:
   - cloudflare/security-audit-skill
   active_owner: cloudflare/security-audit-skill
   content_hash: sha256:b92001117a92c4161d43777a0ba2fa182a8a4d97f2304cc8c0cee5331497b73b
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/troubleshooting
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/troubleshooting
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/troubleshooting
+  content_hash: null
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/troubleshooting/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - chromedevtools/chrome-devtools-mcp/skills/troubleshooting
+  active_owner: chromedevtools/chrome-devtools-mcp/skills/troubleshooting
+  content_hash: sha256:80357d865f9604c12403b9754c1a513d4ee8afcfda84423c7a0e62a246c472f7
 - kind: project-relative
   target: agent-skills
   value: .agents/skills/valibot
