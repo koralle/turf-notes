@@ -76,7 +76,15 @@ export const PasskeyUI = ({
   });
   const label = "パスキーでサインイン";
 
-  return hasPasskey ? (
+  if (!hasPasskey) {
+    return (
+      <div className={hint}>
+        パスキーが未登録です。メールアドレスとパスワードでサインインしてください。
+      </div>
+    );
+  }
+
+  return (
     <>
       <div className={hint}>登録済みのパスキーでサインインします。</div>
       {passkey.error === null ? null : (
@@ -106,9 +114,5 @@ export const PasskeyUI = ({
         </div>
       )}
     </>
-  ) : (
-    <div className={hint}>
-      パスキーが未登録です。メールアドレスとパスワードでサインインしてください。
-    </div>
   );
 };

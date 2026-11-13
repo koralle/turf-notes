@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { css } from "styled-system/css";
 
 import { authMethodsQuery } from "../../rpc/queries";
@@ -45,18 +45,20 @@ function SignInPage() {
   const passwordEnabled = methods.data?.passwordSignInEnabled ?? true;
 
   const navigate = useNavigate();
-  const onSuccessPasswordSignIn = useCallback(async () => {
-    await navigate({ to: "/" });
-  }, [navigate]);
+  // パスキーが既定。パスワード欄は「パスキーが未登録」か「その他の方法」を開いたときだけ出す。
+  const passwordFormShown = passwordEnabled && (showPassword || !hasPasskey);
+  // 区切りはパスキーの案内の下にパスワード欄が続くときだけ要る。
+  const dividerShown = passwordEnabled && hasPasskey && showPassword;
 
-  const onSuccessPasskeySignIn = useCallback(
-    async (outcome: PasskeySignInOutcome) => {
-      if (outcome === "signed-in") {
-        await navigate({ to: "/" });
-      }
-    },
-    [navigate]
-  );
+  const onSuccessPasswordSignIn = async () => {
+    await navigate({ to: "/" });
+  };
+
+  const onSuccessPasskeySignIn = async (outcome: PasskeySignInOutcome) => {
+    if (outcome === "signed-in") {
+      await navigate({ to: "/" });
+    }
+  };
 
   return (
     <SignInCard>
@@ -70,9 +72,9 @@ function SignInPage() {
         passwordEnabled={passwordEnabled}
       />
 
-      {passwordEnabled && (showPassword || !hasPasskey) ? (
+      {passwordFormShown ? (
         <>
-          {hasPasskey && showPassword ? (
+          {dividerShown ? (
             <div className={divider}>パスワードでサインイン</div>
           ) : null}
           <SignInForm
