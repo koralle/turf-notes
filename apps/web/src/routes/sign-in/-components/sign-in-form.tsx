@@ -3,6 +3,7 @@ import { Button as RacButton } from "react-aria-components";
 import { css } from "styled-system/css";
 
 import { useSignIn } from "../-hooks/use-sign-in";
+import { primaryButton } from "../-lib/button";
 import type { SignInFormSchema } from "../-lib/schema";
 import { signInFormSchema } from "../-lib/schema";
 import { InlineError } from "../../../components/inline-error";
@@ -21,26 +22,11 @@ const field = css({
   w: "100%",
 });
 
-const primary = css({
-  alignItems: "center",
-  bg: "accent",
-  border: "none",
-  borderRadius: "9px",
-  color: "#fff",
-  cursor: "pointer",
-  display: "flex",
-  fontSize: { base: "15px", md: "13px" },
-  fontWeight: 600,
-  justifyContent: "center",
-  minH: { base: "48px", md: "auto" },
-  mt: "18px",
-  py: "10px",
-  w: "100%",
-});
-
 const errorSpacing = css({ mt: "10px" });
 
 const bannerSpacing = css({ mt: "14px" });
+
+const buttonSpacing = css({ mt: "18px" });
 
 interface SignInFormProps {
   onSignIn: (value: SignInFormSchema) => Promise<void>;
@@ -119,7 +105,7 @@ export const SignInForm = ({ onSignIn, onSuccessSignIn }: SignInFormProps) => {
       <RacButton
         // 保留に入ると RAC がボタン名を assertive で読み上げるので、名前を進行中の文言に差し替える。
         aria-label={isPending ? `${label}しています` : label}
-        className={primary}
+        className={`${primaryButton} ${buttonSpacing}`}
         isPending={isPending}
         type="submit"
       >

@@ -2,6 +2,7 @@ import { Button as RacButton } from "react-aria-components";
 import { css } from "styled-system/css";
 
 import { useSignIn } from "../-hooks/use-sign-in";
+import { primaryButton } from "../-lib/button";
 import type { PasskeySignInOutcome } from "../-lib/passkey-sign-in";
 import { ErrorBanner } from "./error-banner";
 
@@ -10,23 +11,6 @@ const hint = css({
   fontSize: { base: "13px", md: "12px" },
   lineHeight: 1.8,
   mb: "16px",
-});
-
-const primary = css({
-  alignItems: "center",
-  bg: "accent",
-  border: "none",
-  borderRadius: "9px",
-  color: "#fff",
-  cursor: "pointer",
-  display: "flex",
-  fontSize: { base: "15px", md: "13px" },
-  fontWeight: 600,
-  justifyContent: "center",
-  minH: { base: "48px", md: "auto" },
-  mt: "18px",
-  py: "10px",
-  w: "100%",
 });
 
 const secondary = css({
@@ -107,12 +91,11 @@ export const PasskeyUI = ({
       <RacButton
         // 保留に入ると RAC がボタン名を assertive で読み上げるので、名前を進行中の文言に差し替える。
         aria-label={passkey.isPending ? `${label}しています` : label}
-        className={primary}
+        className={primaryButton}
         isPending={passkey.isPending}
         onPress={() => {
           passkey.signIn();
         }}
-        style={{ marginTop: 0 }}
       >
         {label}
       </RacButton>
