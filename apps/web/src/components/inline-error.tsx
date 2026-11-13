@@ -7,11 +7,17 @@ const base = css({ color: "danger", display: "block", fontSize: "11.5px" });
 export const InlineError = ({
   children,
   className,
+  id,
 }: {
   children: ReactNode;
   className?: string;
+  /** 項目ごとのエラーを入力欄から `aria-describedby` で指すときに使う。 */
+  id?: string;
 }) => (
-  <output className={className === undefined ? base : `${base} ${className}`}>
+  <output
+    className={className === undefined ? base : `${base} ${className}`}
+    id={id}
+  >
     {children}
   </output>
 );

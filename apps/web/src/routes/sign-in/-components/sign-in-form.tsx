@@ -5,6 +5,7 @@ import { css } from "styled-system/css";
 import { useSignIn } from "../-hooks/use-sign-in";
 import type { SignInFormSchema } from "../-lib/schema";
 import { signInFormSchema } from "../-lib/schema";
+import { InlineError } from "../../../components/inline-error";
 import { ErrorBanner } from "./error-banner";
 
 const field = css({
@@ -37,7 +38,7 @@ const primary = css({
   w: "100%",
 });
 
-const errorText = css({ color: "danger", fontSize: "11.5px", mt: "10px" });
+const errorSpacing = css({ mt: "10px" });
 
 const bannerSpacing = css({ mt: "14px" });
 
@@ -75,6 +76,7 @@ export const SignInForm = ({ onSignIn, onSuccessSignIn }: SignInFormProps) => {
       >
         メールアドレス
         <input
+          aria-describedby={fields.email.ariaDescribedBy}
           aria-invalid={fields.email.ariaInvalid}
           autoComplete="email"
           className={field}
@@ -84,7 +86,9 @@ export const SignInForm = ({ onSignIn, onSuccessSignIn }: SignInFormProps) => {
         />
       </label>
       {fields.email.errors === undefined ? null : (
-        <div className={errorText}>{fields.email.errors}</div>
+        <InlineError className={errorSpacing} id={fields.email.errorId}>
+          {fields.email.errors}
+        </InlineError>
       )}
 
       <label
@@ -96,6 +100,7 @@ export const SignInForm = ({ onSignIn, onSuccessSignIn }: SignInFormProps) => {
       >
         パスワード
         <input
+          aria-describedby={fields.password.ariaDescribedBy}
           aria-invalid={fields.password.ariaInvalid}
           autoComplete="current-password"
           className={field}
@@ -105,7 +110,9 @@ export const SignInForm = ({ onSignIn, onSuccessSignIn }: SignInFormProps) => {
         />
       </label>
       {fields.password.errors === undefined ? null : (
-        <div className={errorText}>{fields.password.errors}</div>
+        <InlineError className={errorSpacing} id={fields.password.errorId}>
+          {fields.password.errors}
+        </InlineError>
       )}
 
       <RacButton className={primary} isDisabled={isPending} type="submit">
