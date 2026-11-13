@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { userEvent, within } from "storybook/test";
+import type { ComponentProps } from "react";
+import { useState } from "react";
+import { expect, userEvent, within } from "storybook/test";
 
 import {
   resolvePasskeyErrorMessage,
@@ -37,6 +39,42 @@ const meta = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
+
+/**
+ * 開閉の状態は本番では `route.tsx` が持つ（`showPassword` を `passwordExpanded` と
+ * `onTogglePassword` の両方に配る）。story でも同じ形で持たせないと、開いた状態を描けない。
+ */
+const PasswordToggle = (args: ComponentProps<typeof PasskeyUI>) => {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <PasskeyUI
+      {...args}
+      onTogglePassword={() => {
+        setExpanded((prev) => !prev);
+      }}
+      passwordExpanded={expanded}
+    />
+  );
+};
+
+/**
+ * パスワード欄を開いた状態。押すと `aria-expanded` が切り替わることまで確かめる。
+ * この状態は他の story では描けない（`passwordExpanded` を固定しているため）。
+ */
+export const PasswordExpanded: Story = {
+  render: (args) => <PasswordToggle {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const toggle = canvas.getByRole("button", {
+      name: "その他の方法でログインする",
+    });
+
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await userEvent.click(toggle);
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  },
+};
 
 export const Default: Story = {};
 
