@@ -146,9 +146,10 @@ body {
   }
 }
 
-/* react-aria-components は無効時に data-disabled を付ける */
+/* react-aria-components は無効時に data-disabled、保留時に data-pending を付ける */
 @layer base {
-  [data-disabled] {
+  [data-disabled],
+  [data-pending] {
     cursor: not-allowed;
     opacity: 0.45;
   }
