@@ -17,6 +17,7 @@ const meta = {
     onSignIn: async () => "signed-in",
     onSuccessSignIn: async () => {},
     onTogglePassword: () => {},
+    passwordExpanded: false,
     passwordEnabled: true,
   },
   decorators: [

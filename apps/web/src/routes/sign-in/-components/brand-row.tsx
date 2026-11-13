@@ -9,7 +9,9 @@ export const BrandRow = () => (
       mb: { base: "22px", md: "10px" },
     })}
   >
+    {/* ロゴの頭文字。読み上げると「T Turf Notes」になるので飾り扱いにする。 */}
     <span
+      aria-hidden="true"
       className={css({
         alignItems: "center",
         bg: "accent",
