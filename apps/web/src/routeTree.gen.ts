@@ -10,7 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
-import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as SignInRouteRouteImport } from './routes/sign-in/route'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppMemosMemoIdRouteImport } from './routes/_app/memos/$memoId'
@@ -24,7 +24,7 @@ const AppRouteRoute = AppRouteRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SignInRoute = SignInRouteImport.update({
+const SignInRouteRoute = SignInRouteRouteImport.update({
   id: '/sign-in',
   path: '/sign-in',
   getParentRoute: () => rootRouteImport,
@@ -73,7 +73,7 @@ const AppRacesDateVenueRaceNumberRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
-  '/sign-in': typeof SignInRoute
+  '/sign-in': typeof SignInRouteRoute
   '/settings': typeof AppSettingsRoute
   '/memos/$memoId': typeof AppMemosMemoIdRoute
   '/memos/new': typeof AppMemosNewRoute
@@ -83,7 +83,7 @@ export interface FileRoutesByFullPath {
   '/races/$date/$venue/$raceNumber': typeof AppRacesDateVenueRaceNumberRoute
 }
 export interface FileRoutesByTo {
-  '/sign-in': typeof SignInRoute
+  '/sign-in': typeof SignInRouteRoute
   '/settings': typeof AppSettingsRoute
   '/': typeof AppIndexRoute
   '/memos/$memoId': typeof AppMemosMemoIdRoute
@@ -96,7 +96,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteRouteWithChildren
-  '/sign-in': typeof SignInRoute
+  '/sign-in': typeof SignInRouteRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/': typeof AppIndexRoute
   '/_app/memos/$memoId': typeof AppMemosMemoIdRoute
@@ -145,7 +145,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
-  SignInRoute: typeof SignInRoute
+  SignInRouteRoute: typeof SignInRouteRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -161,7 +161,7 @@ declare module '@tanstack/react-router' {
       id: '/sign-in'
       path: '/sign-in'
       fullPath: '/sign-in'
-      preLoaderRoute: typeof SignInRouteImport
+      preLoaderRoute: typeof SignInRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/': {
@@ -251,7 +251,7 @@ const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   AppRouteRoute: AppRouteRouteWithChildren,
-  SignInRoute: SignInRoute,
+  SignInRouteRoute: SignInRouteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

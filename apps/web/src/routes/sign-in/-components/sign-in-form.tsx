@@ -1,0 +1,116 @@
+import { useForm } from "@conform-to/react/future";
+import { Button as RacButton } from "react-aria-components";
+import { css } from "styled-system/css";
+
+import { useSignIn } from "../-hooks/use-sign-in";
+import type { SignInFormSchema } from "../-lib/schema";
+import { signInFormSchema } from "../-lib/schema";
+import { ErrorBanner } from "./error-banner";
+
+const field = css({
+  borderColor: "line",
+  borderRadius: "7px",
+  borderStyle: "solid",
+  borderWidth: "1px",
+  fontFamily: "inherit",
+  fontSize: { base: "16px", md: "13.5px" },
+  minH: { base: "44px", md: "auto" },
+  mt: "6px",
+  p: "9px 11px",
+  w: "100%",
+});
+
+const primary = css({
+  alignItems: "center",
+  bg: "accent",
+  border: "none",
+  borderRadius: "9px",
+  color: "#fff",
+  cursor: "pointer",
+  display: "flex",
+  fontSize: { base: "15px", md: "13px" },
+  fontWeight: 600,
+  justifyContent: "center",
+  minH: { base: "48px", md: "auto" },
+  mt: "18px",
+  py: "10px",
+  w: "100%",
+});
+
+const errorText = css({ color: "danger", fontSize: "11.5px", mt: "10px" });
+
+const bannerSpacing = css({ mt: "14px" });
+
+interface SignInFormProps {
+  onSignIn: (value: SignInFormSchema) => Promise<void>;
+  onSuccessSignIn: () => Promise<void>;
+}
+
+export const SignInForm = ({ onSignIn, onSuccessSignIn }: SignInFormProps) => {
+  const { signIn, isPending, error } = useSignIn({
+    onSignIn,
+    onSuccess: onSuccessSignIn,
+  });
+
+  const { form, fields } = useForm(signInFormSchema, {
+    shouldValidate: "onBlur",
+    onSubmit: async (event, { value }) => {
+      event.preventDefault();
+      signIn(value);
+    },
+  });
+
+  return (
+    <form {...form.props}>
+      {error === null ? null : (
+        <ErrorBanner className={bannerSpacing}>{error}</ErrorBanner>
+      )}
+
+      <label
+        className={css({
+          display: "block",
+          fontSize: "12px",
+          mt: "14px",
+        })}
+      >
+        メールアドレス
+        <input
+          aria-invalid={fields.email.ariaInvalid}
+          autoComplete="email"
+          className={field}
+          id={fields.email.id}
+          name={fields.email.name}
+          type="email"
+        />
+      </label>
+      {fields.email.errors === undefined ? null : (
+        <div className={errorText}>{fields.email.errors}</div>
+      )}
+
+      <label
+        className={css({
+          display: "block",
+          fontSize: "12px",
+          mt: "12px",
+        })}
+      >
+        パスワード
+        <input
+          aria-invalid={fields.password.ariaInvalid}
+          autoComplete="current-password"
+          className={field}
+          id={fields.password.id}
+          name={fields.password.name}
+          type="password"
+        />
+      </label>
+      {fields.password.errors === undefined ? null : (
+        <div className={errorText}>{fields.password.errors}</div>
+      )}
+
+      <RacButton className={primary} isDisabled={isPending} type="submit">
+        パスワードでサインイン
+      </RacButton>
+    </form>
+  );
+};
