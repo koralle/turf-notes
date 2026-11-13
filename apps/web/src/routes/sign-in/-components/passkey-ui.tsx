@@ -55,6 +55,15 @@ const recoveryNote = css({
 
 const bannerSpacing = css({ mb: "14px" });
 
+/** パスキーを使えないときの最後の手段。サーバーにアクセスできる人だけが戻せる（ADR-0002）。 */
+const RecoveryNote = () => (
+  <div className={recoveryNote}>
+    パスキーを使えない場合は、サーバー上で
+    <code> pnpm --filter @turf-notes/api enable-password </code>
+    を実行するとパスワードサインインを戻せます。
+  </div>
+);
+
 interface PasskeyUIProps {
   hasPasskey: boolean;
   onSignIn: () => Promise<PasskeySignInOutcome>;
@@ -78,9 +87,14 @@ export const PasskeyUI = ({
 
   if (!hasPasskey) {
     return (
-      <div className={hint}>
-        パスキーが未登録です。メールアドレスとパスワードでサインインしてください。
-      </div>
+      <>
+        <div className={hint}>
+          {passwordEnabled
+            ? "パスキーが未登録です。メールアドレスとパスワードでサインインしてください。"
+            : "パスキーが未登録で、パスワードサインインも無効です。"}
+        </div>
+        {passwordEnabled ? null : <RecoveryNote />}
+      </>
     );
   }
 
@@ -107,11 +121,7 @@ export const PasskeyUI = ({
           その他の方法でログインする
         </RacButton>
       ) : (
-        <div className={recoveryNote}>
-          パスキーを全部失った場合は、サーバー上で
-          <code> pnpm --filter @turf-notes/api enable-password </code>
-          を実行してください。
-        </div>
+        <RecoveryNote />
       )}
     </>
   );

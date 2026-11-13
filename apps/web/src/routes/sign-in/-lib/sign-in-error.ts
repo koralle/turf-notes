@@ -37,6 +37,10 @@ export const cancelledPasskeyErrorCodes = new Set([
   "ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY",
 ]);
 
+/**
+ * パスワードサインインは無効にできるので、文言ではパスワードへ誘導しない
+ * （無効なのに存在しない入力欄を指すことになる）。行き先は画面側が示す。
+ */
 export const resolvePasskeyErrorMessage = (error: {
   code?: string;
   status: number;
@@ -46,11 +50,11 @@ export const resolvePasskeyErrorMessage = (error: {
     error.code === "ERROR_INVALID_RP_ID" ||
     error.code === "ORIGIN_NOT_CONFIGURED"
   ) {
-    return "この環境ではパスキーを使えません。パスワードでサインインしてください。";
+    return "この環境ではパスキーを使えません。";
   }
 
   if (error.code === "PASSKEY_NOT_FOUND") {
-    return "このパスキーは登録されていません。パスワードでサインインしてください。";
+    return "このパスキーは登録されていません。";
   }
 
   if (error.code === "CHALLENGE_NOT_FOUND") {

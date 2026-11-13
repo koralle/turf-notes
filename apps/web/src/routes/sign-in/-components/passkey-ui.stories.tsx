@@ -47,7 +47,12 @@ export const PasswordDisabled: Story = {
   args: { passwordEnabled: false },
 };
 
-/** RP ID・origin の設定違い。パスワードへ誘導するしかない。 */
+/** パスワードサインインも無効で、パスキーも無い。サーバー上の CLI でしか戻せない。 */
+export const LockedOut: Story = {
+  args: { hasPasskey: false, passwordEnabled: false },
+};
+
+/** RP ID・origin の設定違い。パスキーを使うしかない。 */
 export const EnvironmentUnsupported: Story = {
   args: {
     onSignIn: async () => {

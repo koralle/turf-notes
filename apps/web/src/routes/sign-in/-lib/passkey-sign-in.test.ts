@@ -36,7 +36,7 @@ describe("signInWithPasskey", () => {
     });
 
     await expect(signInWithPasskey()).rejects.toThrow(
-      "このパスキーは登録されていません。パスワードでサインインしてください。"
+      "このパスキーは登録されていません。"
     );
   });
 

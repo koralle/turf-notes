@@ -48,18 +48,16 @@ describe("resolvePasskeyErrorMessage", () => {
     ["ERROR_INVALID_DOMAIN"],
     ["ERROR_INVALID_RP_ID"],
     ["ORIGIN_NOT_CONFIGURED"],
-  ])("%s は環境の問題としてパスワードへ誘導する", (code) => {
+  ])("%s は環境の問題として案内する", (code) => {
     expect(resolvePasskeyErrorMessage({ code, status: 400 })).toBe(
-      "この環境ではパスキーを使えません。パスワードでサインインしてください。"
+      "この環境ではパスキーを使えません。"
     );
   });
 
-  test("PASSKEY_NOT_FOUND は未登録としてパスワードへ誘導する", () => {
+  test("PASSKEY_NOT_FOUND は未登録として案内する", () => {
     expect(
       resolvePasskeyErrorMessage({ code: "PASSKEY_NOT_FOUND", status: 404 })
-    ).toBe(
-      "このパスキーは登録されていません。パスワードでサインインしてください。"
-    );
+    ).toBe("このパスキーは登録されていません。");
   });
 
   test("CHALLENGE_NOT_FOUND は時間切れとして案内する", () => {
