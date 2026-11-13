@@ -20,9 +20,14 @@ export const resolvePasswordErrorMessage = (error: { status: number }) =>
     : "サインインに失敗しました。もう一度お試しください。";
 
 /**
- * 無言で戻す WebAuthn のエラー。`NotAllowedError` は「ダイアログを閉じた」「時間切れ」
- * 「この端末に該当するパスキーが無い」をまとめて返す（RP から区別できないのは仕様）ので、
- * 何も出さずに戻す。`AbortError` はこちらの中断。
+ * 無言で戻す WebAuthn のエラー。
+ *
+ * - `ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY`: simplewebauthn が `NotAllowedError` に付ける
+ *   コード。ダイアログを閉じた・時間切れ・この端末に該当するパスキーが無い、をまとめて
+ *   返す（RP から区別できないのは仕様）ので、何も出さずに戻す。実際に飛んでくるのはこれ。
+ * - `ERROR_CEREMONY_ABORTED`: `startAuthentication` に `AbortSignal` を渡したときだけ返る。
+ *   今の `@better-auth/passkey` は渡さないので飛ばないが、渡すようになったときの中断を
+ *   黙って戻すために残す。
  *
  * `AUTH_CANCELLED` は名前と裏腹に better-auth の catch-all（WebAuthnError 以外の throw と
  * 検証 fetch の失敗）なので入れない。入れると検証中の通信失敗まで無言で飲まれる。
