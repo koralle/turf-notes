@@ -47,6 +47,10 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/composite-actions/cache-and-install
+      # story の play は実ブラウザ（Vitest browser mode）で回す。Chromium だけ要る。
+      - name: Install Chromium for Vitest browser mode
+        working-directory: apps/web
+        run: pnpm exec playwright install --with-deps chromium
       - run: pnpm run test
 
   knip:

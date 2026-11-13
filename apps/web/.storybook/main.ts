@@ -7,7 +7,7 @@ import { mergeConfig } from "vite";
 const dirname = import.meta.dirname;
 
 const config: StorybookConfig = {
-  addons: ["@storybook/addon-docs"],
+  addons: ["@storybook/addon-docs", "@storybook/addon-vitest"],
   core: {
     builder: {
       name: "@storybook/builder-vite",

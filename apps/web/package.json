@@ -11,7 +11,7 @@
     "panda:codegen": "panda codegen",
     "preview": "vite preview",
     "storybook": "panda codegen && storybook dev -p 6006",
-    "test": "vitest run",
+    "test": "panda codegen && vitest run",
     "typecheck": "panda codegen && tsrs"
   },
   "dependencies": {
@@ -42,6 +42,7 @@
     "@pandacss/preset-base": "catalog:ui",
     "@pandacss/preset-panda": "catalog:ui",
     "@storybook/addon-docs": "catalog:storybook",
+    "@storybook/addon-vitest": "catalog:storybook",
     "@storybook/builder-vite": "catalog:storybook",
     "@storybook/react-vite": "catalog:storybook",
     "@turf-notes/forge": "workspace:*",
@@ -49,6 +50,9 @@
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "@vitejs/plugin-react": "catalog:vite",
+    "@vitest/browser": "catalog:test",
+    "@vitest/browser-playwright": "catalog:test",
+    "playwright": "catalog:test",
     "postcss": "catalog:ui",
     "react-doctor": "catalog:tooling",
     "storybook": "catalog:storybook",
