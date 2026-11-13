@@ -74,6 +74,7 @@ export const PasskeyUI = ({
     onSignIn,
     onSuccess: onSuccessSignIn,
   });
+  const label = "パスキーでサインイン";
 
   return hasPasskey ? (
     <>
@@ -82,14 +83,16 @@ export const PasskeyUI = ({
         <ErrorBanner className={bannerSpacing}>{passkey.error}</ErrorBanner>
       )}
       <RacButton
+        // 保留に入ると RAC がボタン名を assertive で読み上げるので、名前を進行中の文言に差し替える。
+        aria-label={passkey.isPending ? `${label}しています` : label}
         className={primary}
-        isDisabled={passkey.isPending}
+        isPending={passkey.isPending}
         onPress={() => {
           passkey.signIn();
         }}
         style={{ marginTop: 0 }}
       >
-        パスキーでサインイン
+        {label}
       </RacButton>
       {passwordEnabled ? (
         <RacButton className={secondary} onPress={onTogglePassword}>

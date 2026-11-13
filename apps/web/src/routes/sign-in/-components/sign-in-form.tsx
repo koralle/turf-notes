@@ -48,6 +48,7 @@ interface SignInFormProps {
 }
 
 export const SignInForm = ({ onSignIn, onSuccessSignIn }: SignInFormProps) => {
+  const label = "パスワードでサインイン";
   const { signIn, isPending, error } = useSignIn({
     onSignIn,
     onSuccess: onSuccessSignIn,
@@ -115,8 +116,14 @@ export const SignInForm = ({ onSignIn, onSuccessSignIn }: SignInFormProps) => {
         </InlineError>
       )}
 
-      <RacButton className={primary} isDisabled={isPending} type="submit">
-        パスワードでサインイン
+      <RacButton
+        // 保留に入ると RAC がボタン名を assertive で読み上げるので、名前を進行中の文言に差し替える。
+        aria-label={isPending ? `${label}しています` : label}
+        className={primary}
+        isPending={isPending}
+        type="submit"
+      >
+        {label}
       </RacButton>
     </form>
   );
