@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import type { StorybookConfig } from "@storybook/react-vite";
+import type { StorybookConfig } from "@storybook/tanstack-react";
 import viteReact from "@vitejs/plugin-react";
 import { mergeConfig } from "vite";
 
@@ -17,7 +17,7 @@ const config: StorybookConfig = {
       },
     },
   },
-  framework: { name: "@storybook/react-vite", options: {} },
+  framework: { name: "@storybook/tanstack-react", options: {} },
   stories: ["../src/**/*.stories.@(ts|tsx)"],
   viteFinal: (viteConfig) =>
     mergeConfig(viteConfig, {

@@ -53,6 +53,8 @@ interface PasskeyUIProps {
   onSignIn: () => Promise<PasskeySignInOutcome>;
   onSuccessSignIn: (outcome: PasskeySignInOutcome) => Promise<void>;
   onTogglePassword: () => void;
+  /** パスワード欄の開閉。開閉ボタンの `aria-expanded` になる。 */
+  passwordExpanded: boolean;
   passwordEnabled: boolean;
 }
 
@@ -61,6 +63,7 @@ export const PasskeyUI = ({
   onSignIn,
   onSuccessSignIn,
   onTogglePassword,
+  passwordExpanded,
   passwordEnabled,
 }: PasskeyUIProps) => {
   const passkey = useSignIn({
@@ -100,7 +103,11 @@ export const PasskeyUI = ({
         {label}
       </RacButton>
       {passwordEnabled ? (
-        <RacButton className={secondary} onPress={onTogglePassword}>
+        <RacButton
+          aria-expanded={passwordExpanded}
+          className={secondary}
+          onPress={onTogglePassword}
+        >
           その他の方法でログインする
         </RacButton>
       ) : (

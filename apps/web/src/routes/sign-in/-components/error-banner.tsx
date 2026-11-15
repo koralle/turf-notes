@@ -39,7 +39,7 @@ export const ErrorBanner = ({
     className={className === undefined ? banner : `${banner} ${className}`}
     role="alert"
   >
-    <span className={icon}>
+    <span aria-hidden="true" className={icon}>
       <CircleAlert size={14} />
     </span>
     {children}

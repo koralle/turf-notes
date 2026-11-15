@@ -29,8 +29,12 @@ const title = css({
   mb: "6px",
 });
 
+/**
+ * `_app` のシェルと違い、サインインはレイアウトの外に出すので `main` が要る
+ * （無いと支援技術が本文へ飛べず、Lighthouse の landmark-one-main も落ちる）。
+ */
 export const SignInCard = ({ children }: { children: ReactNode }) => (
-  <div className={page}>
+  <main className={page}>
     <div className={card}>
       <BrandRow />
 
@@ -38,5 +42,5 @@ export const SignInCard = ({ children }: { children: ReactNode }) => (
 
       {children}
     </div>
-  </div>
+  </main>
 );

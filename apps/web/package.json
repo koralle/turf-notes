@@ -43,7 +43,7 @@
     "@pandacss/preset-panda": "catalog:ui",
     "@storybook/addon-docs": "catalog:storybook",
     "@storybook/builder-vite": "catalog:storybook",
-    "@storybook/react-vite": "catalog:storybook",
+    "@storybook/tanstack-react": "catalog:storybook",
     "@turf-notes/forge": "workspace:*",
     "@types/node": "catalog:typescript",
     "@types/react": "catalog:react",
