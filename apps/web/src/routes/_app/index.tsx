@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Plus, Search, X } from "lucide-react";
 import { useState } from "react";
@@ -7,13 +7,20 @@ import { css } from "styled-system/css";
 import { EmptyState } from "../../components/empty-state";
 import { LoadMore } from "../../components/load-more";
 import { MemoList, MemoRow } from "../../components/memo-row";
+import { QueryBoundary } from "../../components/query-boundary";
 import { useDebouncedValue } from "../../hooks/use-debounced-value";
 import { memoListQuery } from "../../rpc/queries";
 
 export const Route = createFileRoute("/_app/")({
   // 検索語は画面の state なので、温めるのは検索なしの1ページ目だけ。
-  loader: async ({ context }) =>
-    await context.queryClient.infiniteQuery(memoListQuery("")),
+  // 失敗は画面の境界に任せる（検索欄は出したままにする）。
+  loader: async ({ context }) => {
+    try {
+      await context.queryClient.infiniteQuery(memoListQuery(""));
+    } catch {
+      // 何もしない。
+    }
+  },
   component: HomePage,
 });
 
@@ -95,8 +102,7 @@ const resultNote = css({
   color: "faint",
   display: { base: "block", md: "none" },
   fontSize: "11px",
-  mt: "10px",
-  px: { base: "18px", md: "32px" },
+  mb: "10px",
 });
 
 const timeline = css({
@@ -127,34 +133,6 @@ function HomePage() {
   const [query, setQuery] = useState("");
   // 1文字ごとに API を叩かないよう、入力が止まってから検索する。
   const search = useDebouncedValue(query).trim();
-
-  const list = useInfiniteQuery(memoListQuery(search));
-
-  const items = (list.data?.pages ?? []).flatMap((page) => page.items);
-
-  const renderList = () => {
-    if (list.isPending) {
-      return null;
-    }
-    if (items.length === 0) {
-      return (
-        <EmptyState>
-          {search === ""
-            ? "まだメモがありません。新規メモから始めてください。"
-            : "見つかりませんでした。"}
-        </EmptyState>
-      );
-    }
-    return (
-      <MemoList>
-        {items.map((memo) => (
-          <MemoRow key={memo.id} memo={memo} />
-        ))}
-      </MemoList>
-    );
-  };
-
-  const showResultCount = search !== "" && list.isSuccess && !list.hasNextPage;
 
   return (
     <>
@@ -207,18 +185,10 @@ function HomePage() {
         </div>
       </div>
 
-      {showResultCount ? (
-        <div className={resultNote}>
-          「{search}」の検索結果 {items.length}件
-        </div>
-      ) : null}
-
       <div className={timeline}>
-        {renderList()}
-
-        {list.hasNextPage ? (
-          <LoadMore onClick={() => void list.fetchNextPage()} />
-        ) : null}
+        <QueryBoundary>
+          <Timeline search={search} />
+        </QueryBoundary>
       </div>
 
       <Link
@@ -232,3 +202,39 @@ function HomePage() {
     </>
   );
 }
+
+/** タイムライン本体。検索語を変えても、前の結果が出ている間は待たない。 */
+const Timeline = ({ search }: { search: string }) => {
+  const list = useSuspenseInfiniteQuery(memoListQuery(search));
+
+  const items = list.data.pages.flatMap((page) => page.items);
+
+  if (items.length === 0) {
+    return (
+      <EmptyState>
+        {search === ""
+          ? "まだメモがありません。新規メモから始めてください。"
+          : "見つかりませんでした。"}
+      </EmptyState>
+    );
+  }
+
+  return (
+    <>
+      {search !== "" && !list.hasNextPage ? (
+        <div className={resultNote}>
+          「{search}」の検索結果 {items.length}件
+        </div>
+      ) : null}
+      <MemoList>
+        {items.map((memo) => (
+          <MemoRow key={memo.id} memo={memo} />
+        ))}
+      </MemoList>
+      {/* 前の検索結果を出している間は、その続きを読ませない（ページの基準が古い）。 */}
+      {list.hasNextPage && !list.isFetching ? (
+        <LoadMore onClick={() => void list.fetchNextPage()} />
+      ) : null}
+    </>
+  );
+};

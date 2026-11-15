@@ -53,3 +53,9 @@ export const errorCode = (error: unknown): string =>
   typeof error === "object" && error !== null && "code" in error
     ? String(error.code)
     : "";
+
+const missingCodes = new Set(["memo-not-found", "tag-not-found"]);
+
+/** 対象が無いことを表す定義済みエラーのコードか。画面はこれを見て「見つかりません」を出す。 */
+export const isMissing = (error: unknown): boolean =>
+  missingCodes.has(errorCode(error));

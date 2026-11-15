@@ -211,6 +211,9 @@ catalogs:
       specifier: 8.1.1
       version: 8.1.1
   react:
+    '@suspensive/react':
+      specifier: 3.21.4
+      version: 3.21.4
     '@types/react':
       specifier: 19.3.0
       version: 19.3.0
@@ -475,6 +478,9 @@ importers:
       '@orpc/react-query':
         specifier: catalog:rpc
         version: 1.16.2(@opentelemetry/api@1.9.1)(@orpc/client@1.16.2(@opentelemetry/api@1.9.1))(@tanstack/query-core@5.106.1)(@tanstack/react-query@5.106.1(@types/react@19.3.0)(react@19.3.1))(react@19.3.1)
+      '@suspensive/react':
+        specifier: catalog:react
+        version: 3.21.4(react@19.3.1)
       '@tanstack/react-query':
         specifier: catalog:tanstack
         version: 5.106.1(@types/react@19.3.0)(react@19.3.1)
@@ -3446,6 +3452,11 @@ packages:
         optional: true
       '@tanstack/start-client-core':
         optional: true
+
+  '@suspensive/react@3.21.4':
+    resolution: {integrity: sha512-o5otqY2qy5HejEx2zt4O/ZlCvwNAWT/nFY8H3wodXUePR0RoyGPudjNne3lYPKR54v2zezV5eTOsIIEgMehhKg==}
+    peerDependencies:
+      react: ^18 || ^19
 
   '@swc/helpers@0.5.23':
     resolution: {integrity: sha512-5lSsMOTXURePglDfvuAQUqkGek9Hg2kksOYay2m0+XR++b2NWYL/4sWyuvVBIs8oKnJaxkdi9whaL/sqN13afw==}
@@ -8527,6 +8538,10 @@ snapshots:
       - rollup
       - supports-color
       - typescript
+
+  '@suspensive/react@3.21.4(react@19.3.1)':
+    dependencies:
+      react: 19.3.1
 
   '@swc/helpers@0.5.23':
     dependencies:

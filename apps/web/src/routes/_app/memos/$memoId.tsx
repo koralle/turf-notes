@@ -1,10 +1,16 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { css } from "styled-system/css";
 
 import { Markdown } from "../../../components/markdown";
 import { MobileHeader } from "../../../components/mobile-header";
+import { QueryBoundary } from "../../../components/query-boundary";
+import { MissingMemo } from "../../../components/query-fallbacks";
 import { RaceBadgeLink } from "../../../components/race-badge";
 import { TagChip } from "../../../components/tag-chip";
 import { client, orpc } from "../../../rpc/client";
@@ -15,7 +21,7 @@ export const Route = createFileRoute("/_app/memos/$memoId")({
     try {
       await context.queryClient.query(memoQuery(params.memoId));
     } catch {
-      // 見つからない・取れないはここで投げず、画面の「メモが見つかりません」に任せる。
+      // 見つからない・取れないはここで投げず、画面の境界に任せる。
     }
   },
   component: MemoDetailPage,
@@ -109,36 +115,6 @@ const cancelButton = css({
 function MemoDetailPage() {
   const { memoId } = Route.useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-
-  const memo = useQuery(memoQuery(memoId));
-
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
-
-  const remove = useMutation({
-    mutationFn: async () => await client.memos.delete({ id: memoId }),
-    onSuccess: async () => {
-      // 削除したメモはもう取れないので、無効化ではなく捨てる（取り直すと 404 になる）。
-      queryClient.removeQueries({ queryKey: orpc.memos.key() });
-      // タグの件数はタグ一覧・サイドバーが出している。
-      await queryClient.invalidateQueries({ queryKey: orpc.tags.key() });
-      await navigate({ to: "/" });
-    },
-  });
-
-  if (memo.isPending) {
-    return null;
-  }
-
-  if (memo.isError) {
-    return (
-      <div style={{ padding: 32 }}>
-        メモが見つかりません。<Link to="/">ホームへ戻る</Link>
-      </div>
-    );
-  }
-
-  const item = memo.data;
 
   return (
     <>
@@ -155,126 +131,154 @@ function MemoDetailPage() {
         onBack={() => void navigate({ to: "/" })}
         title="メモ"
       />
-      <div className={wrap}>
-        <div className={desktopActions}>
-          <button
-            className={css({
-              color: "muted",
-              cursor: "pointer",
-              fontSize: "12.5px",
-            })}
-            onClick={() => void navigate({ to: "/" })}
-            type="button"
-          >
-            ← ホーム
-          </button>
-          <Link
-            className={css({ color: "accent", fontSize: "12.5px", ml: "auto" })}
-            params={{ memoId }}
-            to="/memos/$memoId/edit"
-          >
-            編集
-          </Link>
-          <button
-            className={css({
-              color: "danger",
-              cursor: "pointer",
-              fontSize: "12.5px",
-            })}
-            onClick={() => {
-              if (confirmingDelete) {
+      <QueryBoundary notFound={<MissingMemo />}>
+        <MemoDetail memoId={memoId} />
+      </QueryBoundary>
+    </>
+  );
+}
+
+const MemoDetail = ({ memoId }: { memoId: string }) => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const memo = useSuspenseQuery(memoQuery(memoId));
+
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+
+  const remove = useMutation({
+    mutationFn: async () => await client.memos.delete({ id: memoId }),
+    onSuccess: async () => {
+      // 削除したメモはもう取れないので、無効化ではなく捨てる（取り直すと 404 になる）。
+      queryClient.removeQueries({ queryKey: orpc.memos.key() });
+      // タグの件数はタグ一覧・サイドバーが出している。
+      await queryClient.invalidateQueries({ queryKey: orpc.tags.key() });
+      await navigate({ to: "/" });
+    },
+  });
+
+  const item = memo.data;
+
+  return (
+    <div className={wrap}>
+      <div className={desktopActions}>
+        <button
+          className={css({
+            color: "muted",
+            cursor: "pointer",
+            fontSize: "12.5px",
+          })}
+          onClick={() => void navigate({ to: "/" })}
+          type="button"
+        >
+          ← ホーム
+        </button>
+        <Link
+          className={css({ color: "accent", fontSize: "12.5px", ml: "auto" })}
+          params={{ memoId }}
+          to="/memos/$memoId/edit"
+        >
+          編集
+        </Link>
+        <button
+          className={css({
+            color: "danger",
+            cursor: "pointer",
+            fontSize: "12.5px",
+          })}
+          onClick={() => {
+            if (confirmingDelete) {
+              remove.mutate();
+              return;
+            }
+            setConfirmingDelete(true);
+          }}
+          type="button"
+        >
+          {confirmingDelete ? "本当に削除" : "削除"}
+        </button>
+      </div>
+
+      <h1 className={h1}>{item.heading}</h1>
+
+      <div className={meta}>
+        {item.race === null ? null : <RaceBadgeLink race={item.race} />}
+        {item.tags.map((tag) => (
+          <TagChip key={tag.id} tag={tag} />
+        ))}
+      </div>
+
+      <div className={bodyText}>
+        <Markdown source={item.body} />
+      </div>
+
+      {item.links.length === 0 ? null : (
+        <div className={section}>
+          <div className={sectionLabel}>参照しているメモ</div>
+          {item.links.map((link) => (
+            <Link
+              className={refLink}
+              key={link.id}
+              params={{ memoId: link.id }}
+              to="/memos/$memoId"
+            >
+              → {link.heading}
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {item.backlinks.length === 0 ? null : (
+        <div className={section}>
+          <div className={sectionLabel}>このメモを参照しているメモ</div>
+          {item.backlinks.map((link) => (
+            <Link
+              className={refLink}
+              key={link.id}
+              params={{ memoId: link.id }}
+              to="/memos/$memoId"
+            >
+              ← {link.heading}
+            </Link>
+          ))}
+        </div>
+      )}
+
+      <div className={mobileDanger}>
+        {confirmingDelete ? (
+          <>
+            <button
+              className={dangerButton}
+              disabled={remove.isPending}
+              onClick={() => {
                 remove.mutate();
-                return;
-              }
+              }}
+              type="button"
+            >
+              本当に削除
+            </button>
+            <button
+              className={cancelButton}
+              onClick={() => {
+                setConfirmingDelete(false);
+              }}
+              type="button"
+            >
+              やめる
+            </button>
+          </>
+        ) : (
+          <button
+            className={dangerButton}
+            onClick={() => {
               setConfirmingDelete(true);
             }}
             type="button"
           >
-            {confirmingDelete ? "本当に削除" : "削除"}
+            このメモを削除
           </button>
-        </div>
-
-        <h1 className={h1}>{item.heading}</h1>
-
-        <div className={meta}>
-          {item.race === null ? null : <RaceBadgeLink race={item.race} />}
-          {item.tags.map((tag) => (
-            <TagChip key={tag.id} tag={tag} />
-          ))}
-        </div>
-
-        <div className={bodyText}>
-          <Markdown source={item.body} />
-        </div>
-
-        {item.links.length === 0 ? null : (
-          <div className={section}>
-            <div className={sectionLabel}>参照しているメモ</div>
-            {item.links.map((link) => (
-              <Link
-                className={refLink}
-                key={link.id}
-                params={{ memoId: link.id }}
-                to="/memos/$memoId"
-              >
-                → {link.heading}
-              </Link>
-            ))}
-          </div>
         )}
-
-        {item.backlinks.length === 0 ? null : (
-          <div className={section}>
-            <div className={sectionLabel}>このメモを参照しているメモ</div>
-            {item.backlinks.map((link) => (
-              <Link
-                className={refLink}
-                key={link.id}
-                params={{ memoId: link.id }}
-                to="/memos/$memoId"
-              >
-                ← {link.heading}
-              </Link>
-            ))}
-          </div>
-        )}
-
-        <div className={mobileDanger}>
-          {confirmingDelete ? (
-            <>
-              <button
-                className={dangerButton}
-                disabled={remove.isPending}
-                onClick={() => {
-                  remove.mutate();
-                }}
-                type="button"
-              >
-                本当に削除
-              </button>
-              <button
-                className={cancelButton}
-                onClick={() => {
-                  setConfirmingDelete(false);
-                }}
-                type="button"
-              >
-                やめる
-              </button>
-            </>
-          ) : (
-            <button
-              className={dangerButton}
-              onClick={() => {
-                setConfirmingDelete(true);
-              }}
-              type="button"
-            >
-              このメモを削除
-            </button>
-          )}
-        </div>
       </div>
-    </>
+    </div>
   );
-}
+};

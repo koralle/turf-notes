@@ -1,7 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 
 import { MemoEditor } from "../../../../components/memo-editor";
+import { QueryBoundary } from "../../../../components/query-boundary";
+import { MissingMemo } from "../../../../components/query-fallbacks";
 import { memoQuery } from "../../../../rpc/queries";
 
 // ディレクトリ名末尾の _ は「$memoId の子にしない」エスケープ。外すと詳細ページ配下に入り、
@@ -12,7 +14,7 @@ export const Route = createFileRoute("/_app/memos/$memoId_/edit")({
     try {
       await context.queryClient.query(memoQuery(params.memoId));
     } catch {
-      // 見つからない・取れないはここで投げず、画面の「メモが見つかりません」に任せる。
+      // 見つからない・取れないはここで投げず、画面の境界に任せる。
     }
   },
   component: EditMemoPage,
@@ -20,19 +22,16 @@ export const Route = createFileRoute("/_app/memos/$memoId_/edit")({
 
 function EditMemoPage() {
   const { memoId } = Route.useParams();
-  const memo = useQuery(memoQuery(memoId));
 
-  if (memo.isPending) {
-    return null;
-  }
+  return (
+    <QueryBoundary notFound={<MissingMemo />}>
+      <EditForm memoId={memoId} />
+    </QueryBoundary>
+  );
+}
 
-  if (memo.isError) {
-    return (
-      <div style={{ padding: 32 }}>
-        メモが見つかりません。<Link to="/">ホームへ戻る</Link>
-      </div>
-    );
-  }
+const EditForm = ({ memoId }: { memoId: string }) => {
+  const memo = useSuspenseQuery(memoQuery(memoId));
 
   return <MemoEditor memo={memo.data} />;
-}
+};
