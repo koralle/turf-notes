@@ -1,9 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { tagKinds } from "@turf-notes/domain";
 import { css } from "styled-system/css";
 
 import { EmptyState } from "../../../components/empty-state";
+import { QueryBoundary } from "../../../components/query-boundary";
 import { kindLabels, tagDotOf } from "../../../lib/tag-kind";
 import { tagsQuery } from "../../../rpc/queries";
 
@@ -70,47 +71,49 @@ const count = css({
 });
 
 function TagsPage() {
-  // `/_app` の loader が温めている。ここは読むだけ。
-  const tags = useQuery(tagsQuery);
-
-  if (tags.isPending || tags.isError) {
-    return null;
-  }
-
-  const all = tags.data ?? [];
-
   return (
     <div className={wrap}>
       <h1 className={title}>タグ</h1>
-      {all.length === 0 ? (
-        <EmptyState>
-          タグはまだありません。メモを作るときにタグを付けられます。
-        </EmptyState>
-      ) : (
-        tagKinds.map((kind) => {
-          const groupTags = all.filter((tag) => tag.kind === kind);
-          if (groupTags.length === 0) {
-            return null;
-          }
-          return (
-            <section className={group} key={kind}>
-              <h2 className={groupLabel}>{kindLabels[kind]}</h2>
-              {groupTags.map((tag) => (
-                <Link
-                  className={row}
-                  key={tag.id}
-                  params={{ tagId: String(tag.id) }}
-                  to="/tags/$tagId"
-                >
-                  <span className={`${dot} ${tagDotOf[kind]}`} />
-                  <span className={name}>{tag.name}</span>
-                  <span className={count}>{tag.memoCount}</span>
-                </Link>
-              ))}
-            </section>
-          );
-        })
-      )}
+      <QueryBoundary>
+        <TagGroups />
+      </QueryBoundary>
     </div>
   );
 }
+
+const TagGroups = () => {
+  // `/_app` の loader が温めている。ここは読むだけ。
+  const tags = useSuspenseQuery(tagsQuery);
+
+  const all = tags.data;
+
+  return all.length === 0 ? (
+    <EmptyState>
+      タグはまだありません。メモを作るときにタグを付けられます。
+    </EmptyState>
+  ) : (
+    tagKinds.map((kind) => {
+      const groupTags = all.filter((tag) => tag.kind === kind);
+      if (groupTags.length === 0) {
+        return null;
+      }
+      return (
+        <section className={group} key={kind}>
+          <h2 className={groupLabel}>{kindLabels[kind]}</h2>
+          {groupTags.map((tag) => (
+            <Link
+              className={row}
+              key={tag.id}
+              params={{ tagId: String(tag.id) }}
+              to="/tags/$tagId"
+            >
+              <span className={`${dot} ${tagDotOf[kind]}`} />
+              <span className={name}>{tag.name}</span>
+              <span className={count}>{tag.memoCount}</span>
+            </Link>
+          ))}
+        </section>
+      );
+    })
+  );
+};

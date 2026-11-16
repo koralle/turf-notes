@@ -1,11 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import type { MemoSummary } from "@turf-notes/api-contract/schemas";
+import type { RaceKey } from "@turf-notes/domain";
 import { raceKeyOf } from "@turf-notes/domain";
 import { css } from "styled-system/css";
 
 import { EmptyState } from "../../../../../components/empty-state";
 import { MemoList, MemoRow } from "../../../../../components/memo-row";
 import { MobileHeader } from "../../../../../components/mobile-header";
+import { ReadError } from "../../../../../components/query-fallbacks";
 import { fullDate } from "../../../../../lib/date";
 import { raceMemosQuery } from "../../../../../rpc/queries";
 
@@ -20,6 +23,7 @@ export const Route = createFileRoute("/_app/races/$date/$venue/$raceNumber")({
       await context.queryClient.query(raceMemosQuery(race));
     }
   },
+  errorComponent: ReadError,
   component: RacePage,
 });
 
@@ -36,11 +40,54 @@ const timeline = css({
 function RacePage() {
   const { date, venue, raceNumber } = Route.useParams();
   const race = raceKeyOf({ date, number: raceNumber, venue });
+
+  // 3つ組が URL として不正なら、問い合わせずに空の一覧として出す。
+  if (race === null) {
+    return (
+      <RaceView date={date} items={[]} raceNumber={raceNumber} venue={venue} />
+    );
+  }
+
+  return (
+    <RaceMemos date={date} race={race} raceNumber={raceNumber} venue={venue} />
+  );
+}
+
+const RaceMemos = ({
+  date,
+  venue,
+  raceNumber,
+  race,
+}: {
+  date: string;
+  venue: string;
+  raceNumber: string;
+  race: RaceKey;
+}) => {
+  const memoList = useSuspenseQuery(raceMemosQuery(race));
+
+  return (
+    <RaceView
+      date={date}
+      items={memoList.data.items}
+      raceNumber={raceNumber}
+      venue={venue}
+    />
+  );
+};
+
+const RaceView = ({
+  date,
+  venue,
+  raceNumber,
+  items,
+}: {
+  date: string;
+  venue: string;
+  raceNumber: string;
+  items: MemoSummary[];
+}) => {
   const navigate = useNavigate();
-
-  const memoList = useQuery(raceMemosQuery(race));
-
-  const items = memoList.data?.items ?? [];
   const raceName = items.find((item) => item.race?.name !== undefined)?.race
     ?.name;
 
@@ -93,4 +140,4 @@ function RacePage() {
       </div>
     </>
   );
-}
+};
