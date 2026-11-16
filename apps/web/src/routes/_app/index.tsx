@@ -8,19 +8,15 @@ import { EmptyState } from "../../components/empty-state";
 import { LoadMore } from "../../components/load-more";
 import { MemoList, MemoRow } from "../../components/memo-row";
 import { QueryBoundary } from "../../components/query-boundary";
+import { ReadError } from "../../components/query-fallbacks";
 import { useDebouncedValue } from "../../hooks/use-debounced-value";
 import { memoListQuery } from "../../rpc/queries";
 
 export const Route = createFileRoute("/_app/")({
   // 検索語は画面の state なので、温めるのは検索なしの1ページ目だけ。
-  // 失敗は画面の境界に任せる（検索欄は出したままにする）。
-  loader: async ({ context }) => {
-    try {
-      await context.queryClient.infiniteQuery(memoListQuery(""));
-    } catch {
-      // 何もしない。
-    }
-  },
+  loader: async ({ context }) =>
+    await context.queryClient.infiniteQuery(memoListQuery("")),
+  errorComponent: ReadError,
   component: HomePage,
 });
 
@@ -231,8 +227,7 @@ const Timeline = ({ search }: { search: string }) => {
           <MemoRow key={memo.id} memo={memo} />
         ))}
       </MemoList>
-      {/* 前の検索結果を出している間は、その続きを読ませない（ページの基準が古い）。 */}
-      {list.hasNextPage && !list.isFetching ? (
+      {list.hasNextPage ? (
         <LoadMore onClick={() => void list.fetchNextPage()} />
       ) : null}
     </>

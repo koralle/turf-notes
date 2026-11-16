@@ -12,6 +12,7 @@ import { LoadMore } from "../../../components/load-more";
 import { MemoList, MemoRow } from "../../../components/memo-row";
 import { MobileHeader } from "../../../components/mobile-header";
 import { QueryBoundary } from "../../../components/query-boundary";
+import { ReadError } from "../../../components/query-fallbacks";
 import { kindLabels, tagDotOf } from "../../../lib/tag-kind";
 import { tagMemosQuery, tagsQuery } from "../../../rpc/queries";
 
@@ -19,13 +20,10 @@ export const Route = createFileRoute("/_app/tags/$tagId")({
   loader: async ({ context, params }) => {
     const id = tagIdOf(params.tagId);
     if (id !== null) {
-      try {
-        await context.queryClient.infiniteQuery(tagMemosQuery(id));
-      } catch {
-        // 失敗は画面の境界に任せる（見出しと戻るは出したままにする）。
-      }
+      await context.queryClient.infiniteQuery(tagMemosQuery(id));
     }
   },
+  errorComponent: ReadError,
   component: TagPage,
 });
 
@@ -84,7 +82,7 @@ function TagPage() {
   }
 
   return (
-    <QueryBoundary notFound={<MissingTag />}>
+    <QueryBoundary>
       <TagBody id={id} />
     </QueryBoundary>
   );

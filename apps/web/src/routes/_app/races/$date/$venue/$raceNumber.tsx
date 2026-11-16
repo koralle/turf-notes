@@ -8,7 +8,7 @@ import { css } from "styled-system/css";
 import { EmptyState } from "../../../../../components/empty-state";
 import { MemoList, MemoRow } from "../../../../../components/memo-row";
 import { MobileHeader } from "../../../../../components/mobile-header";
-import { QueryBoundary } from "../../../../../components/query-boundary";
+import { ReadError } from "../../../../../components/query-fallbacks";
 import { fullDate } from "../../../../../lib/date";
 import { raceMemosQuery } from "../../../../../rpc/queries";
 
@@ -20,13 +20,10 @@ export const Route = createFileRoute("/_app/races/$date/$venue/$raceNumber")({
       venue: params.venue,
     });
     if (race !== null) {
-      try {
-        await context.queryClient.query(raceMemosQuery(race));
-      } catch {
-        // 失敗は画面の境界に任せる（見出しと戻るは出したままにする）。
-      }
+      await context.queryClient.query(raceMemosQuery(race));
     }
   },
+  errorComponent: ReadError,
   component: RacePage,
 });
 
@@ -52,14 +49,7 @@ function RacePage() {
   }
 
   return (
-    <QueryBoundary>
-      <RaceMemos
-        date={date}
-        race={race}
-        raceNumber={raceNumber}
-        venue={venue}
-      />
-    </QueryBoundary>
+    <RaceMemos date={date} race={race} raceNumber={raceNumber} venue={venue} />
   );
 }
 

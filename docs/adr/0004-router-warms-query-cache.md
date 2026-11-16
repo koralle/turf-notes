@@ -39,5 +39,5 @@ loader と画面が同じ `staleTime` を見るので、温めた直後に画面
 - `retryOnMount: false` を既定にした。loader がエラーを飲んだとき（メモ不在など）、データ無しのエラークエリは既定では mount で再試行され、同じ 404 が2本飛ぶ。`refetchOnMount` では止まらない（データがあるときしか見られない）。
 - セッションが画面を開いている間に切れた場合、`beforeLoad` は再実行されない。Query の `queryCache.onError` が `UNAUTHORIZED` を見て router でサインインへ移し、離れたあとにキャッシュを捨てる（ページ全体の読み直しはしないので、編集中の未保存ガードが効く）。
 - 削除は無効化ではなく `removeQueries` でメモのキャッシュを捨てる。無効化だと削除済みメモの詳細を取り直して 404 になるため。
-- loader は取得を温めるだけで、失敗を投げない（画面の境界が受ける。ADR-0006）。
+- loader は取得を温め、失敗したら投げる（route の `errorComponent` が受ける。ADR-0006）。
 - サインイン画面は `ssr` の対象のままだが、`auth.methods` は `useQuery`（サーバーでは実行されない）で読む。loader を足すと SSR 中に `/rpc` を叩いて落ちるので足さない。

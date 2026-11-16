@@ -12,6 +12,7 @@ export {
   headingOf,
   memoBodySchema,
   memoId,
+  memoIdOf,
   memoIdSchema,
   memoSchema,
   memoTitleSchema,

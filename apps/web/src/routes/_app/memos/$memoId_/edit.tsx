@@ -1,9 +1,10 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { memoIdOf } from "@turf-notes/domain";
 
 import { MemoEditor } from "../../../../components/memo-editor";
-import { QueryBoundary } from "../../../../components/query-boundary";
-import { MissingMemo } from "../../../../components/query-fallbacks";
+import { MissingMemo, ReadError } from "../../../../components/query-fallbacks";
+import { isMissing } from "../../../../rpc/client";
 import { memoQuery } from "../../../../rpc/queries";
 
 // ディレクトリ名末尾の _ は「$memoId の子にしない」エスケープ。外すと詳細ページ配下に入り、
@@ -11,23 +12,33 @@ import { memoQuery } from "../../../../rpc/queries";
 export const Route = createFileRoute("/_app/memos/$memoId_/edit")({
   // 詳細画面から来る場合は既に温まっている。直接開いたときだけ取りに行く。
   loader: async ({ context, params }) => {
-    try {
-      await context.queryClient.query(memoQuery(params.memoId));
-    } catch {
-      // 見つからない・取れないはここで投げず、画面の境界に任せる。
+    const id = memoIdOf(params.memoId);
+    if (id === null) {
+      return { missing: true };
     }
+    try {
+      await context.queryClient.query(memoQuery(id));
+    } catch (error) {
+      if (isMissing(error)) {
+        return { missing: true };
+      }
+      throw error;
+    }
+    return { missing: false };
   },
+  errorComponent: ReadError,
   component: EditMemoPage,
 });
 
 function EditMemoPage() {
+  const { missing } = Route.useLoaderData();
   const { memoId } = Route.useParams();
 
-  return (
-    <QueryBoundary notFound={<MissingMemo />}>
-      <EditForm memoId={memoId} />
-    </QueryBoundary>
-  );
+  if (missing) {
+    return <MissingMemo />;
+  }
+
+  return <EditForm memoId={memoId} />;
 }
 
 const EditForm = ({ memoId }: { memoId: string }) => {

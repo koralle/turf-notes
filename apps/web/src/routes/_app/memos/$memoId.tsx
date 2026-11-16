@@ -4,26 +4,37 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { memoIdOf } from "@turf-notes/domain";
 import { useState } from "react";
 import { css } from "styled-system/css";
 
 import { Markdown } from "../../../components/markdown";
 import { MobileHeader } from "../../../components/mobile-header";
-import { QueryBoundary } from "../../../components/query-boundary";
-import { MissingMemo } from "../../../components/query-fallbacks";
+import { MissingMemo, ReadError } from "../../../components/query-fallbacks";
 import { RaceBadgeLink } from "../../../components/race-badge";
 import { TagChip } from "../../../components/tag-chip";
-import { client, orpc } from "../../../rpc/client";
+import { client, isMissing, orpc } from "../../../rpc/client";
 import { memoQuery } from "../../../rpc/queries";
 
 export const Route = createFileRoute("/_app/memos/$memoId")({
   loader: async ({ context, params }) => {
-    try {
-      await context.queryClient.query(memoQuery(params.memoId));
-    } catch {
-      // 見つからない・取れないはここで投げず、画面の境界に任せる。
+    const id = memoIdOf(params.memoId);
+    // uuid でない id は問い合わせない（API は入力不正として弾くので「無い」として扱う）。
+    if (id === null) {
+      return { missing: true };
     }
+    try {
+      await context.queryClient.query(memoQuery(id));
+    } catch (error) {
+      // 「無い」は取得の失敗ではないので、画面に出す data として返す（SSR でも同じ見た目になる）。
+      if (isMissing(error)) {
+        return { missing: true };
+      }
+      throw error;
+    }
+    return { missing: false };
   },
+  errorComponent: ReadError,
   component: MemoDetailPage,
 });
 
@@ -113,8 +124,13 @@ const cancelButton = css({
 });
 
 function MemoDetailPage() {
+  const { missing } = Route.useLoaderData();
   const { memoId } = Route.useParams();
   const navigate = useNavigate();
+
+  if (missing) {
+    return <MissingMemo />;
+  }
 
   return (
     <>
@@ -131,9 +147,7 @@ function MemoDetailPage() {
         onBack={() => void navigate({ to: "/" })}
         title="メモ"
       />
-      <QueryBoundary notFound={<MissingMemo />}>
-        <MemoDetail memoId={memoId} />
-      </QueryBoundary>
+      <MemoDetail memoId={memoId} />
     </>
   );
 }

@@ -1,7 +1,14 @@
 import * as v from "valibot";
 import { describe, expect, expectTypeOf, test } from "vitest";
 
-import { excerptOf, headingOf, memoId, memoIdSchema, memoSchema } from ".";
+import {
+  excerptOf,
+  headingOf,
+  memoId,
+  memoIdOf,
+  memoIdSchema,
+  memoSchema,
+} from ".";
 import type { MemoId } from ".";
 import { tagId } from "../tag";
 import type { TagId } from "../tag";
@@ -35,6 +42,17 @@ describe("memoIdSchema / memoId", () => {
     // @ts-expect-error brand されていない string は MemoId として扱えない
     const branded: MemoId = plain;
     expect(memoId(branded)).toBe(id);
+  });
+});
+
+describe("memoIdOf", () => {
+  test("URL の文字列を MemoId にする", () => {
+    expect(memoIdOf(id)).toBe(id);
+  });
+
+  test("UUID でない文字列は null", () => {
+    expect(memoIdOf("memo-1")).toBeNull();
+    expect(memoIdOf("")).toBeNull();
   });
 });
 

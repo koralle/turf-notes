@@ -1,5 +1,7 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 import { css } from "styled-system/css";
+
+import { actionLink } from "../lib/action-link";
 
 const box = css({
   color: "muted",
@@ -8,8 +10,6 @@ const box = css({
   p: "40px",
   textAlign: "center",
 });
-
-const actionLink = css({ color: "accent", textDecoration: "underline" });
 
 const actionButton = css({
   bg: "transparent",
@@ -34,6 +34,16 @@ export const LoadFailed = ({ onRetry }: { onRetry: () => void }) => (
     </button>
   </div>
 );
+
+/**
+ * loader が失敗したときの画面（route の `errorComponent`）。
+ * 再試行は loader をやり直す。この時点では画面が組まれていないので、取得だけをやり直せる。
+ */
+export const ReadError = () => {
+  const router = useRouter();
+
+  return <LoadFailed onRetry={() => void router.invalidate()} />;
+};
 
 /** メモが無い（削除済み・URL の誤り）ときの表示。 */
 export const MissingMemo = () => (

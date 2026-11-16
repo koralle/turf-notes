@@ -1,4 +1,4 @@
-import { keepPreviousData, skipToken } from "@tanstack/react-query";
+import { skipToken } from "@tanstack/react-query";
 import type { RaceKey, TagId } from "@turf-notes/domain";
 
 import { orpc } from "./client";
@@ -34,8 +34,6 @@ export const memoListQuery = (q: string) =>
       ...(q === "" ? {} : { q }),
       ...(cursor === undefined ? {} : { cursor }),
     }),
-    // 検索語を変えても前の結果を出したままにする。無いと画面が一瞬空になる。
-    placeholderData: keepPreviousData,
     staleTime: FRESH_FOR,
   });
 

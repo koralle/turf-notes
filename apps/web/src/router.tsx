@@ -11,6 +11,7 @@ import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query
 import { css } from "styled-system/css";
 
 import { LoadFailed } from "./components/query-fallbacks";
+import { actionLink } from "./lib/action-link";
 import { routeTree } from "./routeTree.gen";
 import { errorCode } from "./rpc/client";
 
@@ -20,13 +21,11 @@ const notFound = css({
   p: "40px",
   textAlign: "center",
 });
-const notFoundLink = css({ color: "accent", textDecoration: "underline" });
-
 /** ルートに一致しなかったときの表示。既定の `<p>Not Found</p>` だけだと行き止まりになる。 */
 const NotFound = () => (
   <div className={notFound}>
     ページが見つかりません。{" "}
-    <Link className={notFoundLink} to="/">
+    <Link className={actionLink} to="/">
       ホームへ戻る
     </Link>
   </div>
