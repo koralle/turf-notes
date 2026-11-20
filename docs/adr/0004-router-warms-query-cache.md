@@ -29,7 +29,7 @@ loader と画面が同じ `staleTime` を見るので、温めた直後に画面
 - **loader だけにして `useQuery` をやめる**: `@tanstack/react-query` を依存から消せるが、無限スクロールの `fetchNextPage`、mutation 後の `invalidateQueries`、パスキー（Better Auth のクライアント関数）の取得を作り直すことになる。ADR-0003 の分担も崩れる。
 - **`@orpc/tanstack-query` / `@orpc/react-query` を入れず、`queryOptions` を手で書く**: 依存は1つ減るが、キーの階層・`input` の直列化・無限クエリと単発クエリの区別を自前で保守することになる。実際に手で書いた版では、参照検索を `["memos","ref",q]` という別の名前空間に逃がして衝突を避け、不正な `tagId` を `0` で埋めて `enabled: false` を重ねていた。`@orpc/react-query` は `@orpc/tanstack-query` の React 層で、この3つ（パス由来のキー・`skipToken`・`type` による区別）がそのまま解決される。React 用の context ヘルパーはクライアントがモジュール定数なので使わない。
 - **loader で `staleTime: "static"` を付ける**: 古いキャッシュでも待たずに返るので遷移は速いが、`isStaleByTime("static")` は `isInvalidated` より先に false を返す。保存直後に詳細が古いまま描画されるため採らない。鮮度は各定義の `staleTime`（30秒。`me` は無期限）に任せる。
-- **`useSuspenseQuery` で読む**: loader が待つので pending 分岐は消せるが、Suspense 境界とエラー境界を全画面に置く必要がある。今回は `useQuery` のまま、pending/error の分岐を残す。
+- **`useSuspenseQuery` で読む**: loader が待つので pending 分岐は消せるが、Suspense 境界とエラー境界を全画面に置く必要がある。この時点では `useQuery` のまま、pending/error の分岐を残した。**更新: ADR-0006 で Suspense に移した**（境界は `QueryBoundary` にまとめ、失敗は画面ごとに受ける）。
 
 ## Consequences
 
@@ -39,5 +39,5 @@ loader と画面が同じ `staleTime` を見るので、温めた直後に画面
 - `retryOnMount: false` を既定にした。loader がエラーを飲んだとき（メモ不在など）、データ無しのエラークエリは既定では mount で再試行され、同じ 404 が2本飛ぶ。`refetchOnMount` では止まらない（データがあるときしか見られない）。
 - セッションが画面を開いている間に切れた場合、`beforeLoad` は再実行されない。Query の `queryCache.onError` が `UNAUTHORIZED` を見て router でサインインへ移し、離れたあとにキャッシュを捨てる（ページ全体の読み直しはしないので、編集中の未保存ガードが効く）。
 - 削除は無効化ではなく `removeQueries` でメモのキャッシュを捨てる。無効化だと削除済みメモの詳細を取り直して 404 になるため。
-- loader が失敗すると router のエラー画面になる。自前の「見つかりません」表示を持つ画面（メモ詳細・編集）の loader は、その表示を出すために例外を飲んでいる。新しい画面で同じことをするときは同じ形にする。
+- loader は取得を温め、失敗したら投げる（route の `errorComponent` が受ける。ADR-0006）。
 - サインイン画面は `ssr` の対象のままだが、`auth.methods` は `useQuery`（サーバーでは実行されない）で読む。loader を足すと SSR 中に `/rpc` を叩いて落ちるので足さない。

@@ -12,6 +12,12 @@ export type MemoId = v.InferOutput<typeof memoIdSchema>;
 /** 文字列から MemoId を作る。DB 行など外から来た id はこれを通す。 */
 export const memoId = (value: string): MemoId => v.parse(memoIdSchema, value);
 
+/** 文字列から MemoId を作る（URL パラメータなど）。uuid でなければ null。 */
+export const memoIdOf = (raw: string): MemoId | null => {
+  const parsed = v.safeParse(memoIdSchema, raw);
+  return parsed.success ? parsed.output : null;
+};
+
 /** 任意の表題。未入力のときは本文の1行目を表示上の見出しに使う（GLOSSARY: Title）。 */
 export const memoTitleSchema = v.nullable(v.pipe(v.string(), v.maxLength(200)));
 

@@ -10,6 +10,8 @@ import {
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 import { css } from "styled-system/css";
 
+import { LoadFailed } from "./components/query-fallbacks";
+import { actionLink } from "./lib/action-link";
 import { routeTree } from "./routeTree.gen";
 import { errorCode } from "./rpc/client";
 
@@ -19,23 +21,11 @@ const notFound = css({
   p: "40px",
   textAlign: "center",
 });
-const notFoundLink = css({ color: "accent", textDecoration: "underline" });
-const retryButton = css({
-  bg: "transparent",
-  border: "none",
-  color: "accent",
-  cursor: "pointer",
-  fontFamily: "inherit",
-  fontSize: "inherit",
-  p: 0,
-  textDecoration: "underline",
-});
-
 /** ルートに一致しなかったときの表示。既定の `<p>Not Found</p>` だけだと行き止まりになる。 */
 const NotFound = () => (
   <div className={notFound}>
     ページが見つかりません。{" "}
-    <Link className={notFoundLink} to="/">
+    <Link className={actionLink} to="/">
       ホームへ戻る
     </Link>
   </div>
@@ -46,19 +36,12 @@ const NotFound = () => (
  * この画面は API の障害で出るので、日本語で何が起きたかと再試行を出す。
  * 再試行はページを開き直す（`reset` は beforeLoad の失敗をやり直さず、無反応になる）。
  */
-const LoadFailed = () => (
-  <div className={notFound}>
-    読み込みに失敗しました。{" "}
-    <button
-      className={retryButton}
-      onClick={() => {
-        window.location.reload();
-      }}
-      type="button"
-    >
-      もう一度読み込む
-    </button>
-  </div>
+const RouteLoadFailed = () => (
+  <LoadFailed
+    onRetry={() => {
+      window.location.reload();
+    }}
+  />
 );
 
 export const getRouter = () => {
@@ -87,7 +70,7 @@ export const getRouter = () => {
 
   const router = createTanStackRouter({
     context: { queryClient },
-    defaultErrorComponent: LoadFailed,
+    defaultErrorComponent: RouteLoadFailed,
     defaultNotFoundComponent: NotFound,
     defaultPreload: "intent",
     defaultPreloadStaleTime: 0,
@@ -97,7 +80,16 @@ export const getRouter = () => {
     routeTree,
   });
 
-  setupRouterSsrQueryIntegration({ queryClient, router });
+  // 失敗したクエリはクライアントへ渡さない。エラーは直列化されると `code` が消えるので、
+  // 画面は「見つかりません」と「読み込みに失敗」を区別できなくなる。代わりにクライアントで
+  // 取り直す（一時的な障害ならここで戻る）。
+  setupRouterSsrQueryIntegration({
+    dehydrateOptions: {
+      shouldDehydrateQuery: (query) => query.state.status === "success",
+    },
+    queryClient,
+    router,
+  });
 
   /**
    * セッションが切れたときの退出。編集中の未保存ガード（`useBlocker`）を通すため、
