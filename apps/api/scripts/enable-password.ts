@@ -10,7 +10,7 @@ const url = process.env["TURSO_CONNECTION_URL"] ?? "http://127.0.0.1:8080";
 const email = process.argv[2] ?? "me@example.com";
 
 const authToken = process.env["TURSO_AUTH_TOKEN"];
-const db = createDb({ url, ...(authToken ? { authToken } : {}) });
+const db = createDb({ url, ...(authToken === undefined ? {} : { authToken }) });
 
 const updated = await db
   .update(users)

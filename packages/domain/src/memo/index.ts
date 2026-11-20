@@ -105,4 +105,4 @@ export const headingOf = (title: string | null, body: string): string => {
 
 /** 一覧に出す本文の抜粋。改行は畳む。 */
 export const excerptOf = (body: string): string =>
-  body.replaceAll(/\s+/g, " ").trim().slice(0, 120);
+  body.replaceAll(/\s+/gu, " ").trim().slice(0, 120);

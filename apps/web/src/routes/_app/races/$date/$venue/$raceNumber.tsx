@@ -95,7 +95,9 @@ const RaceView = ({
     <>
       <MobileHeader
         note={items.length === 0 ? undefined : `${items.length}件`}
-        onBack={() => void navigate({ to: "/" })}
+        onBack={() => {
+          void navigate({ to: "/" });
+        }}
         title="レース"
       />
       <div className={head}>

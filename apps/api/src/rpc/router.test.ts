@@ -83,7 +83,7 @@ describe("認証", () => {
   test("サインイン済みなら自分の情報が返る", async () => {
     const client = await rpc(owner.email);
 
-    expect(await client.me()).toStrictEqual({
+    await expect(client.me()).resolves.toStrictEqual({
       email: owner.email,
       id: owner.id,
       name: owner.name,
@@ -92,7 +92,7 @@ describe("認証", () => {
 });
 
 describe("メモ", () => {
-  test("作成・一覧・詳細・更新・削除が一続きで通る", async () => {
+  test("作成・一覧・詳細・更新が一続きで通る", async () => {
     const client = await rpc(owner.email);
 
     const { id } = await client.memos.create({ body: "道中で力みが出た。" });
@@ -104,16 +104,27 @@ describe("メモ", () => {
     expect(detail.body).toBe("道中で力みが出た。");
     expect(detail.version).toBe(0);
 
-    expect(
-      await client.memos.update({
+    await expect(
+      client.memos.update({
         body: "道中で力みが出た。直線で伸びた。",
         id,
         version: 0,
       })
-    ).toStrictEqual({ id });
+    ).resolves.toStrictEqual({ id });
 
     expect((await client.memos.detail({ id })).version).toBe(1);
-    expect(await client.memos.delete({ id })).toStrictEqual({ ok: true });
+  });
+
+  test("削除すると一覧から消える", async () => {
+    const client = await rpc(owner.email);
+    const { id } = await client.memos.create({ body: "消すメモ。" });
+
+    await expect(client.memos.delete({ id })).resolves.toStrictEqual({
+      ok: true,
+    });
+
+    const list = await client.memos.list({});
+    expect(list.items.map((item) => item.id)).toStrictEqual([]);
   });
 
   test("古い版番号で保存すると memo-conflict", async () => {
@@ -187,9 +198,9 @@ describe("タグ", () => {
     const countOf = async () =>
       (await client.tags.list()).find((item) => item.id === tag.id)?.memoCount;
 
-    expect(await countOf()).toBe(1);
+    await expect(countOf()).resolves.toBe(1);
     await client.memos.delete({ id });
-    expect(await countOf()).toBe(0);
+    await expect(countOf()).resolves.toBe(0);
   });
 
   test("他人のタグは付けられない（tag-not-found）", async () => {

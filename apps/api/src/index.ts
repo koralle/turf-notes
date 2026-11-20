@@ -17,7 +17,9 @@ const dbFor = (env: Env): AppDb => {
 
   const db = createDb({
     url: env.TURSO_CONNECTION_URL,
-    ...(env.TURSO_AUTH_TOKEN ? { authToken: env.TURSO_AUTH_TOKEN } : {}),
+    ...(env.TURSO_AUTH_TOKEN === undefined
+      ? {}
+      : { authToken: env.TURSO_AUTH_TOKEN }),
   });
   dbCache.set(env.TURSO_CONNECTION_URL, db);
   return db;

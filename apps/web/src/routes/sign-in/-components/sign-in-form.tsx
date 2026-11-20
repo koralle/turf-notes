@@ -42,7 +42,7 @@ export const SignInForm = ({ onSignIn, onSuccessSignIn }: SignInFormProps) => {
 
   const { form, fields } = useForm(signInFormSchema, {
     shouldValidate: "onBlur",
-    onSubmit: async (event, { value }) => {
+    onSubmit: (event, { value }) => {
       event.preventDefault();
       signIn(value);
     },

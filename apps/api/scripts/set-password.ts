@@ -16,7 +16,7 @@ if (email === undefined || password === undefined) {
   process.exit(1);
 }
 
-const db = createDb({ url, ...(authToken ? { authToken } : {}) });
+const db = createDb({ url, ...(authToken === undefined ? {} : { authToken }) });
 
 const [user] = await db
   .select({ id: users.id })

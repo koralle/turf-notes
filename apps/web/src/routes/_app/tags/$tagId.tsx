@@ -61,7 +61,9 @@ const MissingTag = () => {
   return (
     <>
       <MobileHeader
-        onBack={() => void navigate({ to: "/tags" })}
+        onBack={() => {
+          void navigate({ to: "/tags" });
+        }}
         title="タグ"
       />
       <div className={missing}>
@@ -106,7 +108,9 @@ const TagBody = ({ id }: { id: TagId }) => {
     <>
       <MobileHeader
         note={`${tag.memoCount}件`}
-        onBack={() => void navigate({ to: "/tags" })}
+        onBack={() => {
+          void navigate({ to: "/tags" });
+        }}
         title="タグ"
       />
       <div className={head}>
@@ -146,7 +150,11 @@ const TagBody = ({ id }: { id: TagId }) => {
           </MemoList>
         )}
         {memoList.hasNextPage ? (
-          <LoadMore onClick={() => void memoList.fetchNextPage()} />
+          <LoadMore
+            onClick={() => {
+              void memoList.fetchNextPage();
+            }}
+          />
         ) : null}
       </div>
     </>

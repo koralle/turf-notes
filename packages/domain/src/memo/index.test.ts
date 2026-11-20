@@ -97,6 +97,7 @@ describe("memoSchema", () => {
       })
     ).toBe(false);
   });
+
   test("パース結果は readonly（型だけの制約）", () => {
     const parsed = v.parse(memoSchema, {
       ...memo,

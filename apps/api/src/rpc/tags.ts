@@ -2,7 +2,7 @@ import { createTag, listTags } from "../features/tags/queries";
 import type { RouterKit } from "./base";
 
 export const createTagsRouter = ({ impl, requireAuth }: RouterKit) => {
-  const tags = impl.tags;
+  const { tags } = impl;
 
   return {
     list: tags.list

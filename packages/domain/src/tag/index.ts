@@ -33,7 +33,7 @@ export const tagIdOf = (raw: string): TagId | null => {
 
 /** 表示形。NFC にし、前後と連続する空白を畳む。DB の name 列に入る形。 */
 export const tagDisplayName = (name: string): string =>
-  name.normalize("NFC").trim().replaceAll(/\s+/g, " ");
+  name.normalize("NFC").trim().replaceAll(/\s+/gu, " ");
 
 /** 一意性の判定にだけ使う正規化形。表示形を小文字化したもの（要件 §4.2）。 */
 export const normalizeTagName = (name: string): string =>

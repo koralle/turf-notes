@@ -144,7 +144,9 @@ function MemoDetailPage() {
             編集
           </Link>
         }
-        onBack={() => void navigate({ to: "/" })}
+        onBack={() => {
+          void navigate({ to: "/" });
+        }}
         title="メモ"
       />
       <MemoDetail memoId={memoId} />
@@ -182,7 +184,9 @@ const MemoDetail = ({ memoId }: { memoId: string }) => {
             cursor: "pointer",
             fontSize: "12.5px",
           })}
-          onClick={() => void navigate({ to: "/" })}
+          onClick={() => {
+            void navigate({ to: "/" });
+          }}
           type="button"
         >
           ← ホーム

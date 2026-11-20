@@ -11,7 +11,7 @@ import {
 import type { RouterKit } from "./base";
 
 export const createMemosRouter = ({ impl, requireAuth }: RouterKit) => {
-  const memos = impl.memos;
+  const { memos } = impl;
 
   return {
     list: memos.list

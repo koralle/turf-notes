@@ -413,7 +413,12 @@ const TagSection = ({
           name="tagKind"
           className={field}
           onChange={(event) => {
-            setNewTagKind(event.target.value as TagKind);
+            const kind = tagKinds.find(
+              (candidate) => candidate === event.target.value
+            );
+            if (kind !== undefined) {
+              setNewTagKind(kind);
+            }
           }}
           value={newTagKind}
         >
@@ -537,7 +542,7 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
     title,
     venue,
   });
-  const initialState = useRef(currentState).current;
+  const [initialState] = useState(currentState);
   const isDirty = currentState !== initialState;
 
   const dirty = useRef(false);
@@ -643,7 +648,9 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
         </div>
       ) : null}
       <MobileHeader
-        onBack={() => void navigate({ to: "/" })}
+        onBack={() => {
+          void navigate({ to: "/" });
+        }}
         title={memo === undefined ? "新規メモ" : "メモを編集"}
       />
       <div className={topbar}>
@@ -653,7 +660,9 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
             cursor: "pointer",
             fontSize: "12.5px",
           })}
-          onClick={() => void navigate({ to: "/" })}
+          onClick={() => {
+            void navigate({ to: "/" });
+          }}
           type="button"
         >
           ← 戻る

@@ -144,7 +144,9 @@ function HomePage() {
         </h1>
         <button
           className={newButton}
-          onClick={() => void navigate({ to: "/memos/new" })}
+          onClick={() => {
+            void navigate({ to: "/memos/new" });
+          }}
           type="button"
         >
           新規メモ
@@ -228,7 +230,11 @@ const Timeline = ({ search }: { search: string }) => {
         ))}
       </MemoList>
       {list.hasNextPage ? (
-        <LoadMore onClick={() => void list.fetchNextPage()} />
+        <LoadMore
+          onClick={() => {
+            void list.fetchNextPage();
+          }}
+        />
       ) : null}
     </>
   );

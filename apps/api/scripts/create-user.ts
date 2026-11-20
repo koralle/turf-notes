@@ -15,7 +15,7 @@ const [
 ] = process.argv.slice(2);
 
 const authToken = process.env["TURSO_AUTH_TOKEN"];
-const db = createDb({ url, ...(authToken ? { authToken } : {}) });
+const db = createDb({ url, ...(authToken === undefined ? {} : { authToken }) });
 const auth = createAuth({ db, secret, baseURL });
 
 const result = await auth.api.signUpEmail({ body: { email, name, password } });

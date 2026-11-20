@@ -26,8 +26,8 @@ Use the repository’s installed Intent. If it is unavailable, report the missin
 
 ## ディレクトリ
 
-- `apps/web` — TanStack Start + Panda CSS。DB に触らない。`/rpc/*` と `/api/auth/*` は `src/server.ts` が Service Binding で `apps/api` へ流す
-- `apps/api` — Hono + oRPC + Better Auth。`src/rpc/base.ts` の `requireAuth` で認証と DB を注入する
+- `apps/web` — TanStack Start + Panda CSS。DB に触らない。`/rpc/*` と `/api/auth/*` は `src/server.ts` が Service Binding で `apps/api` へ流す。lint は `apps/web/oxlint.config.ts` がルート設定を置き換える（react / tanstack はここだけ）
+- `apps/api` — Hono + oRPC + Better Auth。`src/rpc/base.ts` の `requireAuth` で認証と DB を注入する。lint は `apps/api/oxlint.config.ts` がルート設定を置き換える（landmines はここだけ）
 - `packages/api-contract` — oRPC contract と Valibot スキーマ。input / output / 型付きエラーはここだけ
 - `packages/db` — Drizzle スキーマとマイグレーション。**適用済みのマイグレーションは手で編集しない** （変更は CI の `migrations` ジョブが落とす。スキーマ変更は新しいマイグレーションを足す）
 - `packages/forge` — tsconfig / oxlint / oxfmt の共通設定。全パッケージに効かせたい lint 設定はここ
@@ -38,17 +38,17 @@ Use the repository’s installed Intent. If it is unavailable, report the missin
 
 ## コマンド
 
-| コマンド                  | 説明                                          |
-| ------------------------- | --------------------------------------------- |
-| `pnpm dev`                | web(3000) + api（auxiliary worker）を同時起動 |
-| `pnpm check` / `pnpm fix` | Ultracite（Oxlint + Oxfmt）                   |
-| `pnpm doctor`             | React Doctor（apps/web の React 診断）        |
-| `pnpm typecheck`          | ルート + 全パッケージの型検査                 |
-| `pnpm test`               | Vitest                                        |
-| `pnpm knip`               | 未使用依存・export の検出                     |
-| `pnpm build`              | 全パッケージのビルド                          |
+| コマンド | 説明 |
+| --- | --- |
+| `pnpm dev` | web(3000) + api（auxiliary worker）を同時起動 |
+| `pnpm check` / `pnpm fix` | Ultracite（Oxlint + Oxfmt。型情報を使うため先に `panda codegen` を回す） |
+| `pnpm run doctor` | React Doctor（`doctor.config.ts`。apps/web の React 診断） |
+| `pnpm typecheck` | ルート + 全パッケージの型検査 |
+| `pnpm test` | Vitest |
+| `pnpm knip` | 未使用依存・export の検出 |
+| `pnpm build` | 全パッケージのビルド |
 
-コードを変更したら、完了前に `pnpm check && pnpm typecheck && pnpm test && pnpm knip && pnpm doctor && pnpm build` を通す。CI はこれに Storybook のビルドとマイグレーションの追記チェックを足したものを回す。
+コードを変更したら、完了前に `pnpm check && pnpm typecheck && pnpm test && pnpm knip && pnpm run doctor && pnpm build` を通す。CI はこれに Storybook のビルドとマイグレーションの追記チェックを足したものを回す。ネットワークが無い環境では、Socket への問い合わせをする供給網スコアだけ `pnpm run doctor --no-supply-chain` で切る。
 
 ## 認証の復旧
 

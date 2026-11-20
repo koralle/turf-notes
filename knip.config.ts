@@ -22,6 +22,8 @@ const config: KnipConfig = {
   },
   workspaces: {
     ".": {
+      // React Doctor の設定（`react-doctor/api` を import する）
+      entry: ["doctor.config.ts"],
       // エージェントが `pnpm intent` で使う CLI。コードからは import しない。
       ignoreDependencies: [
         "lefthook",

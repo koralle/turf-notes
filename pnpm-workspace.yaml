@@ -42,10 +42,13 @@ catalogs:
     uuidv7: 1.2.1
 
   lint:
-    oxfmt: 0.77.0
-    oxlint: 1.92.0
-    oxlint-tsgolint: 7.0.2006
-    ultracite: 8.1.1
+    "@interfere/landmines": 0.1.1
+    eslint-plugin-storybook: 10.6.8
+    oxfmt: 0.79.0
+    oxlint: 1.94.0
+    oxlint-plugin-react-doctor: 0.9.23
+    oxlint-tsgolint: 7.0.2007
+    ultracite: 8.3.1
 
   react:
     "@suspensive/react": 3.21.4
@@ -83,7 +86,7 @@ catalogs:
     chrome-devtools-mcp: 1.13.0
     knip: 6.44.1
     lefthook: 2.2.2
-    react-doctor: 0.9.22
+    react-doctor: 0.9.23
     tsx: 4.23.15
 
   typescript:
@@ -125,43 +128,4 @@ minimumReleaseAgeExclude:
   - "@orpc/standard-server-node@1.16.2"
   - "@orpc/standard-server-peer@1.16.2"
   - "@orpc/standard-server@1.16.2"
-  - "@oxfmt/binding-android-arm-eabi@0.77.0"
-  - "@oxfmt/binding-android-arm64@0.77.0"
-  - "@oxfmt/binding-darwin-arm64@0.77.0"
-  - "@oxfmt/binding-darwin-x64@0.77.0"
-  - "@oxfmt/binding-freebsd-x64@0.77.0"
-  - "@oxfmt/binding-linux-arm-gnueabihf@0.77.0"
-  - "@oxfmt/binding-linux-arm-musleabihf@0.77.0"
-  - "@oxfmt/binding-linux-arm64-gnu@0.77.0"
-  - "@oxfmt/binding-linux-arm64-musl@0.77.0"
-  - "@oxfmt/binding-linux-ppc64-gnu@0.77.0"
-  - "@oxfmt/binding-linux-riscv64-gnu@0.77.0"
-  - "@oxfmt/binding-linux-riscv64-musl@0.77.0"
-  - "@oxfmt/binding-linux-s390x-gnu@0.77.0"
-  - "@oxfmt/binding-linux-x64-gnu@0.77.0"
-  - "@oxfmt/binding-linux-x64-musl@0.77.0"
-  - "@oxfmt/binding-openharmony-arm64@0.77.0"
-  - "@oxfmt/binding-win32-arm64-msvc@0.77.0"
-  - "@oxfmt/binding-win32-ia32-msvc@0.77.0"
-  - "@oxfmt/binding-win32-x64-msvc@0.77.0"
-  - "@oxlint/binding-android-arm-eabi@1.92.0"
-  - "@oxlint/binding-android-arm64@1.92.0"
-  - "@oxlint/binding-darwin-arm64@1.92.0"
-  - "@oxlint/binding-darwin-x64@1.92.0"
-  - "@oxlint/binding-freebsd-x64@1.92.0"
-  - "@oxlint/binding-linux-arm-gnueabihf@1.92.0"
-  - "@oxlint/binding-linux-arm-musleabihf@1.92.0"
-  - "@oxlint/binding-linux-arm64-gnu@1.92.0"
-  - "@oxlint/binding-linux-arm64-musl@1.92.0"
-  - "@oxlint/binding-linux-ppc64-gnu@1.92.0"
-  - "@oxlint/binding-linux-riscv64-gnu@1.92.0"
-  - "@oxlint/binding-linux-riscv64-musl@1.92.0"
-  - "@oxlint/binding-linux-s390x-gnu@1.92.0"
-  - "@oxlint/binding-linux-x64-gnu@1.92.0"
-  - "@oxlint/binding-linux-x64-musl@1.92.0"
-  - "@oxlint/binding-openharmony-arm64@1.92.0"
-  - "@oxlint/binding-win32-arm64-msvc@1.92.0"
-  - "@oxlint/binding-win32-ia32-msvc@1.92.0"
-  - "@oxlint/binding-win32-x64-msvc@1.92.0"
-  - oxfmt@0.77.0
-  - oxlint@1.92.0
+  - eslint-plugin-storybook@10.6.8

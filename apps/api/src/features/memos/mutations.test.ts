@@ -40,19 +40,19 @@ beforeEach(async () => {
 describe("updateMemo", () => {
   test("読み込んだ版番号と一致すれば保存でき、版番号が1増える", async () => {
     const id = await createOk({ body: "道中で力みが出た。" });
-    expect(await rowOf(id)).toStrictEqual({
+    await expect(rowOf(id)).resolves.toStrictEqual({
       body: "道中で力みが出た。",
       version: 0,
     });
 
-    expect(
-      await updateMemo(testDb, owner, {
+    await expect(
+      updateMemo(testDb, owner, {
         body: "直線で伸びた。",
         id,
         version: 0,
       })
-    ).toStrictEqual({ kind: "ok" });
-    expect(await rowOf(id)).toStrictEqual({
+    ).resolves.toStrictEqual({ kind: "ok" });
+    await expect(rowOf(id)).resolves.toStrictEqual({
       body: "直線で伸びた。",
       version: 1,
     });
@@ -62,38 +62,44 @@ describe("updateMemo", () => {
     const id = await createOk({ body: "一回目" });
     await updateMemo(testDb, owner, { body: "二回目", id, version: 0 });
 
-    expect(
-      await updateMemo(testDb, owner, { body: "古い内容", id, version: 0 })
-    ).toStrictEqual({ kind: "conflict" });
-    expect(await rowOf(id)).toStrictEqual({ body: "二回目", version: 1 });
+    await expect(
+      updateMemo(testDb, owner, { body: "古い内容", id, version: 0 })
+    ).resolves.toStrictEqual({ kind: "conflict" });
+    await expect(rowOf(id)).resolves.toStrictEqual({
+      body: "二回目",
+      version: 1,
+    });
   });
 
   test("存在しないメモは not-found", async () => {
-    expect(
-      await updateMemo(testDb, owner, {
+    await expect(
+      updateMemo(testDb, owner, {
         body: "本文",
         id: memoId("0192f0aa-0000-7000-8000-0000000000ff"),
         version: 0,
       })
-    ).toStrictEqual({ kind: "not-found" });
+    ).resolves.toStrictEqual({ kind: "not-found" });
   });
 
   test("削除済みのメモは not-found（別タブで削除された場合）", async () => {
     const id = await createOk({ body: "削除される" });
     await softDeleteMemo(testDb, owner, id);
 
-    expect(
-      await updateMemo(testDb, owner, { body: "あとから保存", id, version: 0 })
-    ).toStrictEqual({ kind: "not-found" });
+    await expect(
+      updateMemo(testDb, owner, { body: "あとから保存", id, version: 0 })
+    ).resolves.toStrictEqual({ kind: "not-found" });
   });
 
   test("他のユーザーのメモは not-found（版番号が合っていても書けない）", async () => {
     const id = await createOk({ body: "持ち主のメモ" });
 
-    expect(
-      await updateMemo(testDb, stranger, { body: "横取り", id, version: 0 })
-    ).toStrictEqual({ kind: "not-found" });
-    expect(await rowOf(id)).toStrictEqual({ body: "持ち主のメモ", version: 0 });
+    await expect(
+      updateMemo(testDb, stranger, { body: "横取り", id, version: 0 })
+    ).resolves.toStrictEqual({ kind: "not-found" });
+    await expect(rowOf(id)).resolves.toStrictEqual({
+      body: "持ち主のメモ",
+      version: 0,
+    });
   });
 });
 
@@ -112,17 +118,17 @@ describe("createMemo", () => {
       throw new Error("tag insert failed");
     }
 
-    expect(
-      await createMemo(testDb, owner, { body: "本文", tagIds: [foreign.id] })
-    ).toStrictEqual({ kind: "tag-not-found" });
+    await expect(
+      createMemo(testDb, owner, { body: "本文", tagIds: [foreign.id] })
+    ).resolves.toStrictEqual({ kind: "tag-not-found" });
   });
 
   test("削除済みのメモは参照先にできない", async () => {
     const id = await createOk({ body: "参照先" });
     await softDeleteMemo(testDb, owner, id);
 
-    expect(
-      await createMemo(testDb, owner, { body: "参照元", linkIds: [id] })
-    ).toStrictEqual({ kind: "link-not-found" });
+    await expect(
+      createMemo(testDb, owner, { body: "参照元", linkIds: [id] })
+    ).resolves.toStrictEqual({ kind: "link-not-found" });
   });
 });

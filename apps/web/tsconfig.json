@@ -16,6 +16,8 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     "vite.config.ts",
-    "panda.config.ts"
+    "panda.config.ts",
+    "oxlint.config.ts",
+    "oxlint.config.test.ts"
   ]
 }

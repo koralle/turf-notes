@@ -1,8 +1,46 @@
 import { defineConfig } from "oxlint";
 import type { OxlintConfig } from "oxlint";
 import core from "ultracite/oxlint/core";
-import react from "ultracite/oxlint/react";
-import tanstack from "ultracite/oxlint/tanstack";
+import vitest from "ultracite/oxlint/vitest";
+
+/**
+ * `ultracite/oxlint/vitest` はルールを `overrides` で一括有効化するため、
+ * `extends` する側からは個別ルールを上書きできない（プリセットの `overrides` が必ず勝つ）。
+ * このリポジトリの規約と衝突するものだけを差し替えたプリセットを渡す。
+ *
+ * - `consistent-test-it`: 既定は `describe` 内で `it` を推奨するが、このリポジトリは `test` 固定。
+ * - `prefer-to-be-truthy` / `prefer-to-be-falsy`: `toBe(true)` / `toBe(false)` を truthy へ
+ *   丸めさせると、boolean を返す契約（API の応答、判定関数）が別の truthy 値に
+ *   変わっても緑のままになる。
+ * - `prefer-import-in-mock`: 自動修正が `vi.mock(import("..."))` へ書き換えるが、これは
+ *   型付き overload になるため部分的な module mock が型検査を通らなくなる。
+ * - `prefer-describe-function-title`: `describe` の見出しは文字列で書く。対象は valibot の
+ *   スキーマのように関数でないものも多く、関数を渡す形に統一できない。
+ * - `require-top-level-describe`: 1 ファイル 1 対象のテストは、ファイル全体を `describe` で
+ *   包まずに共有の `beforeEach` と `test` を並べる（ファイル名が対象を示している）。
+ * - `require-to-throw-message`: 投げる値は valibot の ValiError。文言は valibot の版で
+ *   変わるので、テストを文言に結び付けない。
+ * - `expect-expect`: 表明を `expect*` で始まるヘルパーにまとめたテストを、表明なしと数えない。
+ */
+const vitestPreset: OxlintConfig = {
+  overrides: (vitest.overrides ?? []).map((override) => ({
+    ...override,
+    rules: {
+      ...override.rules,
+      "vitest/consistent-test-it": [
+        "error",
+        { fn: "test", withinDescribe: "test" },
+      ],
+      "vitest/expect-expect": ["error", { assertFunctionNames: ["expect*"] }],
+      "vitest/prefer-import-in-mock": "off",
+      "vitest/prefer-describe-function-title": "off",
+      "vitest/prefer-to-be-falsy": "off",
+      "vitest/prefer-to-be-truthy": "off",
+      "vitest/require-to-throw-message": "off",
+      "vitest/require-top-level-describe": "off",
+    },
+  })),
+};
 
 /**
  * Oxlint は `extends` した設定の `ignorePatterns` を継承しない。
@@ -18,43 +56,24 @@ const ignorePatterns = [
   "**/worker-configuration.d.ts",
 ];
 
+/**
+ * テストとメンテナンススクリプト向けの緩和。`extends` する側のディレクトリに
+ * 依存しない glob にする。
+ */
+const testFiles = [
+  "**/*.test.ts",
+  "**/*.test.tsx",
+  "**/src/test/**/*.ts",
+  "**/src/test/**/*.tsx",
+  "**/scripts/**/*.ts",
+];
+
 const oxlintConfig = defineConfig({
-  extends: [core, react, tanstack],
+  // react / tanstack は apps/web/oxlint.config.ts が受け持つ（React を使うのは web だけ）。
+  extends: [core, vitestPreset],
   overrides: [
     {
-      // テストは `test()` に統一する（`it()` は禁止）。
-      // Oxlint に `vitest/consistent-test-it` が無いため、同名の jest ルールを使う。
-      // jest プラグインを有効にすると他の jest ルールも既定カテゴリで有効になり、
-      // vitest 用テストと衝突するため明示的に off にする。
-      files: [
-        "**/*.test.ts",
-        "**/*.test.tsx",
-        "**/src/test/**/*.ts",
-        "**/src/test/**/*.tsx",
-      ],
-      plugins: ["jest"],
-      rules: {
-        "jest/consistent-test-it": [
-          "error",
-          { fn: "test", withinDescribe: "test" },
-        ],
-        "jest/expect-expect": "off",
-        "jest/no-conditional-expect": "off",
-        "jest/require-to-throw-message": "off",
-        "jest/valid-describe-callback": "off",
-        "jest/valid-expect": "off",
-        "jest/valid-title": "off",
-      },
-    },
-    {
-      // テスト・メンテナンススクリプト向けの緩和。
-      files: [
-        "**/*.test.ts",
-        "**/*.test.tsx",
-        "**/src/test/**/*.ts",
-        "**/src/test/**/*.tsx",
-        "**/scripts/**/*.ts",
-      ],
+      files: testFiles,
       rules: {
         "func-style": "off",
         "no-await-in-loop": "off",
@@ -62,9 +81,8 @@ const oxlintConfig = defineConfig({
         "no-use-before-define": "off",
         "no-useless-return": "off",
         "promise/avoid-new": "off",
+        // テストダブルは本物の port が async である以上 async になるが、本文に await は無い。
         "require-await": "off",
-        "require-unicode-regexp": "off",
-        "sort-keys": "off",
         "typescript/await-thenable": "off",
         "typescript/consistent-type-imports": "off",
         "typescript/no-base-to-string": "off",
@@ -74,58 +92,48 @@ const oxlintConfig = defineConfig({
         "typescript/no-unsafe-call": "off",
         "typescript/no-unsafe-member-access": "off",
         "typescript/no-unsafe-return": "off",
+        // 契約のエラー型へ絞る `as` は、テストで応答を読み解くための最短経路。
         "typescript/no-unsafe-type-assertion": "off",
         "typescript/strict-void-return": "off",
         "unicorn/import-style": "off",
         "unicorn/no-immediate-mutation": "off",
+        "unicorn/no-await-expression-member": "off",
       },
+    },
+    {
+      // stories はテスト fixture と同じ扱い。prod のコードでは unsafe 系を有効に保つ。
+      files: ["**/*.stories.{ts,tsx}"],
+      rules: {
+        // ハンドラの差し替えは「何もしない」が正当な応答になる。
+        "no-empty-function": "off",
+        // 差し替える port が Promise を返す以上 async になるが、本文に await は無い。
+        "require-await": "off",
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-return": "off",
+        "typescript/no-unsafe-type-assertion": "off",
+      },
+    },
+    {
+      // パース結果を型レベルで readonly にする変換。readonly は型にしか現れないため、
+      // 実行時の値は入力と同一で、valibot の検証では示せない。
+      files: ["**/packages/domain/src/readonly.ts"],
+      rules: { "typescript/no-unsafe-type-assertion": "off" },
     },
   ],
   rules: {
     // 契約スキーマのバレルは意図して持つ（domain の再エクスポートを含むため既定の100では足りない）。
     // サブパス export で回避すると公開面が概念ごとに非対称になるので、閾値側で受ける。
     "oxc/no-barrel-file": ["error", { threshold: 150 }],
-    // 関数宣言（function XxxPage()）を許す。コンポーネントは arrow に統一しない。
-    "func-style": "off",
-    "react/function-component-definition": "off",
-    // fire-and-forget の Promise に `void` を付けるのは意図的なので許す。
-    "no-void": "off",
-    // 3項演算子の入れ子より、早期 return を強制しない（読みやすさは都度判断する）。
-    "unicorn/no-array-reduce": "off",
-    "react/jsx-no-useless-fragment": "off",
-    complexity: "off",
-    "default-case": "off",
-    eqeqeq: "off",
-    "import/first": "off",
-    "no-empty-function": "off",
-    "no-eq-null": "off",
-    "no-use-before-define": "off",
-    "prefer-destructuring": "off",
-    "promise/prefer-await-to-callbacks": "off",
-    "promise/prefer-await-to-then": "off",
-    "react-hooks/rules-of-hooks": "off",
-    "react/exhaustive-effect-dependencies": "off",
-    "react/hooks": "off",
-    "react/refs": "off",
-    "react/set-state-in-effect": "off",
-    "react/todo": "off",
-    "require-await": "off",
-    "require-unicode-regexp": "off",
+    // キーの並びは意味を持たない。Drizzle のスキーマは列の順が DDL と対応しており、
+    // 並べ替えると定義が読めなくなるため、この規約は採らない。
     "sort-keys": "off",
-    "typescript/consistent-return": "off",
-    "typescript/no-deprecated": "off",
-    "typescript/no-misused-promises": "off",
-    "typescript/no-non-null-assertion": "off",
-    "typescript/no-unsafe-argument": "off",
-    "typescript/no-unsafe-assignment": "off",
-    "typescript/no-unsafe-call": "off",
-    "typescript/no-unsafe-member-access": "off",
-    "typescript/no-unsafe-return": "off",
-    "typescript/no-unsafe-type-assertion": "off",
-    "typescript/only-throw-error": "off",
-    "typescript/strict-boolean-expressions": "off",
-    "typescript/strict-void-return": "off",
-    "unicorn/no-await-expression-member": "off",
+    // コールバックを Promise へ書き換える前提のルール。TanStack Query の
+    // コールバック API と Better Auth のフックは callback 前提で、書き換えると
+    // 呼び出し側の設計が変わるため無効。
+    "promise/prefer-await-to-callbacks": "off",
   },
 });
 
@@ -133,6 +141,8 @@ type CreateOxlintConfigOptions = Omit<
   OxlintConfig,
   "extends" | "ignorePatterns"
 > & {
+  /** 追加で有効にしたいプリセット。共通設定の後ろに連結される。 */
+  extends?: OxlintConfig["extends"];
   /** リポジトリ固有で追加したい ignore。共通の ignore の後ろに連結される。 */
   ignorePatterns?: string[];
 };
@@ -140,13 +150,17 @@ type CreateOxlintConfigOptions = Omit<
 /**
  * パッケージごとの設定を作る。`extends` と共通 `ignorePatterns` を必ず含むため、
  * 呼び出し側は差分だけを渡せばよい（`ignorePatterns` の再宣言漏れを防ぐ）。
+ *
+ * 注意: 返した設定はネスト設定として親設定を置き換える。
+ * 全パッケージに効かせたい設定はここ（forge）に置くこと。
  */
 export const createOxlintConfig = ({
+  extends: presets = [],
   ignorePatterns: additionalIgnorePatterns = [],
   ...rest
 }: CreateOxlintConfigOptions = {}) =>
   defineConfig({
-    extends: [oxlintConfig],
+    extends: [oxlintConfig, ...presets],
     ignorePatterns: [...ignorePatterns, ...additionalIgnorePatterns],
     ...rest,
   });
