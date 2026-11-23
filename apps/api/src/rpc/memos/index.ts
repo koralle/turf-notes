@@ -2,13 +2,13 @@ import {
   createMemo,
   softDeleteMemo,
   updateMemo,
-} from "../features/memos/mutations";
+} from "../../features/memos/mutations";
 import {
   getMemoDetail,
   listMemos,
   listMemosForRace,
-} from "../features/memos/queries";
-import type { RouterKit } from "./base";
+} from "../../features/memos/queries";
+import type { RouterKit } from "../base";
 
 export const createMemosRouter = ({ impl, requireAuth }: RouterKit) => {
   const { memos } = impl;
