@@ -32,6 +32,7 @@ const yearStyle = css({
   display: "block",
   fontSize: { base: "10px", md: "9.5px" },
 });
+
 const dayStyle = css({
   color: { base: "muted", md: "ink" },
   display: "block",
@@ -40,6 +41,7 @@ const dayStyle = css({
   fontWeight: 600,
   mt: { base: "0", md: "1px" },
 });
+
 const weekdayStyle = css({
   color: "faint",
   display: "block",

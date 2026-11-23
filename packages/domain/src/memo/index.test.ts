@@ -97,11 +97,13 @@ describe("memoSchema", () => {
       })
     ).toBe(false);
   });
+
   test("パース結果は readonly（型だけの制約）", () => {
     const parsed = v.parse(memoSchema, {
       ...memo,
       tagIds: [tagId(1), tagId(2)],
     });
+
     expectTypeOf(parsed.body).toEqualTypeOf<string>();
     expectTypeOf(parsed.tagIds).toEqualTypeOf<readonly TagId[] | undefined>();
     // @ts-expect-error readonly なので書き換えられない

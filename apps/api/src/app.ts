@@ -15,6 +15,7 @@ export interface AppDeps {
 
 export const createApp = (deps: AppDeps) => {
   const app = new Hono();
+
   const rpcHandler = new RPCHandler(
     createRouter({ authenticate: deps.authenticate, db: deps.db })
   );

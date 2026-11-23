@@ -68,7 +68,8 @@ export const createTag = async (
     )
     .limit(1);
 
-  const row = rows[0];
+  const [row] = rows;
+
   if (row === undefined) {
     throw new Error("tag insert failed");
   }

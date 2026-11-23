@@ -29,11 +29,14 @@ export const authMethodsQuery = orpc.auth.methods.queryOptions({
 export const memoListQuery = (q: string) =>
   orpc.memos.list.infiniteOptions({
     getNextPageParam: (last) => last.nextCursor ?? undefined,
+    // SAFETY: 最初のページはカーソル無しから始まる。ここだけ `undefined` を
+    // `string | undefined` として渡す（次のページからはサーバーの値が入る）。
     initialPageParam: undefined as string | undefined,
-    input: (cursor: string | undefined) => ({
-      ...(q === "" ? {} : { q }),
-      ...(cursor === undefined ? {} : { cursor }),
-    }),
+    input: (cursor: string | undefined) => {
+      const base = q === "" ? {} : { q };
+
+      return cursor === undefined ? base : { ...base, cursor };
+    },
     staleTime: FRESH_FOR,
   });
 
@@ -41,11 +44,10 @@ export const memoListQuery = (q: string) =>
 export const tagMemosQuery = (tagId: TagId) =>
   orpc.memos.list.infiniteOptions({
     getNextPageParam: (last) => last.nextCursor ?? undefined,
+    // SAFETY: 最初のページはカーソル無しから始まる（`memoListQuery` と同じ）。
     initialPageParam: undefined as string | undefined,
-    input: (cursor: string | undefined) => ({
-      tagIds: [tagId],
-      ...(cursor === undefined ? {} : { cursor }),
-    }),
+    input: (cursor: string | undefined) =>
+      cursor === undefined ? { tagIds: [tagId] } : { cursor, tagIds: [tagId] },
     staleTime: FRESH_FOR,
   });
 

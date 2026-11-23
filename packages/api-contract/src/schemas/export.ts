@@ -23,4 +23,5 @@ export const exportDataSchema = v.object({
     })
   ),
 });
+
 export type ExportData = v.InferOutput<typeof exportDataSchema>;

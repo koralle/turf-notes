@@ -4,8 +4,12 @@ import type { AppDb } from "@turf-notes/db";
 import { authSchema } from "@turf-notes/db/schema";
 import { betterAuth } from "better-auth";
 import { APIError, createAuthMiddleware } from "better-auth/api";
+import * as v from "valibot";
 
 import { isPasswordSignInAllowed } from "../features/settings/queries";
+
+/** Better Auth が parse した sign-in の body。JSON と form-urlencoded の両方がここへ来る。 */
+const signInEmailBody = v.object({ email: v.string() });
 
 export interface CreateAuthOptions {
   db: AppDb;
@@ -17,9 +21,21 @@ export interface CreateAuthOptions {
  * passkey の rpID / origin を `BETTER_AUTH_URL` から導く。
  * ブラウザは web の origin で WebAuthn を行い、web が Request をそのまま転送するので、
  * `BETTER_AUTH_URL` は web の公開 URL と一致させる（要件 NFR-1）。
+ * 壊れた値は既定値でごまかさず、設定ミスとして落とす。
  */
+const parseBaseUrl = (baseURL: string): URL => {
+  try {
+    return new URL(baseURL);
+  } catch (error) {
+    throw new Error(`BETTER_AUTH_URL is not a valid URL: ${baseURL}`, {
+      cause: error,
+    });
+  }
+};
+
 const passkeyPluginOptions = (baseURL: string) => {
-  const url = new URL(baseURL);
+  const url = parseBaseUrl(baseURL);
+
   return { origin: url.origin, rpID: url.hostname, rpName: "Turf Notes" };
 };
 
@@ -37,17 +53,13 @@ const passwordSignInGate = (db: AppDb) =>
       return;
     }
 
-    const body: unknown = ctx.body;
-    if (
-      typeof body !== "object" ||
-      body === null ||
-      !("email" in body) ||
-      typeof body.email !== "string"
-    ) {
+    const body = v.safeParse(signInEmailBody, ctx.body);
+
+    if (!body.success) {
       return;
     }
 
-    if (await isPasswordSignInAllowed(db, body.email)) {
+    if (await isPasswordSignInAllowed(db, body.output.email)) {
       return;
     }
 

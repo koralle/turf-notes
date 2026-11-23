@@ -11,6 +11,7 @@ export const cookieSessionAuthenticator =
   (auth: Auth): Authenticator =>
   async (headers) => {
     const session = await auth.api.getSession({ headers });
+
     if (session === null) {
       return null;
     }

@@ -17,6 +17,47 @@ const raceColumns = (race: RaceInput | null | undefined) => ({
   raceName: race?.name ?? null,
 });
 
+/**
+ * タグと参照先が自分のもので、書き込み先として存在することを確かめる。
+ * 確かめないと、FK 違反が素の SQL エラー（500）になったり、他人の行を混ぜられたりする。
+ */
+const missingReference = async (
+  db: AppDb,
+  userId: UserId,
+  tagIds: readonly TagId[],
+  linkIds: readonly MemoId[]
+): Promise<"tag-not-found" | "link-not-found" | null> => {
+  if (tagIds.length > 0) {
+    const rows = await db
+      .select({ id: tags.id })
+      .from(tags)
+      .where(and(eq(tags.userId, userId), inArray(tags.id, tagIds)));
+
+    if (new Set(rows.map((row) => row.id)).size !== new Set(tagIds).size) {
+      return "tag-not-found";
+    }
+  }
+
+  if (linkIds.length > 0) {
+    const rows = await db
+      .select({ id: memos.id })
+      .from(memos)
+      .where(
+        and(
+          eq(memos.userId, userId),
+          isNull(memos.deletedAt),
+          inArray(memos.id, linkIds)
+        )
+      );
+
+    if (new Set(rows.map((row) => row.id)).size !== new Set(linkIds).size) {
+      return "link-not-found";
+    }
+  }
+
+  return null;
+};
+
 export const createMemo = async (
   db: AppDb,
   userId: UserId,
@@ -28,6 +69,7 @@ export const createMemo = async (
   const linkIds = input.linkIds ?? [];
 
   const missing = await missingReference(db, userId, tagIds, linkIds);
+
   if (missing !== null) {
     return { kind: missing };
   }
@@ -70,45 +112,6 @@ export type CreateMemoResult =
   | { kind: "link-not-found" };
 
 /**
- * タグと参照先が自分のもので、書き込み先として存在することを確かめる。
- * 確かめないと、FK 違反が素の SQL エラー（500）になったり、他人の行を混ぜられたりする。
- */
-const missingReference = async (
-  db: AppDb,
-  userId: UserId,
-  tagIds: readonly TagId[],
-  linkIds: readonly MemoId[]
-): Promise<"tag-not-found" | "link-not-found" | null> => {
-  if (tagIds.length > 0) {
-    const rows = await db
-      .select({ id: tags.id })
-      .from(tags)
-      .where(and(eq(tags.userId, userId), inArray(tags.id, tagIds)));
-    if (new Set(rows.map((row) => row.id)).size !== new Set(tagIds).size) {
-      return "tag-not-found";
-    }
-  }
-
-  if (linkIds.length > 0) {
-    const rows = await db
-      .select({ id: memos.id })
-      .from(memos)
-      .where(
-        and(
-          eq(memos.userId, userId),
-          isNull(memos.deletedAt),
-          inArray(memos.id, linkIds)
-        )
-      );
-    if (new Set(rows.map((row) => row.id)).size !== new Set(linkIds).size) {
-      return "link-not-found";
-    }
-  }
-
-  return null;
-};
-
-/**
  * 内容を丸ごと差し替える。読み込んだ版番号と一致しない時は書き換えずに conflict を返す
  * （楽観ロック）。タグと参照も同じトランザクションで入れ替える。
  */
@@ -123,6 +126,7 @@ export const updateMemo = async (
     input.tagIds ?? [],
     input.linkIds ?? []
   );
+
   if (missing !== null) {
     return { kind: missing };
   }
@@ -167,6 +171,7 @@ export const updateMemo = async (
 
     await tx.delete(memoTags).where(eq(memoTags.memoId, input.id));
     const tagIds = input.tagIds ?? [];
+
     if (tagIds.length > 0) {
       await tx
         .insert(memoTags)
@@ -175,6 +180,7 @@ export const updateMemo = async (
 
     await tx.delete(memoLinks).where(eq(memoLinks.fromMemoId, input.id));
     const linkIds = input.linkIds ?? [];
+
     if (linkIds.length > 0) {
       await tx
         .insert(memoLinks)

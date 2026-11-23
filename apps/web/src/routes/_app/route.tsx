@@ -14,6 +14,7 @@ export const Route = createFileRoute("/_app")({
       if (errorCode(error) !== "UNAUTHORIZED") {
         throw error;
       }
+
       throw redirect({ to: "/sign-in" });
     }
   },

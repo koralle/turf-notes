@@ -15,6 +15,7 @@ export const memoId = (value: string): MemoId => v.parse(memoIdSchema, value);
 /** 文字列から MemoId を作る（URL パラメータなど）。uuid でなければ null。 */
 export const memoIdOf = (raw: string): MemoId | null => {
   const parsed = v.safeParse(memoIdSchema, raw);
+
   return parsed.success ? parsed.output : null;
 };
 
@@ -37,6 +38,7 @@ const tagIdsSchema = v.pipe(
     "同じタグを重複して指定できません"
   )
 );
+
 const linkIdsSchema = v.pipe(
   v.array(memoIdSchema),
   v.maxLength(50),
@@ -94,15 +96,17 @@ export type Memo = v.InferOutput<typeof memoSchema>;
 /** 一覧・参照で使う見出し。タイトルが無ければ本文の最初の非空行。 */
 export const headingOf = (title: string | null, body: string): string => {
   const trimmedTitle = title?.trim() ?? "";
+
   if (trimmedTitle.length > 0) {
     return trimmedTitle;
   }
 
   const firstLine =
     body.split("\n").find((line) => line.trim().length > 0) ?? "";
+
   return firstLine.trim().slice(0, 80);
 };
 
 /** 一覧に出す本文の抜粋。改行は畳む。 */
 export const excerptOf = (body: string): string =>
-  body.replaceAll(/\s+/g, " ").trim().slice(0, 120);
+  body.replaceAll(/\s+/gu, " ").trim().slice(0, 120);

@@ -413,7 +413,13 @@ const TagSection = ({
           name="tagKind"
           className={field}
           onChange={(event) => {
-            setNewTagKind(event.target.value as TagKind);
+            const kind = tagKinds.find(
+              (candidate) => candidate === event.target.value
+            );
+
+            if (kind !== undefined) {
+              setNewTagKind(kind);
+            }
           }}
           value={newTagKind}
         >
@@ -517,13 +523,17 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
   const [text, setText] = useState(memo?.body ?? "");
   const [raceDate, setRaceDate] = useState(memo?.race?.date ?? "");
   const [venue, setVenue] = useState(memo?.race?.venue ?? "");
+
   const [raceNumber, setRaceNumber] = useState(
     () => memo?.race?.number.toString() ?? ""
   );
+
   const [raceName, setRaceName] = useState(memo?.race?.name ?? "");
+
   const [tagIds, setTagIds] = useState<TagId[]>(
     () => memo?.tags.map((tag) => tag.id) ?? []
   );
+
   const [links, setLinks] = useState<MemoRef[]>(memo?.links ?? []);
 
   // 入力が最初の状態から変わったか。保存せずに離れるときの確認に使う（FR-M3）。
@@ -537,7 +547,8 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
     title,
     venue,
   });
-  const initialState = useRef(currentState).current;
+
+  const [initialState] = useState(currentState);
   const isDirty = currentState !== initialState;
 
   const dirty = useRef(false);
@@ -558,18 +569,28 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
     mutationFn: async () => {
       // 3つ組がそろっているかだけを見る。値の検証は契約（サーバー）に任せる。
       const venueParam = venues.find((item) => item === venue);
+      const raceNameParam = raceName.trim();
+
+      const raceBody = () => {
+        if (raceDate === "" || venueParam === undefined || raceNumber === "") {
+          return null;
+        }
+
+        const triple = {
+          date: raceDate,
+          number: Number(raceNumber),
+          venue: venueParam,
+        };
+
+        return raceNameParam === ""
+          ? triple
+          : { ...triple, name: raceNameParam };
+      };
+
       const payload = {
         body: text,
         linkIds: links.map((link) => link.id),
-        race:
-          raceDate === "" || venueParam === undefined || raceNumber === ""
-            ? null
-            : {
-                date: raceDate,
-                number: Number(raceNumber),
-                venue: venueParam,
-                ...(raceName.trim() === "" ? {} : { name: raceName.trim() }),
-              },
+        race: raceBody(),
         tagIds,
         title: title.trim() === "" ? null : title.trim(),
       };
@@ -593,12 +614,15 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
   const addTag = (id: TagId) => {
     setTagIds((prev) => [...new Set([...prev, id])]);
   };
+
   const removeTag = (id: TagId) => {
     setTagIds((prev) => prev.filter((item) => item !== id));
   };
+
   const addLink = (link: MemoRef) => {
     setLinks((prev) => [...prev, link]);
   };
+
   const removeLink = (id: MemoRef["id"]) => {
     setLinks((prev) => prev.filter((item) => item.id !== id));
   };
@@ -643,7 +667,9 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
         </div>
       ) : null}
       <MobileHeader
-        onBack={() => void navigate({ to: "/" })}
+        onBack={() => {
+          void navigate({ to: "/" });
+        }}
         title={memo === undefined ? "新規メモ" : "メモを編集"}
       />
       <div className={topbar}>
@@ -653,7 +679,9 @@ export const MemoEditor = ({ memo }: { memo?: MemoDetail }) => {
             cursor: "pointer",
             fontSize: "12.5px",
           })}
-          onClick={() => void navigate({ to: "/" })}
+          onClick={() => {
+            void navigate({ to: "/" });
+          }}
           type="button"
         >
           ← 戻る

@@ -32,6 +32,7 @@ const wrap = css({
   px: { base: "18px", md: "40px" },
   py: { base: "20px", md: "30px" },
 });
+
 const section = css({
   borderTopColor: "line",
   borderTopStyle: "solid",
@@ -39,12 +40,14 @@ const section = css({
   mt: { base: "22px", md: "26px" },
   pt: { base: "16px", md: "20px" },
 });
+
 const label = css({
   color: "faint",
   fontSize: "10px",
   letterSpacing: "0.1em",
   textTransform: "uppercase",
 });
+
 const field = css({
   borderColor: "line",
   borderRadius: "7px",
@@ -55,6 +58,7 @@ const field = css({
   minH: { base: "44px", md: "auto" },
   p: "7px 9px",
 });
+
 const smallButton = css({
   alignItems: "center",
   bg: "accentWeak",
@@ -71,6 +75,7 @@ const smallButton = css({
   py: "6px",
   whiteSpace: "nowrap",
 });
+
 const row = css({
   alignItems: { base: "stretch", md: "center" },
   borderBottomColor: "line",
@@ -81,8 +86,10 @@ const row = css({
   gap: { base: "4px", md: "10px" },
   py: "10px",
 });
+
 const muted = css({ color: "muted", fontSize: "12px" });
 const errorSpacing = css({ mt: "8px" });
+
 const accountRow = css({
   alignItems: { base: "stretch", md: "center" },
   display: "flex",
@@ -90,12 +97,15 @@ const accountRow = css({
   gap: "12px",
   mt: "8px",
 });
+
 const passkeyActions = css({
   alignItems: "center",
   display: "flex",
   gap: { base: "12px", md: "10px" },
 });
+
 const renameInput = css({ flex: 1, minWidth: 0 });
+
 const mutedButton = css({
   alignItems: "center",
   color: "muted",
@@ -103,12 +113,14 @@ const mutedButton = css({
   fontSize: "12px",
   minH: { base: "40px", md: "auto" },
 });
+
 const passkeyAdd = css({
   display: "flex",
   flexDirection: { base: "column", md: "row" },
   gap: "6px",
   mt: "14px",
 });
+
 const dangerButton = css({
   alignItems: "center",
   color: "danger",
@@ -118,11 +130,14 @@ const dangerButton = css({
   _disabled: { cursor: "default", opacity: 0.4 },
 });
 
-const formatDate = (value: unknown): string => {
-  const ms = typeof value === "number" ? value : Date.parse(String(value));
+const formatDate = (value: Date | number | string): string => {
+  const ms =
+    value instanceof Date ? value.getTime() : new Date(value).getTime();
+
   if (Number.isNaN(ms)) {
     return "";
   }
+
   return new Date(ms).toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" });
 };
 
@@ -130,6 +145,7 @@ const AccountSection = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const me = useQuery(meQuery);
+
   const signOut = useMutation({
     mutationFn: async () => await authClient.signOut(),
     onSuccess: async () => {
@@ -200,10 +216,12 @@ const PasskeySection = () => {
       const result = await authClient.passkey.addPasskey(
         newPasskeyName.trim() === "" ? {} : { name: newPasskeyName.trim() }
       );
+
       // Better Auth は失敗を返り値で返すので、他の mutation と同じく例外に揃える。
       if (result.error !== null && result.error !== undefined) {
         throw new Error("passkey-add-failed");
       }
+
       return result;
     },
     onSuccess: async () => {
@@ -230,6 +248,7 @@ const PasskeySection = () => {
   });
 
   const passkeyList = passkeys.data?.data ?? [];
+
   // パスワードサインインが無効なときに最後の1つを消すと、サインイン手段が無くなる。
   const lastPasskeyLocked =
     passkeyList.length === 1 && methods.data?.passwordSignInEnabled !== true;
@@ -365,6 +384,7 @@ const PasswordSection = () => {
   const methods = useQuery(authMethodsQuery);
   // 無効化にはパスキーが要るので、同じキャッシュを読んで登録有無を見る。
   const passkeys = useQuery(passkeysQuery);
+
   const togglePassword = useMutation({
     mutationFn: async (enabled: boolean) =>
       await client.settings.setPasswordSignIn({ enabled }),
@@ -443,9 +463,11 @@ const DataSection = () => {
     startExport(async () => {
       try {
         const data = await client.exportAll();
+
         const blob = new Blob([JSON.stringify(data, null, 2)], {
           type: "application/json",
         });
+
         const url = URL.createObjectURL(blob);
         const anchor = document.createElement("a");
         anchor.download = `turf-notes-${new Date().toISOString().slice(0, 10)}.json`;

@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { signInWithPasskey } from "./passkey-sign-in";
 
-const { signInPasskey } = vi.hoisted(() => ({ signInPasskey: vi.fn() }));
+// 本物の authClient.signIn.passkey は better-auth の戻り値を返す。ここでは応答を
+// そのまま差し替えるので、引数なしの Promise として型を付ける。
+const { signInPasskey } = vi.hoisted(() => ({
+  signInPasskey: vi.fn<() => Promise<unknown>>(),
+}));
 
 vi.mock("../../../features/auth/auth-client", () => ({
   authClient: { signIn: { passkey: signInPasskey } },

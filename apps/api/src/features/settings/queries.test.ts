@@ -38,26 +38,26 @@ beforeEach(async () => {
 
 describe("setPasswordSignIn", () => {
   test("パスキーが無ければ無効化できず、DB も変わらない（FR-A4）", async () => {
-    expect(await setPasswordSignIn(testDb, id, false)).toStrictEqual({
+    await expect(setPasswordSignIn(testDb, id, false)).resolves.toStrictEqual({
       kind: "no-passkey",
     });
-    expect(await enabledInDb()).toBe(true);
+    await expect(enabledInDb()).resolves.toBe(true);
   });
 
   test("パスキーが無くても有効化はできる", async () => {
-    expect(await setPasswordSignIn(testDb, id, true)).toStrictEqual({
+    await expect(setPasswordSignIn(testDb, id, true)).resolves.toStrictEqual({
       kind: "ok",
     });
-    expect(await enabledInDb()).toBe(true);
+    await expect(enabledInDb()).resolves.toBe(true);
   });
 
   test("パスキーがあれば無効化できる", async () => {
     await addPasskey("passkey-1");
 
-    expect(await setPasswordSignIn(testDb, id, false)).toStrictEqual({
+    await expect(setPasswordSignIn(testDb, id, false)).resolves.toStrictEqual({
       kind: "ok",
     });
-    expect(await enabledInDb()).toBe(false);
+    await expect(enabledInDb()).resolves.toBe(false);
   });
 
   test("無効化したあと有効化できる", async () => {
@@ -67,9 +67,9 @@ describe("setPasswordSignIn", () => {
       .set({ passwordSignInEnabled: false })
       .where(eq(users.id, id));
 
-    expect(await setPasswordSignIn(testDb, id, true)).toStrictEqual({
+    await expect(setPasswordSignIn(testDb, id, true)).resolves.toStrictEqual({
       kind: "ok",
     });
-    expect(await enabledInDb()).toBe(true);
+    await expect(enabledInDb()).resolves.toBe(true);
   });
 });

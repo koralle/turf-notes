@@ -56,7 +56,7 @@ const seedUser = async (email: string, enabled: boolean) => {
 const expectRejected = async (response: Response) => {
   expect(response.status).toBe(401);
   expect(response.headers.getSetCookie()).toStrictEqual([]);
-  expect(await response.json()).toStrictEqual({
+  await expect(response.json()).resolves.toStrictEqual({
     code: "INVALID_EMAIL_OR_PASSWORD",
     message: "Invalid email or password",
   });
@@ -93,7 +93,7 @@ describe("パスワードサインインのゲート", () => {
     const unknown = await signIn("unknown@example.com", form);
 
     expect(disabled.status).toBe(unknown.status);
-    expect(await disabled.json()).toStrictEqual(await unknown.json());
+    await expect(disabled.json()).resolves.toStrictEqual(await unknown.json());
   });
 
   test.each(contentTypes)(

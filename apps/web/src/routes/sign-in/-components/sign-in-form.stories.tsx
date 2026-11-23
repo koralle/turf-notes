@@ -19,6 +19,7 @@ const meta = {
   decorators: [
     (Story) => {
       const queryClient = new QueryClient();
+
       return (
         <QueryClientProvider client={queryClient}>
           <SignInCard>

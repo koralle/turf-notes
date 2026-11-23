@@ -90,6 +90,7 @@ const dotBase = css({
   h: "6px",
   w: "6px",
 });
+
 const countStyle = css({ color: "faint", fontSize: "11px", ml: "auto" });
 
 const mainCol = css({
@@ -106,15 +107,13 @@ const Sidebar = () => {
   // `/_app` の loader が温めている。ここは読むだけ。
   const tags = useQuery(tagsQuery);
 
-  const grouped = (tags.data ?? []).reduce<Record<string, TagWithCount[]>>(
-    (acc, tag) => {
-      const list = acc[tag.kind] ?? [];
-      list.push(tag);
-      acc[tag.kind] = list;
-      return acc;
-    },
-    {}
-  );
+  const grouped: Record<string, TagWithCount[]> = {};
+
+  for (const tag of tags.data ?? []) {
+    const list = grouped[tag.kind] ?? [];
+    list.push(tag);
+    grouped[tag.kind] = list;
+  }
 
   return (
     <aside className={sidebar}>
@@ -219,6 +218,7 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
+
   const isTopLevel =
     pathname === "/" || pathname === "/tags" || pathname === "/settings";
 

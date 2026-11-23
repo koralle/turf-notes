@@ -12,6 +12,7 @@
     "typecheck": "tsrs"
   },
   "dependencies": {
+    "@interfere/landmines": "catalog:lint",
     "@tsconfig/strictest": "catalog:typescript",
     "oxfmt": "catalog:lint",
     "oxlint": "catalog:lint",

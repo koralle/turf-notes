@@ -11,10 +11,10 @@ export interface TursoConnection {
  * Drizzle のインスタンスを作る。Worker では isolate ごとに1つだけ作って使い回す。
  */
 export const createDb = ({ url, authToken }: TursoConnection) => {
-  const client = createClient({
-    url,
-    ...(authToken === undefined ? {} : { authToken }),
-  });
+  const client = createClient(
+    authToken === undefined ? { url } : { url, authToken }
+  );
+
   // drizzle 1.x は「設定オブジェクト」を受け取る。テーブル定義は `db.query` を使うときだけ
   // `schema` に渡す（その場合は relations が要る）ので、ここでは client だけ渡す。
   return drizzle({ client });

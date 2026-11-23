@@ -60,6 +60,7 @@ export const MobileHeader = ({
   note?: string | undefined;
 }) => {
   let trailing: ReactNode = null;
+
   if (action !== undefined) {
     trailing = <div className={actionSlot}>{action}</div>;
   } else if (note !== undefined) {

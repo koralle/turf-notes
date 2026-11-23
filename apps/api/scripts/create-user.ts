@@ -3,9 +3,11 @@ import { createDb } from "@turf-notes/db";
 import { createAuth } from "../src/auth/create-auth";
 
 const url = process.env["TURSO_CONNECTION_URL"] ?? "http://127.0.0.1:8080";
+
 const secret =
   process.env["BETTER_AUTH_SECRET"] ??
   "dev-secret-please-change-this-value-32chars";
+
 const baseURL = process.env["BETTER_AUTH_URL"] ?? "http://localhost:3000";
 
 const [
@@ -15,7 +17,7 @@ const [
 ] = process.argv.slice(2);
 
 const authToken = process.env["TURSO_AUTH_TOKEN"];
-const db = createDb({ url, ...(authToken ? { authToken } : {}) });
+const db = createDb(authToken === undefined ? { url } : { url, authToken });
 const auth = createAuth({ db, secret, baseURL });
 
 const result = await auth.api.signUpEmail({ body: { email, name, password } });

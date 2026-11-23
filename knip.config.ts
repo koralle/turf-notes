@@ -22,6 +22,8 @@ const config: KnipConfig = {
   },
   workspaces: {
     ".": {
+      // React Doctor の設定（`react-doctor/api` を import する）
+      entry: ["doctor.config.ts"],
       // エージェントが `pnpm intent` で使う CLI。コードからは import しない。
       ignoreDependencies: [
         "lefthook",
@@ -36,6 +38,11 @@ const config: KnipConfig = {
     },
     "packages/domain": {
       vitest: { config: ["vitest.config.ts"] },
+    },
+    "packages/forge": {
+      // Oxlint の jsPlugin は specifier 文字列で読み、`ultracite/oxlint/landmines`
+      // が組み立てる。knip はこの 1 段を追えないので、ここで依存として明示する。
+      ignoreDependencies: ["@interfere/landmines"],
     },
     "apps/web": {
       // Storybook 専用の Vite 設定は main.ts からパス文字列で参照している

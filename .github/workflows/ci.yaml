@@ -29,7 +29,8 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/composite-actions/cache-and-install
-      - run: pnpm run doctor
+      # Socket への問い合わせは CI の外（手元とスコア API）でだけ行う。
+      - run: pnpm run doctor --no-supply-chain
 
   typecheck:
     name: Typecheck

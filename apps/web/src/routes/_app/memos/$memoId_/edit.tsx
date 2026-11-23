@@ -13,17 +13,21 @@ export const Route = createFileRoute("/_app/memos/$memoId_/edit")({
   // 詳細画面から来る場合は既に温まっている。直接開いたときだけ取りに行く。
   loader: async ({ context, params }) => {
     const id = memoIdOf(params.memoId);
+
     if (id === null) {
       return { missing: true };
     }
+
     try {
       await context.queryClient.query(memoQuery(id));
     } catch (error) {
       if (isMissing(error)) {
         return { missing: true };
       }
+
       throw error;
     }
+
     return { missing: false };
   },
   errorComponent: ReadError,

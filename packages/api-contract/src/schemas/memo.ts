@@ -14,6 +14,7 @@ export type {
   Memo as MemoUpdateInput,
   MemoWrite as MemoCreateInput,
 } from "@turf-notes/domain";
+
 export {
   memoSchema as memoUpdateInputSchema,
   memoWriteSchema as memoCreateInputSchema,
@@ -32,12 +33,14 @@ export const memoSummarySchema = v.object({
   /** このメモが参照しているメモ + このメモを参照しているメモの件数。 */
   linkCount: v.number(),
 });
+
 export type MemoSummary = v.InferOutput<typeof memoSummarySchema>;
 
 export const memoRefSchema = v.object({
   id: memoIdSchema,
   heading: v.string(),
 });
+
 export type MemoRef = v.InferOutput<typeof memoRefSchema>;
 
 export const memoDetailSchema = v.object({
@@ -50,6 +53,7 @@ export const memoDetailSchema = v.object({
   /** このメモを参照しているメモ。 */
   backlinks: v.array(memoRefSchema),
 });
+
 export type MemoDetail = v.InferOutput<typeof memoDetailSchema>;
 
 export const memoListInputSchema = v.object({
@@ -58,10 +62,12 @@ export const memoListInputSchema = v.object({
   race: v.optional(raceKeySchema),
   cursor: v.optional(v.string()),
 });
+
 export type MemoListInput = v.InferOutput<typeof memoListInputSchema>;
 
 export const memoListOutputSchema = v.object({
   items: v.array(memoSummarySchema),
   nextCursor: v.nullable(v.string()),
 });
+
 export type MemoListOutput = v.InferOutput<typeof memoListOutputSchema>;

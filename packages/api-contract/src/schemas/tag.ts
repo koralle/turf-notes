@@ -10,6 +10,7 @@ export const tagSummarySchema = v.object({
   name: v.string(),
   kind: tagKindSchema,
 });
+
 export type TagSummary = v.InferOutput<typeof tagSummarySchema>;
 
 /** タグ一覧用。メモ件数を伴う。 */
@@ -17,10 +18,12 @@ export const tagWithCountSchema = v.object({
   ...tagSummarySchema.entries,
   memoCount: v.number(),
 });
+
 export type TagWithCount = v.InferOutput<typeof tagWithCountSchema>;
 
 export const tagCreateInputSchema = v.object({
   name: tagNameSchema,
   kind: tagKindSchema,
 });
+
 export type TagCreateInput = v.InferOutput<typeof tagCreateInputSchema>;

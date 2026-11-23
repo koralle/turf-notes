@@ -42,7 +42,13 @@ export const LoadFailed = ({ onRetry }: { onRetry: () => void }) => (
 export const ReadError = () => {
   const router = useRouter();
 
-  return <LoadFailed onRetry={() => void router.invalidate()} />;
+  return (
+    <LoadFailed
+      onRetry={() => {
+        void router.invalidate();
+      }}
+    />
+  );
 };
 
 /** メモが無い（削除済み・URL の誤り）ときの表示。 */

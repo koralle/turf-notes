@@ -16,7 +16,7 @@ export async function signInWithPasskey(): Promise<PasskeySignInOutcome> {
     throw new Error(resolveTransportErrorMessage(error), { cause: error });
   });
 
-  const error = result.error;
+  const { error } = result;
 
   if (error === null || error === undefined) {
     return "signed-in";
