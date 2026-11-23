@@ -27,6 +27,15 @@ dependencies:
     - git: honojs/skills#e54ce51f6effaeb574ebd2629e89e086e14a2db3
       skills:
         - hono
+    - git: DietrichGebert/ponytail
+      ref: ebd8654c2c627f721eb8f9c0d1bd4090a29f9e10
+      skills:
+        - ponytail
+        - ponytail-audit
+        - ponytail-debt
+        - ponytail-gain
+        - ponytail-help
+        - ponytail-review
     # Agent Plugins (plugin.json) 形式の repo なので、skill ディレクトリを直接指定する
     - git: GoogleChrome/modern-web-guidance/skills/modern-web-guidance#v1.0.0
     # 同様に plugin.json 形式なのでスキルを個別指定する
