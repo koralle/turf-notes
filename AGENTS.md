@@ -62,4 +62,10 @@ Use the repository’s installed Intent. If it is unavailable, report the missin
 
 ## UI
 
-デザインの正本は `design/mockups/` の HTML と `design/screens/` の PNG。色は Panda のトークン（`apps/web/panda.config.ts`）にだけ定義し、生の色値をコンポーネントに書かない。
+UIの変更時には以下のルールを適用する。
+
+- PRには変更前後におけるスクリーンショットを付与する。
+  - PCレイアウト
+  - タブレットのレイアウト（縦・横）
+  - スマホのレイアウト（縦・横）
+- Playwright MCP または Chrome DevTools MCP で検証する
