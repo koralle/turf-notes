@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "pnpm -r run build",
-    "check": "pnpm --filter @turf-notes/web run panda:codegen && ultracite check --type-aware",
+    "check": "pnpm --filter @turf-notes/web run panda:codegen && ultracite check --type-aware --deny-warnings --report-unused-disable-directives",
     "deploy": "pnpm --filter @turf-notes/api run deploy && pnpm --filter @turf-notes/web run deploy",
     "deploy:api": "pnpm --filter @turf-notes/api run deploy",
     "deploy:web": "pnpm --filter @turf-notes/web run deploy",

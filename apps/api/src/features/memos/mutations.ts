@@ -32,6 +32,7 @@ const missingReference = async (
       .select({ id: tags.id })
       .from(tags)
       .where(and(eq(tags.userId, userId), inArray(tags.id, tagIds)));
+
     if (new Set(rows.map((row) => row.id)).size !== new Set(tagIds).size) {
       return "tag-not-found";
     }
@@ -48,6 +49,7 @@ const missingReference = async (
           inArray(memos.id, linkIds)
         )
       );
+
     if (new Set(rows.map((row) => row.id)).size !== new Set(linkIds).size) {
       return "link-not-found";
     }
@@ -67,6 +69,7 @@ export const createMemo = async (
   const linkIds = input.linkIds ?? [];
 
   const missing = await missingReference(db, userId, tagIds, linkIds);
+
   if (missing !== null) {
     return { kind: missing };
   }
@@ -123,6 +126,7 @@ export const updateMemo = async (
     input.tagIds ?? [],
     input.linkIds ?? []
   );
+
   if (missing !== null) {
     return { kind: missing };
   }
@@ -167,6 +171,7 @@ export const updateMemo = async (
 
     await tx.delete(memoTags).where(eq(memoTags.memoId, input.id));
     const tagIds = input.tagIds ?? [];
+
     if (tagIds.length > 0) {
       await tx
         .insert(memoTags)
@@ -175,6 +180,7 @@ export const updateMemo = async (
 
     await tx.delete(memoLinks).where(eq(memoLinks.fromMemoId, input.id));
     const linkIds = input.linkIds ?? [];
+
     if (linkIds.length > 0) {
       await tx
         .insert(memoLinks)

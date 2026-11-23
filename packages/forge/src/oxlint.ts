@@ -1,6 +1,8 @@
 import { defineConfig } from "oxlint";
 import type { OxlintConfig } from "oxlint";
+import antiSlop from "ultracite/oxlint/anti-slop";
 import core from "ultracite/oxlint/core";
+import landmines from "ultracite/oxlint/landmines";
 import vitest from "ultracite/oxlint/vitest";
 
 /**
@@ -53,50 +55,39 @@ const ignorePatterns = [
   "**/.agents/skills/**",
   "**/postcss.config.cjs",
   "**/styled-system/**",
-  "**/worker-configuration.d.ts",
 ];
 
 /**
  * テストとメンテナンススクリプト向けの緩和。`extends` する側のディレクトリに
  * 依存しない glob にする。
  */
-const testFiles = [
-  "**/*.test.ts",
-  "**/*.test.tsx",
-  "**/src/test/**/*.ts",
-  "**/src/test/**/*.tsx",
-  "**/scripts/**/*.ts",
-];
+const testFiles = ["**/*.test.ts", "**/scripts/**/*.ts"];
 
 const oxlintConfig = defineConfig({
+  // Oxlint の既定は correctness を warning で有効にする。warning は `pnpm check` を落とさないので、
+  // プリセットが名前で指定していない correctness ルール（新しい版で増える分を含む）も error にする。
+  categories: { correctness: "deny" },
   // react / tanstack は apps/web/oxlint.config.ts が受け持つ（React を使うのは web だけ）。
-  extends: [core, vitestPreset],
+  // landmines は「エージェントが green にするための近道」を止める opt-in プリセット。
+  // anti-slop は、それとは別の角度から「分かったふり」を止めるプリセット（型の緩め方と
+  // 読みにくい詰め込みを禁止する）。どちらも apps に閉じず、パッケージ全体に効かせる。
+  extends: [core, vitestPreset, landmines, antiSlop],
+  jsPlugins: [...landmines.jsPlugins, ...antiSlop.jsPlugins],
   overrides: [
     {
       files: testFiles,
       rules: {
-        "func-style": "off",
-        "no-await-in-loop": "off",
-        "no-promise-executor-return": "off",
-        "no-use-before-define": "off",
-        "no-useless-return": "off",
-        "promise/avoid-new": "off",
-        // テストダブルは本物の port が async である以上 async になるが、本文に await は無い。
-        "require-await": "off",
-        "typescript/await-thenable": "off",
-        "typescript/consistent-type-imports": "off",
-        "typescript/no-base-to-string": "off",
-        "typescript/no-explicit-any": "off",
-        "typescript/no-unsafe-argument": "off",
-        "typescript/no-unsafe-assignment": "off",
-        "typescript/no-unsafe-call": "off",
-        "typescript/no-unsafe-member-access": "off",
-        "typescript/no-unsafe-return": "off",
+        // 任意の値をスキーマへ通して合否を見るヘルパーは、`unknown` で受けて
+        // `v.safeParse` するのが正しい形（ここが入力の境界）。
+        "anti-slop/no-unknown-parameters": "off",
+        // 差し替える port の戻り値はテスト側で決めるので、`Promise<unknown>` を受ける。
+        "anti-slop/no-unknown-returns": "off",
         // 契約のエラー型へ絞る `as` は、テストで応答を読み解くための最短経路。
+        // `SAFETY:` を全件に書くのは、テストでは読む人への情報量が増えないので要らない。
+        "anti-slop/require-safety-comment-for-type-assertion": "off",
         "typescript/no-unsafe-type-assertion": "off",
-        "typescript/strict-void-return": "off",
-        "unicorn/import-style": "off",
-        "unicorn/no-immediate-mutation": "off",
+        // `expect(await …)` を `await expect(…).resolves` に直すのが基本線だが、
+        // 応答の 1 項目だけを見る `expect((await …).version)` はそのままにする。
         "unicorn/no-await-expression-member": "off",
       },
     },
@@ -127,13 +118,14 @@ const oxlintConfig = defineConfig({
     // 契約スキーマのバレルは意図して持つ（domain の再エクスポートを含むため既定の100では足りない）。
     // サブパス export で回避すると公開面が概念ごとに非対称になるので、閾値側で受ける。
     "oxc/no-barrel-file": ["error", { threshold: 150 }],
-    // キーの並びは意味を持たない。Drizzle のスキーマは列の順が DDL と対応しており、
-    // 並べ替えると定義が読めなくなるため、この規約は採らない。
-    "sort-keys": "off",
     // コールバックを Promise へ書き換える前提のルール。TanStack Query の
     // コールバック API と Better Auth のフックは callback 前提で、書き換えると
     // 呼び出し側の設計が変わるため無効。
     "promise/prefer-await-to-callbacks": "off",
+    // コメントは「なぜ」を残す規約。差分を語るコメントの検出は要らない。
+    "landmines-style/no-comments": "off",
+    // 戻り値型は procedure / hook / port の契約として明示する。
+    "landmines-types/no-explicit-return-types": "off",
   },
 });
 
@@ -143,8 +135,6 @@ type CreateOxlintConfigOptions = Omit<
 > & {
   /** 追加で有効にしたいプリセット。共通設定の後ろに連結される。 */
   extends?: OxlintConfig["extends"];
-  /** リポジトリ固有で追加したい ignore。共通の ignore の後ろに連結される。 */
-  ignorePatterns?: string[];
 };
 
 /**
@@ -156,11 +146,10 @@ type CreateOxlintConfigOptions = Omit<
  */
 export const createOxlintConfig = ({
   extends: presets = [],
-  ignorePatterns: additionalIgnorePatterns = [],
   ...rest
 }: CreateOxlintConfigOptions = {}) =>
   defineConfig({
     extends: [oxlintConfig, ...presets],
-    ignorePatterns: [...ignorePatterns, ...additionalIgnorePatterns],
+    ignorePatterns,
     ...rest,
   });

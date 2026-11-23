@@ -14,6 +14,7 @@ const password = "correct-password";
 const secret = "test-secret-please-change-this-value-32chars";
 
 const owner = { email: "owner@example.com", id: "user-owner", name: "Owner" };
+
 const stranger = {
   email: "stranger@example.com",
   id: "user-stranger",
@@ -29,6 +30,7 @@ const headersFor = async (email: string): Promise<Headers> => {
     body: { email, password },
     returnHeaders: true,
   });
+
   const cookie = headers
     .getSetCookie()
     .map((value) => value.split(";")[0])
@@ -43,6 +45,7 @@ const rpc = async (email?: string) => {
     authenticate: cookieSessionAuthenticator(auth),
     db: () => testDb,
   });
+
   const headers = email === undefined ? new Headers() : await headersFor(email);
 
   return createRouterClient(router, { context: { headers } });
@@ -144,6 +147,7 @@ describe("メモ", () => {
     const { id } = await mine.memos.create({ body: "他人には見えない。" });
 
     const theirs = await rpc(stranger.email);
+
     const error = await theirs.memos
       .detail({ id })
       .catch((error_: unknown) => error_);
@@ -154,6 +158,7 @@ describe("メモ", () => {
 
   test("入力が contract に合わなければ拒否される", async () => {
     const client = await rpc(owner.email);
+
     const error = await client.memos
       .detail({ id: "" })
       .catch((error_: unknown) => error_);
@@ -167,6 +172,7 @@ describe("検索", () => {
   test("タグ名でもメモを探せる（FR-L3）", async () => {
     const client = await rpc(owner.email);
     const tag = await client.tags.create({ kind: "horse", name: "ソダシ" });
+
     const { id } = await client.memos.create({
       body: "本文に馬名はない",
       tagIds: [tag.id],
@@ -190,6 +196,7 @@ describe("タグ", () => {
   test("メモを削除するとタグの件数が減る", async () => {
     const client = await rpc(owner.email);
     const tag = await client.tags.create({ kind: "theme", name: "展開" });
+
     const { id } = await client.memos.create({
       body: "本文",
       tagIds: [tag.id],
@@ -205,12 +212,14 @@ describe("タグ", () => {
 
   test("他人のタグは付けられない（tag-not-found）", async () => {
     const theirs = await rpc(stranger.email);
+
     const foreign = await theirs.tags.create({
       kind: "horse",
       name: "他人の馬",
     });
 
     const mine = await rpc(owner.email);
+
     const error = await mine.memos
       .create({ body: "本文", tagIds: [foreign.id] })
       .catch((error_: unknown) => error_);
@@ -223,10 +232,12 @@ describe("エクスポート", () => {
   test("参照先を削除すると linkIds から消える", async () => {
     const client = await rpc(owner.email);
     const target = await client.memos.create({ body: "参照先" });
+
     const source = await client.memos.create({
       body: "参照元",
       linkIds: [target.id],
     });
+
     await client.memos.delete({ id: target.id });
 
     const dump = await client.exportAll();

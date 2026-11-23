@@ -90,6 +90,7 @@ const dotBase = css({
   h: "6px",
   w: "6px",
 });
+
 const countStyle = css({ color: "faint", fontSize: "11px", ml: "auto" });
 
 const mainCol = css({
@@ -107,6 +108,7 @@ const Sidebar = () => {
   const tags = useQuery(tagsQuery);
 
   const grouped: Record<string, TagWithCount[]> = {};
+
   for (const tag of tags.data ?? []) {
     const list = grouped[tag.kind] ?? [];
     list.push(tag);
@@ -216,6 +218,7 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
+
   const isTopLevel =
     pathname === "/" || pathname === "/tags" || pathname === "/settings";
 

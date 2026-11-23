@@ -11,23 +11,26 @@ const authCache = new Map<string, Auth>();
 
 const dbFor = (env: Env): AppDb => {
   const cached = dbCache.get(env.TURSO_CONNECTION_URL);
+
   if (cached !== undefined) {
     return cached;
   }
 
-  const db = createDb({
-    url: env.TURSO_CONNECTION_URL,
-    ...(env.TURSO_AUTH_TOKEN === undefined
-      ? {}
-      : { authToken: env.TURSO_AUTH_TOKEN }),
-  });
+  const db = createDb(
+    env.TURSO_AUTH_TOKEN === undefined
+      ? { url: env.TURSO_CONNECTION_URL }
+      : { url: env.TURSO_CONNECTION_URL, authToken: env.TURSO_AUTH_TOKEN }
+  );
+
   dbCache.set(env.TURSO_CONNECTION_URL, db);
+
   return db;
 };
 
 const authFor = (env: Env, db: AppDb): Auth => {
   const key = `${env.BETTER_AUTH_URL}|${env.BETTER_AUTH_SECRET}`;
   const cached = authCache.get(key);
+
   if (cached !== undefined) {
     return cached;
   }
@@ -37,7 +40,9 @@ const authFor = (env: Env, db: AppDb): Auth => {
     db,
     secret: env.BETTER_AUTH_SECRET,
   });
+
   authCache.set(key, auth);
+
   return auth;
 };
 
@@ -45,6 +50,7 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const db = dbFor(env);
     const auth = authFor(env, db);
+
     const app = createApp({
       authenticate: cookieSessionAuthenticator(auth),
       auth,

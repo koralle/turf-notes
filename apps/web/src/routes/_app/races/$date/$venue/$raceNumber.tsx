@@ -19,6 +19,7 @@ export const Route = createFileRoute("/_app/races/$date/$venue/$raceNumber")({
       number: params.raceNumber,
       venue: params.venue,
     });
+
     if (race !== null) {
       await context.queryClient.query(raceMemosQuery(race));
     }
@@ -31,6 +32,7 @@ const head = css({
   px: { base: "18px", md: "32px" },
   pt: { base: "12px", md: "20px" },
 });
+
 const timeline = css({
   pb: { base: "calc(24px + env(safe-area-inset-bottom))", md: "10px" },
   pt: { base: "4px", md: "10px" },
@@ -88,6 +90,7 @@ const RaceView = ({
   items: MemoSummary[];
 }) => {
   const navigate = useNavigate();
+
   const raceName = items.find((item) => item.race?.name !== undefined)?.race
     ?.name;
 

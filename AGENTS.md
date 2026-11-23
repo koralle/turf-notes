@@ -27,7 +27,7 @@ Use the repository’s installed Intent. If it is unavailable, report the missin
 ## ディレクトリ
 
 - `apps/web` — TanStack Start + Panda CSS。DB に触らない。`/rpc/*` と `/api/auth/*` は `src/server.ts` が Service Binding で `apps/api` へ流す。lint は `apps/web/oxlint.config.ts` がルート設定を置き換える（react / tanstack はここだけ）
-- `apps/api` — Hono + oRPC + Better Auth。`src/rpc/base.ts` の `requireAuth` で認証と DB を注入する。lint は `apps/api/oxlint.config.ts` がルート設定を置き換える（landmines はここだけ）
+- `apps/api` — Hono + oRPC + Better Auth。`src/rpc/base.ts` の `requireAuth` で認証と DB を注入する。lint はルート設定をそのまま使う（`oxlint.config.ts` を置くと親設定を置き換えてしまうため）
 - `packages/api-contract` — oRPC contract と Valibot スキーマ。input / output / 型付きエラーはここだけ
 - `packages/db` — Drizzle スキーマとマイグレーション。**適用済みのマイグレーションは手で編集しない** （変更は CI の `migrations` ジョブが落とす。スキーマ変更は新しいマイグレーションを足す）
 - `packages/forge` — tsconfig / oxlint / oxfmt の共通設定。全パッケージに効かせたい lint 設定はここ

@@ -94,9 +94,11 @@ const TagGroups = () => {
   ) : (
     tagKinds.map((kind) => {
       const groupTags = all.filter((tag) => tag.kind === kind);
+
       if (groupTags.length === 0) {
         return null;
       }
+
       return (
         <section className={group} key={kind}>
           <h2 className={groupLabel}>{kindLabels[kind]}</h2>

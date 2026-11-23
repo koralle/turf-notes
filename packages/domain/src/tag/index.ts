@@ -28,6 +28,7 @@ export const tagId = (value: number): TagId => v.parse(tagIdSchema, value);
 /** 文字列から TagId を作る（URL パラメータなど）。整数でなければ null。 */
 export const tagIdOf = (raw: string): TagId | null => {
   const parsed = v.safeParse(tagIdSchema, Number(raw));
+
   return parsed.success ? parsed.output : null;
 };
 

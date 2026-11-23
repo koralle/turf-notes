@@ -19,6 +19,7 @@ import { tagMemosQuery, tagsQuery } from "../../../rpc/queries";
 export const Route = createFileRoute("/_app/tags/$tagId")({
   loader: async ({ context, params }) => {
     const id = tagIdOf(params.tagId);
+
     if (id !== null) {
       await context.queryClient.infiniteQuery(tagMemosQuery(id));
     }
@@ -31,6 +32,7 @@ const head = css({
   px: { base: "18px", md: "32px" },
   pt: { base: "12px", md: "20px" },
 });
+
 const timeline = css({
   pb: { base: "calc(24px + env(safe-area-inset-bottom))", md: "10px" },
   pt: { base: "4px", md: "10px" },
@@ -52,6 +54,7 @@ const missing = css({
   fontSize: "13px",
   p: { base: "18px", md: "32px" },
 });
+
 const missingLink = css({ color: "accent", textDecoration: "underline" });
 
 /** 数字でない id や、存在しないタグは空の一覧ではなく「見つからない」を出す。 */

@@ -28,7 +28,6 @@
   "devDependencies": {
     "@cloudflare/vite-plugin": "catalog:cloudflare",
     "@hono/cli": "catalog:tooling",
-    "@interfere/landmines": "catalog:lint",
     "@turf-notes/forge": "workspace:*",
     "@types/node": "catalog:typescript",
     "testcontainers": "catalog:test",

@@ -445,9 +445,6 @@ importers:
       '@hono/cli':
         specifier: catalog:tooling
         version: 0.1.11
-      '@interfere/landmines':
-        specifier: catalog:lint
-        version: 0.1.1(oxlint@1.94.0(oxlint-tsgolint@7.0.2007))
       '@turf-notes/forge':
         specifier: workspace:*
         version: link:../../packages/forge
@@ -542,9 +539,6 @@ importers:
       '@cloudflare/vite-plugin':
         specifier: catalog:cloudflare
         version: 1.67.0(@types/node@26.6.6)(vite@8.3.6(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(workerd@1.20261104.1)(wrangler@4.158.0(@types/node@26.6.6))
-      '@interfere/landmines':
-        specifier: catalog:lint
-        version: 0.1.1(oxlint@1.94.0(oxlint-tsgolint@7.0.2007))
       '@pandacss/dev':
         specifier: catalog:ui
         version: 2.5.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(postcss@8.5.32)
@@ -680,6 +674,9 @@ importers:
 
   packages/forge:
     dependencies:
+      '@interfere/landmines':
+        specifier: catalog:lint
+        version: 0.1.1(oxlint@1.94.0(oxlint-tsgolint@7.0.2007))
       '@tsconfig/strictest':
         specifier: catalog:typescript
         version: 2.0.8

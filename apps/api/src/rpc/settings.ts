@@ -10,6 +10,7 @@ export const createSettingsRouter = ({ impl, requireAuth }: RouterKit) => ({
         context.user.id,
         input.enabled
       );
+
       if (result.kind === "no-passkey") {
         throw errors["no-passkey"]();
       }

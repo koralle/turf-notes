@@ -60,6 +60,7 @@ const memoColumns = {
  */
 const likeContains = (column: SQLWrapper, q: string): SQL => {
   const pattern = `%${q.replaceAll(/[%_\\]/gu, (char) => `\\${char}`)}%`;
+
   return sql`${column} like ${pattern} escape '\\'`;
 };
 
@@ -68,12 +69,14 @@ const encodeCursor = (createdAt: Date, id: MemoId): string =>
 
 const decodeCursor = (cursor: string): { ms: number; id: MemoId } | null => {
   const separator = cursor.indexOf("_");
+
   if (separator <= 0) {
     return null;
   }
 
   const ms = Number(cursor.slice(0, separator));
   const parsed = v.safeParse(memoIdSchema, cursor.slice(separator + 1));
+
   if (!Number.isFinite(ms) || !parsed.success) {
     return null;
   }
@@ -101,6 +104,7 @@ const decorate = async (db: AppDb, rows: MemoRow[]): Promise<MemoSummary[]> => {
     .where(inArray(memoTags.memoId, ids));
 
   const tagsByMemo = new Map<MemoId, TagSummary[]>();
+
   for (const row of tagRows) {
     const list = tagsByMemo.get(row.memoId) ?? [];
     list.push({ id: row.id, name: row.name, kind: row.kind });
@@ -115,10 +119,12 @@ const decorate = async (db: AppDb, rows: MemoRow[]): Promise<MemoSummary[]> => {
     );
 
   const linkCounts = new Map<MemoId, number>();
+
   for (const row of linkRows) {
     if (ids.includes(row.fromMemoId)) {
       linkCounts.set(row.fromMemoId, (linkCounts.get(row.fromMemoId) ?? 0) + 1);
     }
+
     if (ids.includes(row.toMemoId)) {
       linkCounts.set(row.toMemoId, (linkCounts.get(row.toMemoId) ?? 0) + 1);
     }
@@ -149,6 +155,7 @@ export const listMemos = async (
   const conditions = baseConditions(userId);
 
   const q = input.q?.trim() ?? "";
+
   if (q.length > 0) {
     // SQLite の LIKE は ASCII に対しては大文字小文字を区別しない。
     // 日本語の表記揺れまでは吸収しないが、部分一致としては十分（要件 FR-L3）。
@@ -158,11 +165,13 @@ export const listMemos = async (
       .from(memoTags)
       .innerJoin(tags, eq(tags.id, memoTags.tagId))
       .where(and(eq(memoTags.memoId, memos.id), likeContains(tags.name, q)));
+
     const search = or(
       likeContains(memos.body, q),
       likeContains(memos.title, q),
       exists(tagged)
     );
+
     if (search !== undefined) {
       conditions.push(search);
     }
@@ -173,6 +182,7 @@ export const listMemos = async (
       .select({ id: memoTags.memoId })
       .from(memoTags)
       .where(eq(memoTags.tagId, id));
+
     conditions.push(inArray(memos.id, taggedMemoIds));
   }
 
@@ -186,12 +196,15 @@ export const listMemos = async (
 
   const decoded =
     input.cursor === undefined ? null : decodeCursor(input.cursor);
+
   if (decoded !== null) {
     const cursorDate = new Date(decoded.ms);
+
     const keyset = or(
       lt(memos.createdAt, cursorDate),
       and(eq(memos.createdAt, cursorDate), lt(memos.id, decoded.id))
     );
+
     if (keyset !== undefined) {
       conditions.push(keyset);
     }
@@ -245,6 +258,7 @@ export const getMemoDetail = async (
   id: MemoId
 ): Promise<MemoDetail | null> => {
   const row = await findMemo(db, userId, id);
+
   if (row === null) {
     return null;
   }

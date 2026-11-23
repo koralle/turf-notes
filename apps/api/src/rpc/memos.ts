@@ -29,9 +29,11 @@ export const createMemosRouter = ({ impl, requireAuth }: RouterKit) => {
           context.user.id,
           input.id
         );
+
         if (detail === null) {
           throw errors["memo-not-found"]();
         }
+
         return detail;
       }),
 
@@ -39,12 +41,15 @@ export const createMemosRouter = ({ impl, requireAuth }: RouterKit) => {
       .use(requireAuth)
       .handler(async ({ context, errors, input }) => {
         const result = await createMemo(context.db, context.user.id, input);
+
         if (result.kind === "tag-not-found") {
           throw errors["tag-not-found"]();
         }
+
         if (result.kind === "link-not-found") {
           throw errors["memo-not-found"]();
         }
+
         return { id: result.id };
       }),
 
@@ -52,18 +57,23 @@ export const createMemosRouter = ({ impl, requireAuth }: RouterKit) => {
       .use(requireAuth)
       .handler(async ({ context, errors, input }) => {
         const result = await updateMemo(context.db, context.user.id, input);
+
         if (result.kind === "not-found") {
           throw errors["memo-not-found"]();
         }
+
         if (result.kind === "conflict") {
           throw errors["memo-conflict"]();
         }
+
         if (result.kind === "tag-not-found") {
           throw errors["tag-not-found"]();
         }
+
         if (result.kind === "link-not-found") {
           throw errors["memo-not-found"]();
         }
+
         return { id: input.id };
       }),
 
@@ -75,9 +85,11 @@ export const createMemosRouter = ({ impl, requireAuth }: RouterKit) => {
           context.user.id,
           input.id
         );
+
         if (!deleted) {
           throw errors["memo-not-found"]();
         }
+
         return { ok: true };
       }),
 

@@ -38,6 +38,7 @@ const meta = {
             authMethodsQuery.queryKey,
             storyContext.args.methods
           );
+
           return { queryClient };
         },
         route: Route,
@@ -78,6 +79,7 @@ export const PasswordExpanded: Story = {
   args: { methods: { hasPasskey: true, passwordSignInEnabled: true } },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+
     const toggle = canvas.getByRole("button", {
       name: "その他の方法でログインする",
     });

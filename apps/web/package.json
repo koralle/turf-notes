@@ -38,7 +38,6 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "catalog:cloudflare",
-    "@interfere/landmines": "catalog:lint",
     "@pandacss/dev": "catalog:ui",
     "@pandacss/preset-base": "catalog:ui",
     "@pandacss/preset-panda": "catalog:ui",

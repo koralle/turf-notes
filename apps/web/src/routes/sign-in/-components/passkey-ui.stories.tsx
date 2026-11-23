@@ -25,6 +25,7 @@ const meta = {
   decorators: [
     (Story) => {
       const queryClient = new QueryClient();
+
       return (
         <QueryClientProvider client={queryClient}>
           <SignInCard>
@@ -66,6 +67,7 @@ export const PasswordExpanded: Story = {
   render: (args) => <PasswordToggle {...args} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+
     const toggle = canvas.getByRole("button", {
       name: "その他の方法でログインする",
     });

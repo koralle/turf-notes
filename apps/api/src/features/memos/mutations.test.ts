@@ -23,9 +23,11 @@ const rowOf = async (id: MemoId) => {
 /** 作成に成功したときの id を取り出す。 */
 const createOk = async (input: MemoCreateInput): Promise<MemoId> => {
   const result = await createMemo(testDb, owner, input);
+
   if (result.kind !== "ok") {
     throw new Error(`createMemo failed: ${result.kind}`);
   }
+
   return result.id;
 };
 
@@ -114,6 +116,7 @@ describe("createMemo", () => {
         userId: stranger,
       })
       .returning();
+
     if (foreign === undefined) {
       throw new Error("tag insert failed");
     }

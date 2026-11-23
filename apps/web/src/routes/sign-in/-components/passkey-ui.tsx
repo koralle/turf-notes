@@ -70,6 +70,7 @@ export const PasskeyUI = ({
     onSignIn,
     onSuccess: onSuccessSignIn,
   });
+
   const label = "パスキーでサインイン";
 
   if (!hasPasskey) {

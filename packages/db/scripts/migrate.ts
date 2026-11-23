@@ -13,12 +13,8 @@ if (url.startsWith("file:")) {
   await mkdir(path.join(process.cwd(), ".data"), { recursive: true });
 }
 
-const db = createDb({
-  url,
-  ...(process.env["TURSO_AUTH_TOKEN"] === undefined
-    ? {}
-    : { authToken: process.env["TURSO_AUTH_TOKEN"] }),
-});
+const authToken = process.env["TURSO_AUTH_TOKEN"];
+const db = createDb(authToken === undefined ? { url } : { url, authToken });
 
 await migrate(db, {
   migrationsFolder: path.join(import.meta.dirname, "../drizzle"),

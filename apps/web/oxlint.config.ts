@@ -9,15 +9,13 @@ import {
   TANSTACK_QUERY_RULES,
   TANSTACK_START_RULES,
 } from "oxlint-plugin-react-doctor";
-import landmines from "ultracite/oxlint/landmines";
 import react from "ultracite/oxlint/react";
 import tanstack from "ultracite/oxlint/tanstack";
 
-// リポジトリ全体に効く設定は @turf-notes/forge/oxlint が持つ。
+// リポジトリ全体に効く設定は @turf-notes/forge/oxlint が持つ（landmines を含む）。
 // このファイルを置いた時点で apps/web 配下はルート oxlint.config.ts の対象外になる
 // （Oxlint はファイルごとに最も近い設定だけを使い、親設定とはマージしない）。
 // react / tanstack は React と TanStack Router を使うこのアプリだけに効かせる。
-// landmines は「エージェントが green にするための近道」を止める opt-in プリセット。
 
 // react-doctor CLI が package.json から組み立てるのと同じ能力の集合。
 // react:18 / react:19 / react:19.2 は React 19.3 で満たされる階段。
@@ -38,21 +36,24 @@ const reactDoctorEntryByKey = new Map(
   REACT_DOCTOR_RULES.map((entry) => [entry.key, entry])
 );
 
-// oxlint の深刻度は文字列か [深刻度, オプション] の配列で書ける。
-const severityOf = (value: unknown): string => {
-  const head = Array.isArray(value) ? (value as readonly unknown[])[0] : value;
-  return typeof head === "string" ? head : "error";
-};
+// oxlint の深刻度は `off` / `warn` / `error`、または `["error", オプション]` の配列で書ける。
+// 落とすべきは `off` だけなので、有効側を数える。
+type ReactPresetRules = NonNullable<typeof react.rules>;
+
+type PresetRuleValue = ReactPresetRules[keyof ReactPresetRules];
+
+const isEnabledSeverity = (value: PresetRuleValue): boolean =>
+  Array.isArray(value) || value !== "off";
 
 // Ultracite の react プリセットで実際に有効な組み込みルール名（接頭辞を落としたもの）。
 // プリセットには off の項目も入っているので、値を見ないと「組み込みも react-doctor も
 // 黙る」ルールができる。
 const builtInReactRuleNames = new Set(
   Object.entries(react.rules ?? {}).flatMap(([key, value]) => {
-    const severity = severityOf(value);
-    if (severity === "off" || severity === "allow") {
+    if (!isEnabledSeverity(value)) {
       return [];
     }
+
     return [key.slice(key.indexOf("/") + 1)];
   })
 );
@@ -64,48 +65,53 @@ const builtInReactRuleNames = new Set(
 // ものだけ落とす。同じ指摘を 2 回出さないため。
 export const isReactDoctorRuleEnabled = (key: string): boolean => {
   const entry = reactDoctorEntryByKey.get(key);
+
   if (entry === undefined) {
     return false;
   }
+
   const { rule } = entry;
+
   if (
     rule.requires?.some((capability) => !capabilities.has(capability)) === true
   ) {
     return false;
   }
+
   if (
     rule.tags?.includes("react-jsx-only") === true &&
     !capabilities.has("react")
   ) {
     return false;
   }
+
   if (
     rule.disabledWhen?.some((capability) => capabilities.has(capability)) ===
     true
   ) {
     return false;
   }
+
   return !(entry.originallyExternal && builtInReactRuleNames.has(entry.id));
 };
 
 // react-doctor の推奨セットは既定で warning が多い。厳し目なので全件 error にする。
 // tanstack 系は framework が global ではないため推奨セットに入らない。
-const asErrors = (
-  rules: Readonly<Record<string, OxlintRuleSeverity>>
-): Record<string, "error"> => {
+const asErrors = (rules: Readonly<Record<string, OxlintRuleSeverity>>) => {
   const enabled: Record<string, "error"> = {};
+
   for (const key of Object.keys(rules)) {
     if (isReactDoctorRuleEnabled(key)) {
       enabled[key] = "error";
     }
   }
+
   return enabled;
 };
 
 export default createOxlintConfig({
-  extends: [react, tanstack, landmines],
+  extends: [react, tanstack],
   jsPlugins: [
-    ...landmines.jsPlugins,
     { name: "storybook", specifier: "eslint-plugin-storybook" },
     { name: "react-doctor", specifier: "oxlint-plugin-react-doctor" },
   ],
@@ -122,10 +128,6 @@ export default createOxlintConfig({
     ...asErrors(RECOMMENDED_RULES),
     ...asErrors(TANSTACK_START_RULES),
     ...asErrors(TANSTACK_QUERY_RULES),
-    // コメントは「なぜ」を残す規約。差分を語るコメントの検出は要らない。
-    "landmines-style/no-comments": "off",
-    // 戻り値型は hook / port の契約として明示する。
-    "landmines-types/no-explicit-return-types": "off",
   },
   overrides: [
     {
@@ -166,7 +168,24 @@ export default createOxlintConfig({
       // better-auth のパスキーは WebAuthn（ブラウザ API）を要り、実物をテストで動かせないので
       // authClient を差し替えている。MSW で HTTP を置き換える形へ寄せるのは別作業。
       files: ["src/routes/sign-in/-lib/passkey-sign-in.test.ts"],
-      rules: { "landmines-testing/no-test-doubles": "off" },
+      rules: {
+        "anti-slop/no-module-mocking": "off",
+        "landmines-testing/no-test-doubles": "off",
+      },
+    },
+    {
+      // サインインの失敗は fetch / WebAuthn の throw として `unknown` で飛んでくる。
+      // この 3 ファイルがその境界で、`instanceof` で絞って文言に落とす相手（スキーマ）は無い。
+      files: ["src/routes/sign-in/-lib/*.ts"],
+      rules: { "anti-slop/no-unknown-parameters": "off" },
+    },
+    {
+      // oRPC のエラーは throw を経由すると型を失う。ここで未知の値からコードだけを取り出す。
+      files: ["src/rpc/client.ts"],
+      rules: {
+        "anti-slop/no-runtime-typeof": "off",
+        "anti-slop/no-unknown-parameters": "off",
+      },
     },
     {
       // Storybook の設定は knip が読み込んで評価する。`import.meta` の分割代入は

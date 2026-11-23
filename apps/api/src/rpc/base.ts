@@ -27,6 +27,7 @@ export const createRouterKit = (deps: RouterDeps) => {
 
   const requireAuth = impl.middleware(async ({ context, next }) => {
     const user: User | null = await deps.authenticate(context.headers);
+
     if (user === null) {
       throw new ORPCError("UNAUTHORIZED");
     }

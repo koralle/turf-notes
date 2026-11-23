@@ -19,6 +19,7 @@ const ssrFetch = createServerOnlyFn(async (request: Request) => {
   ]);
 
   const cookie = getRequestHeaders().get("cookie");
+
   if (cookie !== null) {
     request.headers.set("cookie", cookie);
   }

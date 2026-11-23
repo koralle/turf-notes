@@ -19,10 +19,12 @@ import { memoQuery } from "../../../rpc/queries";
 export const Route = createFileRoute("/_app/memos/$memoId")({
   loader: async ({ context, params }) => {
     const id = memoIdOf(params.memoId);
+
     // uuid でない id は問い合わせない（API は入力不正として弾くので「無い」として扱う）。
     if (id === null) {
       return { missing: true };
     }
+
     try {
       await context.queryClient.query(memoQuery(id));
     } catch (error) {
@@ -30,8 +32,10 @@ export const Route = createFileRoute("/_app/memos/$memoId")({
       if (isMissing(error)) {
         return { missing: true };
       }
+
       throw error;
     }
+
     return { missing: false };
   },
   errorComponent: ReadError,
@@ -44,6 +48,7 @@ const wrap = css({
   pt: { base: "18px", md: "30px" },
   px: { base: "18px", md: "40px" },
 });
+
 const h1 = css({
   fontSize: { base: "19px", md: "22px" },
   fontWeight: 600,
@@ -51,6 +56,7 @@ const h1 = css({
   m: 0,
   mt: { base: "6px", md: "18px" },
 });
+
 const meta = css({
   alignItems: "center",
   display: "flex",
@@ -58,11 +64,14 @@ const meta = css({
   gap: "8px",
   mt: { base: "10px", md: "12px" },
 });
+
 const bodyText = css({
   fontSize: { base: "14px", md: "16px" },
   mt: { base: "18px", md: "24px" },
 });
+
 const section = css({ mt: { base: "22px", md: "28px" } });
+
 const sectionLabel = css({
   color: "faint",
   fontSize: "10px",
@@ -207,8 +216,10 @@ const MemoDetail = ({ memoId }: { memoId: string }) => {
           onClick={() => {
             if (confirmingDelete) {
               remove.mutate();
+
               return;
             }
+
             setConfirmingDelete(true);
           }}
           type="button"

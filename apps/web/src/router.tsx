@@ -21,6 +21,7 @@ const notFound = css({
   p: "40px",
   textAlign: "center",
 });
+
 /** ルートに一致しなかったときの表示。既定の `<p>Not Found</p>` だけだと行き止まりになる。 */
 const NotFound = () => (
   <div className={notFound}>

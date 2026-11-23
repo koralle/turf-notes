@@ -48,6 +48,7 @@ export const exportAll = async (db: AppDb, user: User): Promise<ExportData> => {
   const exportedIds = new Set(memoRows.map((row) => row.id));
 
   const tagIdsOf = new Map<MemoId, TagId[]>();
+
   for (const row of memoTagRows) {
     const list = tagIdsOf.get(row.memoId) ?? [];
     list.push(row.tagId);
@@ -55,6 +56,7 @@ export const exportAll = async (db: AppDb, user: User): Promise<ExportData> => {
   }
 
   const linkIdsOf = new Map<MemoId, MemoId[]>();
+
   for (const row of linkRows) {
     const list = linkIdsOf.get(row.fromMemoId) ?? [];
     list.push(row.toMemoId);

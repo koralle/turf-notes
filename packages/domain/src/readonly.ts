@@ -11,6 +11,8 @@ export const readonlyValue = <TSchema extends GenericSchema>(schema: TSchema) =>
     schema,
     v.transform(
       (value): ReadonlyDeep<InferOutput<TSchema>> =>
+        // SAFETY: readonly は型にしか現れない。実行時の値は入力と同一で、
+        // valibot の検証では示せないので、ここだけ型を重ねる。
         value as ReadonlyDeep<InferOutput<TSchema>>
     )
   );

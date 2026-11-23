@@ -40,7 +40,9 @@ const isRaceDate = (s: string) => {
   } catch {
     return false;
   }
+
   const year = Number(s.slice(0, 4));
+
   return year >= 1900 && year <= 2100;
 };
 
@@ -103,14 +105,13 @@ export const raceOf = (fields: {
     return null;
   }
 
-  return v.parse(raceSchema, {
-    date: fields.date,
-    venue: fields.venue,
-    number: fields.number,
-    ...(fields.name === null || fields.name === undefined
-      ? {}
-      : { name: fields.name }),
-  });
+  const { date, name, number, venue } = fields;
+  const base = { date, number, venue };
+
+  return v.parse(
+    raceSchema,
+    name === null || name === undefined ? base : { ...base, name }
+  );
 };
 
 export const raceKey = ({ date, venue, number }: RaceKey) =>
@@ -134,5 +135,6 @@ export const raceKeyOf = (fields: {
     number: Number(fields.number),
     venue: fields.venue,
   });
+
   return parsed.success ? parsed.output : null;
 };

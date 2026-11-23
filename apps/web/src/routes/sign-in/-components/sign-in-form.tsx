@@ -35,6 +35,7 @@ interface SignInFormProps {
 
 export const SignInForm = ({ onSignIn, onSuccessSignIn }: SignInFormProps) => {
   const label = "パスワードでサインイン";
+
   const { signIn, isPending, error } = useSignIn({
     onSignIn,
     onSuccess: onSuccessSignIn,

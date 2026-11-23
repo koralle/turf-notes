@@ -39,6 +39,7 @@ export const setPasswordSignIn = async (
       .select({ total: count() })
       .from(passkeys)
       .where(eq(passkeys.userId, userId));
+
     const hasPasskey = (rows[0]?.total ?? 0) > 0;
 
     if (!canSetPasswordSignIn({ hasPasskey, nextEnabled: enabled })) {
