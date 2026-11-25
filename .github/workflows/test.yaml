@@ -13,14 +13,23 @@ permissions:
   contents: read
 
 jobs:
-  packages:
-    name: Packages
+  domain:
+    name: Domain
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/composite-actions/cache-and-install
-      - run: pnpm --filter '!@turf-notes/web' --filter '!@turf-notes/api' -r run test
+      - run: pnpm --filter @turf-notes/domain run test:coverage
+      - name: Report coverage
+        if: (success() || failure()) && github.event_name == 'pull_request' && hashFiles('packages/domain/coverage/coverage-summary.json') != ''
+        uses: davelosert/vitest-coverage-report-action@74c2d9210b4fc44c84d8213f61d7ec99837b7aa0 # v2.13.2
+        with:
+          working-directory: packages/domain
+          vite-config-path: vitest.config.ts
 
   web:
     name: Web

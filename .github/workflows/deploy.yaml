@@ -21,7 +21,7 @@ jobs:
     name: Test
     permissions:
       contents: read
-      # test.yaml の web / api ジョブが PR にカバレッジをコメントするため workflow_call の権限検証を通す。
+      # test.yaml の各テストジョブが PR にカバレッジをコメントするため workflow_call の権限検証を通す。
       pull-requests: write
     uses: ./.github/workflows/test.yaml
 
