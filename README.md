@@ -85,8 +85,9 @@ pnpm dev
 
 | ワークフロー | トリガー | 内容 |
 | --- | --- | --- |
-| `ci.yaml` | PR / デプロイからの呼び出し | lint+format / typecheck / test / knip / build / build-storybook / マイグレーションが追記のみか |
-| `deploy.yaml` | `main` への push・手動 | CI を全部通してから、マイグレーション → API → Web の順でデプロイ |
+| `ci.yaml` | PR / デプロイからの呼び出し | lint+format / typecheck / knip / build / build-storybook / マイグレーションが追記のみか |
+| `test.yaml` | PR / デプロイからの呼び出し | 単体テスト（packages / web / api）と PR へのカバレッジ投稿 |
+| `deploy.yaml` | `main` への push・手動 | CI・テストを全部通してから、マイグレーション → API → Web の順でデプロイ |
 
 `main` にマージすると CI が通り次第そのまま本番へ出ます。デプロイは concurrency（`production`）で直列化し、途中で失敗したらそこで止まります（マイグレーションが失敗したらデプロイしない）。
 
