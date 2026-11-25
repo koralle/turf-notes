@@ -2,6 +2,7 @@ import path from "node:path";
 
 import type { StorybookConfig } from "@storybook/tanstack-react";
 import viteReact from "@vitejs/plugin-react";
+import { msw } from "msw/vite";
 import { mergeConfig } from "vite";
 
 const dirname = import.meta.dirname;
@@ -21,12 +22,7 @@ const config: StorybookConfig = {
   stories: ["../src/**/*.stories.@(ts|tsx)"],
   viteFinal: (viteConfig) =>
     mergeConfig(viteConfig, {
-      plugins: [viteReact()],
-      resolve: {
-        alias: {
-          "styled-system": path.resolve(dirname, "../styled-system"),
-        },
-      },
+      plugins: [viteReact(), msw()],
     }),
 };
 

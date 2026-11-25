@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/tanstack-react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { userEvent, within } from "storybook/test";
 
 import {
@@ -17,17 +16,11 @@ const meta = {
     onSuccessSignIn: async () => {},
   },
   decorators: [
-    (Story) => {
-      const queryClient = new QueryClient();
-
-      return (
-        <QueryClientProvider client={queryClient}>
-          <SignInCard>
-            <Story />
-          </SignInCard>
-        </QueryClientProvider>
-      );
-    },
+    (Story) => (
+      <SignInCard>
+        <Story />
+      </SignInCard>
+    ),
   ],
 } satisfies Meta<typeof SignInForm>;
 

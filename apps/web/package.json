@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "catalog:cloudflare",
+    "@orpc/server": "catalog:rpc",
     "@pandacss/dev": "catalog:ui",
     "@pandacss/preset-base": "catalog:ui",
     "@pandacss/preset-panda": "catalog:ui",
@@ -52,6 +53,7 @@
     "@vitejs/plugin-react": "catalog:vite",
     "@vitest/coverage-v8": "catalog:test",
     "eslint-plugin-storybook": "catalog:lint",
+    "msw": "catalog:test",
     "oxlint-plugin-react-doctor": "catalog:lint",
     "postcss": "catalog:ui",
     "storybook": "catalog:storybook",

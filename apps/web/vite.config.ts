@@ -52,7 +52,13 @@ export default defineConfig(({ command }) => {
       : cloudflare({ viteEnvironment: { name: "ssr" } });
 
   return {
-    plugins: [cloudflarePlugin, tanstackStart(), viteReact()],
+    plugins: [
+      cloudflarePlugin,
+      tanstackStart({
+        router: { routeFileIgnorePattern: String.raw`\.stories\.(ts|tsx)$` },
+      }),
+      viteReact(),
+    ],
     resolve: {
       alias: {
         "styled-system": path.resolve(import.meta.dirname, "styled-system"),

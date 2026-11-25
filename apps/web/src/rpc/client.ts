@@ -2,40 +2,22 @@ import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import type { ContractRouterClient } from "@orpc/contract";
 import { createORPCReactQueryUtils } from "@orpc/react-query";
-import { createServerOnlyFn } from "@tanstack/react-start";
 import type { ApiContract } from "@turf-notes/api-contract";
-
-const inBrowser = typeof window !== "undefined";
-
-/**
- * SSR 中の `/rpc`。Worker の中から自オリジンは叩けないので、`src/server.ts` が
- * ブラウザから流しているのと同じ Service Binding で API Worker を直接呼ぶ。
- * 入ってきたリクエストの cookie を渡さないと、サインイン済みでも 401 になる。
- */
-const ssrFetch = createServerOnlyFn(async (request: Request) => {
-  const [{ env }, { getRequestHeaders }] = await Promise.all([
-    import("cloudflare:workers"),
-    import("@tanstack/react-start/server"),
-  ]);
-
-  const cookie = getRequestHeaders().get("cookie");
-
-  if (cookie !== null) {
-    request.headers.set("cookie", cookie);
-  }
-
-  // API も DB も返さないときに SSR が固まったままになるので、上限を置く。
-  // 固まるより、エラー画面を出して「もう一度読み込む」に任せる。
-  return await env.API.fetch(request, { signal: AbortSignal.timeout(5000) });
-});
 
 /** ブラウザは同じオリジン、SSR 中は Service Binding の行き先（host は使われない）。 */
 const origin = (): string =>
-  inBrowser ? window.location.origin : "https://turf-notes-api";
+  import.meta.env.SSR ? "https://turf-notes-api" : window.location.origin;
 
 const link = new RPCLink({
-  fetch: async (request) =>
-    inBrowser ? await fetch(request) : await ssrFetch(request),
+  fetch: async (request) => {
+    if (import.meta.env.SSR) {
+      const { ssrFetch } = await import("./ssr-fetch");
+
+      return await ssrFetch(request);
+    }
+
+    return await fetch(request);
+  },
   url: () => `${origin()}/rpc`,
 });
 
