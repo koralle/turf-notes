@@ -200,16 +200,14 @@ test("タグ名でもメモを探せる（FR-L3）", async ({ kit, ownerHeaders 
   ).toStrictEqual([id]);
 });
 
-for (const wildcard of ["%", "_"]) {
-  test(`検索語の ${wildcard} はワイルドカードにならない`, async ({
-    kit,
-    ownerHeaders,
-  }) => {
+test.for(["%", "_"])(
+  "検索語の %s はワイルドカードにならない",
+  async (wildcard, { kit, ownerHeaders }) => {
     const memos = memosOf(kit, ownerHeaders);
 
     await memos.create({ body: `記号 ${wildcard} を含む` });
     await memos.create({ body: "ふつうの本文" });
 
     expect((await memos.list({ q: wildcard })).items).toHaveLength(1);
-  });
-}
+  }
+);

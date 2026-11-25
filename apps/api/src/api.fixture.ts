@@ -12,7 +12,7 @@ import { resetTestDb, testDb } from "./test-db";
 
 export const baseURL = "http://localhost:3000";
 export const password = "correct-password";
-export const secret = "test-secret-please-change-this-value-32chars";
+const secret = "test-secret-please-change-this-value-32chars";
 
 export const owner = {
   email: "owner@example.com",
@@ -44,11 +44,7 @@ const signInHeaders = async (auth: Auth, email: string): Promise<Headers> => {
   return new Headers({ cookie });
 };
 
-/**
- * テスト用の app。auth の作りだけ差し替えたいテスト（パスワードサインインのゲートなど）は
- * これを使い、app と auth の繋ぎ方を各ファイルで書き直さない。
- */
-export const testApp = (auth: Auth) =>
+const testApp = (auth: Auth) =>
   createApp({
     authenticate: cookieSessionAuthenticator(auth),
     auth,
