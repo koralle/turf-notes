@@ -1,9 +1,9 @@
 import { createRouterClient } from "@orpc/server";
 import { expect } from "vitest";
 
+import { owner, test } from "../api.fixture";
 import type { RouterDeps } from "./base";
 import { createRouter } from "./router";
-import { owner, test } from "./rpc.fixture";
 
 const rpcOf = (deps: RouterDeps, headers: Headers) =>
   createRouterClient(createRouter(deps), { context: { headers } });

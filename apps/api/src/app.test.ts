@@ -1,22 +1,6 @@
-import { describe, expect, test as baseTest } from "vitest";
+import { describe, expect } from "vitest";
 
-import { createApp } from "./app";
-import { createAuth } from "./auth/create-auth";
-import { cookieSessionAuthenticator } from "./auth/session";
-import { testDb } from "./test-db";
-
-const baseURL = "http://localhost:3000";
-const secret = "test-secret-please-change-this-value-32chars";
-
-const test = baseTest.extend("app", () => {
-  const auth = createAuth({ baseURL, db: testDb, secret });
-
-  return createApp({
-    authenticate: cookieSessionAuthenticator(auth),
-    auth,
-    db: () => testDb,
-  });
-});
+import { baseURL, owner, test } from "./api.fixture";
 
 describe("HTTP 面", () => {
   test("サインアップは 404 で塞がっている（FR-A1）", async ({ app }) => {
@@ -48,5 +32,32 @@ describe("HTTP 面", () => {
     });
 
     expect(response.status).toBe(404);
+  });
+
+  // Hono と oRPC の繋ぎ目（prefix と context の受け渡し）はここでしか確かめられない。
+  test("cookie 付きの POST /rpc/me は自分の情報を返す", async ({
+    app,
+    ownerHeaders,
+  }) => {
+    const response = await app.request(`${baseURL}/rpc/me`, {
+      headers: ownerHeaders,
+      method: "POST",
+    });
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toStrictEqual({
+      json: { email: owner.email, id: owner.id, name: owner.name },
+    });
+  });
+
+  test("未認証の POST /rpc/me は 401 を返す", async ({ app }) => {
+    const response = await app.request(`${baseURL}/rpc/me`, {
+      method: "POST",
+    });
+
+    expect(response.status).toBe(401);
+    await expect(response.json()).resolves.toMatchObject({
+      json: { code: "UNAUTHORIZED", status: 401 },
+    });
   });
 });

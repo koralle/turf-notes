@@ -2,16 +2,17 @@ import { accounts, users } from "@turf-notes/db/schema";
 import { hashPassword } from "better-auth/crypto";
 import { test as baseTest } from "vitest";
 
-import { createAuth } from "../auth/create-auth";
-import type { Auth } from "../auth/create-auth";
-import { cookieSessionAuthenticator } from "../auth/session";
-import { resetTestDb, testDb } from "../test-db";
-import { createRouterKit } from "./base";
-import type { RouterDeps, RouterKit } from "./base";
+import { createApp } from "./app";
+import { createAuth } from "./auth/create-auth";
+import type { Auth } from "./auth/create-auth";
+import { cookieSessionAuthenticator } from "./auth/session";
+import { createRouterKit } from "./rpc/base";
+import type { RouterDeps, RouterKit } from "./rpc/base";
+import { resetTestDb, testDb } from "./test-db";
 
-const baseURL = "http://localhost:3000";
-const password = "correct-password";
-const secret = "test-secret-please-change-this-value-32chars";
+export const baseURL = "http://localhost:3000";
+export const password = "correct-password";
+export const secret = "test-secret-please-change-this-value-32chars";
 
 export const owner = {
   email: "owner@example.com",
@@ -44,10 +45,22 @@ const signInHeaders = async (auth: Auth, email: string): Promise<Headers> => {
 };
 
 /**
- * RPC のテストが使う `test`。各テストの前に DB を空にして owner と stranger を入れ、
- * その DB を見る `deps` / `kit` と、それぞれとしてサインイン済みのヘッダーを渡す。
+ * テスト用の app。auth の作りだけ差し替えたいテスト（パスワードサインインのゲートなど）は
+ * これを使い、app と auth の繋ぎ方を各ファイルで書き直さない。
+ */
+export const testApp = (auth: Auth) =>
+  createApp({
+    authenticate: cookieSessionAuthenticator(auth),
+    auth,
+    db: () => testDb,
+  });
+
+/**
+ * API のテストが使う `test`。各テストの前に DB を空にして owner と stranger を入れ、
+ * その DB を見る `deps` / `kit` / `app` と、それぞれとしてサインイン済みのヘッダーを渡す。
  */
 export const test = baseTest.extend<{
+  app: ReturnType<typeof createApp>;
   auth: Auth;
   deps: RouterDeps;
   kit: RouterKit;
@@ -85,6 +98,9 @@ export const test = baseTest.extend<{
   },
   kit: async ({ deps }, use) => {
     await use(createRouterKit(deps));
+  },
+  app: async ({ auth }, use) => {
+    await use(testApp(auth));
   },
   ownerHeaders: async ({ auth }, use) => {
     await use(await signInHeaders(auth, owner.email));

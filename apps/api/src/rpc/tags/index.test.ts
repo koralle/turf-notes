@@ -3,10 +3,10 @@ import { memos as memoTable } from "@turf-notes/db/schema";
 import { eq } from "drizzle-orm";
 import { expect } from "vitest";
 
+import { test } from "../../api.fixture";
 import { testDb } from "../../test-db";
 import type { RouterKit } from "../base";
 import { createMemosRouter } from "../memos";
-import { test } from "../rpc.fixture";
 import { createTagsRouter } from "./index";
 
 const memosOf = (kit: RouterKit, headers: Headers) =>

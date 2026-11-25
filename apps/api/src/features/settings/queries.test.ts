@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { resetTestDb, testDb } from "../../test-db";
-import { setPasswordSignIn } from "./queries";
+import { getAuthMethods, setPasswordSignIn } from "./queries";
 
 const id = userId("user-settings");
 
@@ -71,5 +71,31 @@ describe("setPasswordSignIn", () => {
       kind: "ok",
     });
     await expect(enabledInDb()).resolves.toBe(true);
+  });
+});
+
+describe("getAuthMethods", () => {
+  // 既定値が false に転ぶと、初回セットアップでパスワード欄もパスキーも無くなり、
+  // 誰もサインインできない状態で固定される。
+  test("ユーザーが居なければパスワードは有効・パスキーなし", async () => {
+    await testDb.delete(users);
+
+    await expect(getAuthMethods(testDb)).resolves.toStrictEqual({
+      hasPasskey: false,
+      passwordSignInEnabled: true,
+    });
+  });
+
+  test("パスキーがあり、パスワードが無効ならそのまま返す", async () => {
+    await addPasskey("passkey-1");
+    await testDb
+      .update(users)
+      .set({ passwordSignInEnabled: false })
+      .where(eq(users.id, id));
+
+    await expect(getAuthMethods(testDb)).resolves.toStrictEqual({
+      hasPasskey: true,
+      passwordSignInEnabled: false,
+    });
   });
 });

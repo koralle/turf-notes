@@ -1,9 +1,9 @@
 import { createRouterClient } from "@orpc/server";
 import { expect } from "vitest";
 
+import { test } from "../../api.fixture";
 import type { RouterKit } from "../base";
 import { createMemosRouter } from "../memos";
-import { test } from "../rpc.fixture";
 import { createExportRouter } from "./index";
 
 const exportOf = (kit: RouterKit, headers: Headers) =>

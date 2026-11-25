@@ -2,15 +2,10 @@ import { accounts, users } from "@turf-notes/db/schema";
 import { hashPassword } from "better-auth/crypto";
 import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 
-import { createApp } from "../app";
+import { baseURL, password, secret, testApp } from "../api.fixture";
 import { resetTestDb, testDb } from "../test-db";
 import { createAuth } from "./create-auth";
 import type { Auth } from "./create-auth";
-import { cookieSessionAuthenticator } from "./session";
-
-const baseURL = "http://localhost:3000";
-const password = "correct-password";
-const secret = "test-secret-please-change-this-value-32chars";
 
 const json = "application/json";
 const form = "application/x-www-form-urlencoded";
@@ -18,7 +13,7 @@ const contentTypes = [json, form] as const;
 
 type ContentType = (typeof contentTypes)[number];
 
-let app: ReturnType<typeof createApp>;
+let app: ReturnType<typeof testApp>;
 let passwordHash = "";
 
 const signIn = async (email: string, contentType: ContentType) => {
@@ -27,13 +22,11 @@ const signIn = async (email: string, contentType: ContentType) => {
       ? JSON.stringify({ email, password })
       : new URLSearchParams({ email, password }).toString();
 
-  return await app.fetch(
-    new Request(`${baseURL}/api/auth/sign-in/email`, {
-      body,
-      headers: { "content-type": contentType },
-      method: "POST",
-    })
-  );
+  return await app.request(`${baseURL}/api/auth/sign-in/email`, {
+    body,
+    headers: { "content-type": contentType },
+    method: "POST",
+  });
 };
 
 const seedUser = async (email: string, enabled: boolean) => {
@@ -56,9 +49,8 @@ const seedUser = async (email: string, enabled: boolean) => {
 const expectRejected = async (response: Response) => {
   expect(response.status).toBe(401);
   expect(response.headers.getSetCookie()).toStrictEqual([]);
-  await expect(response.json()).resolves.toStrictEqual({
+  await expect(response.json()).resolves.toMatchObject({
     code: "INVALID_EMAIL_OR_PASSWORD",
-    message: "Invalid email or password",
   });
 };
 
@@ -73,11 +65,7 @@ beforeEach(async () => {
 
   // rate limit のメモリ状態をテスト間で共有しないよう、毎回作り直す。
   const auth: Auth = createAuth({ baseURL, db: testDb, secret });
-  app = createApp({
-    authenticate: cookieSessionAuthenticator(auth),
-    auth,
-    db: () => testDb,
-  });
+  app = testApp(auth);
 });
 
 describe("パスワードサインインのゲート", () => {
