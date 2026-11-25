@@ -9,6 +9,10 @@ import { defineConfig } from "vite";
 export default defineConfig({
   resolve: {
     alias: {
+      "cloudflare:workers": path.resolve(
+        import.meta.dirname,
+        "./cloudflare-workers-stub.ts"
+      ),
       "styled-system": path.resolve(import.meta.dirname, "../styled-system"),
     },
   },

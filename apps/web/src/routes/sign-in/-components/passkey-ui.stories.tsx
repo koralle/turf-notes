@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/tanstack-react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ComponentProps } from "react";
 import { useState } from "react";
 import { expect, userEvent, within } from "storybook/test";
@@ -23,17 +22,11 @@ const meta = {
     passwordEnabled: true,
   },
   decorators: [
-    (Story) => {
-      const queryClient = new QueryClient();
-
-      return (
-        <QueryClientProvider client={queryClient}>
-          <SignInCard>
-            <Story />
-          </SignInCard>
-        </QueryClientProvider>
-      );
-    },
+    (Story) => (
+      <SignInCard>
+        <Story />
+      </SignInCard>
+    ),
   ],
 } satisfies Meta<typeof PasskeyUI>;
 

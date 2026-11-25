@@ -1,58 +1,49 @@
 import type { Meta, StoryObj } from "@storybook/tanstack-react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import type { AuthMethods } from "@turf-notes/domain";
+import { HttpResponse, http } from "msw/http";
 import { expect, userEvent, within } from "storybook/test";
 
-import { authMethodsQuery } from "../../rpc/queries";
+import { mswHandlers } from "../../mocks/browser";
+import { mockImpl, rpcMockHandler } from "../../mocks/rpc";
 import { Route } from "./route";
 
-/**
- * route の loader と画面の `useQuery` が同じものを見るように、1 つを共有する。
- * キャッシュは story ごとの `methods` で埋め直すので、story をまたいでも漏れない。
- */
-const queryClient = new QueryClient({
-  defaultOptions: { queries: { retry: false } },
-});
+const noPasskeyRpcHandler = () =>
+  rpcMockHandler({
+    auth: {
+      methods: mockImpl.auth.methods.handler(() => ({
+        hasPasskey: false,
+        passwordSignInEnabled: true,
+      })),
+    },
+  });
 
-interface SignInStoryArgs {
-  /** `authMethodsQuery` が返す値。画面はこれだけで分岐する。 */
-  methods: AuthMethods;
-}
+const submitPasswordSignIn = async (canvasElement: HTMLElement) => {
+  const canvas = within(canvasElement);
+
+  await userEvent.type(
+    canvas.getByLabelText("メールアドレス"),
+    "turf@example.com"
+  );
+  await userEvent.type(
+    canvas.getByLabelText("パスワード"),
+    "correct-horse-battery"
+  );
+  await userEvent.click(
+    canvas.getByRole("button", { name: "パスワードでサインイン" })
+  );
+
+  return canvas;
+};
 
 const meta = {
-  title: "Routes/SignInPage",
-  args: {
-    // 本番の既定。パスキーが登録済みで、パスワードサインインは無効。
-    methods: { hasPasskey: true, passwordSignInEnabled: false },
-  },
   parameters: {
     tanstack: {
       router: {
-        // loader より前に走るので、ここでキャッシュを埋めておく。
-        context: ({
-          storyContext,
-        }: {
-          storyContext: { args: SignInStoryArgs };
-        }) => {
-          queryClient.setQueryData(
-            authMethodsQuery.queryKey,
-            storyContext.args.methods
-          );
-
-          return { queryClient };
-        },
         route: Route,
       },
     },
   },
-  decorators: [
-    (Story) => (
-      <QueryClientProvider client={queryClient}>
-        <Story />
-      </QueryClientProvider>
-    ),
-  ],
-} satisfies Meta<SignInStoryArgs>;
+  title: "Routes/SignInPage",
+} satisfies Meta;
 
 export default meta;
 
@@ -63,12 +54,23 @@ export const Default: Story = {};
 
 /** パスキーが未登録。パスワード欄が最初から出る（区切り線は出ない）。 */
 export const NoPasskey: Story = {
-  args: { methods: { hasPasskey: false, passwordSignInEnabled: true } },
+  loaders: [mswHandlers(noPasskeyRpcHandler())],
 };
 
 /** パスキーも無く、パスワードサインインも無効。サーバー上の CLI でしか戻せない。 */
 export const LockedOut: Story = {
-  args: { methods: { hasPasskey: false, passwordSignInEnabled: false } },
+  loaders: [
+    mswHandlers(
+      rpcMockHandler({
+        auth: {
+          methods: mockImpl.auth.methods.handler(() => ({
+            hasPasskey: false,
+            passwordSignInEnabled: false,
+          })),
+        },
+      })
+    ),
+  ],
 };
 
 /**
@@ -76,7 +78,18 @@ export const LockedOut: Story = {
  * route の `showPassword` が `aria-expanded` と欄の表示に届いていることまで確かめる。
  */
 export const PasswordExpanded: Story = {
-  args: { methods: { hasPasskey: true, passwordSignInEnabled: true } },
+  loaders: [
+    mswHandlers(
+      rpcMockHandler({
+        auth: {
+          methods: mockImpl.auth.methods.handler(() => ({
+            hasPasskey: true,
+            passwordSignInEnabled: true,
+          })),
+        },
+      })
+    ),
+  ],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
@@ -91,5 +104,48 @@ export const PasswordExpanded: Story = {
 
     await expect(toggle).toHaveAttribute("aria-expanded", "true");
     await expect(canvas.getByLabelText("メールアドレス")).toBeInTheDocument();
+  },
+};
+
+/** パスワード認証が 401 を返したとき、共通の認証失敗文言を出す。 */
+export const WrongPassword: Story = {
+  loaders: [
+    mswHandlers(
+      noPasskeyRpcHandler(),
+      http.post("/api/auth/sign-in/email", () =>
+        HttpResponse.json(
+          { code: "INVALID_EMAIL_OR_PASSWORD", message: "Invalid credentials" },
+          { status: 401 }
+        )
+      )
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = await submitPasswordSignIn(canvasElement);
+
+    await expect(
+      await canvas.findByText("メールアドレスかパスワードが違います")
+    ).toBeInTheDocument();
+  },
+};
+
+/** 認証 API が 500 を返したとき、再試行を促す文言を出す。 */
+export const ServerError: Story = {
+  loaders: [
+    mswHandlers(
+      noPasskeyRpcHandler(),
+      http.post("/api/auth/sign-in/email", () =>
+        HttpResponse.json({ message: "Internal Server Error" }, { status: 500 })
+      )
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = await submitPasswordSignIn(canvasElement);
+
+    await expect(
+      await canvas.findByText(
+        "サインインに失敗しました。もう一度お試しください。"
+      )
+    ).toBeInTheDocument();
   },
 };
