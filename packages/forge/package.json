@@ -14,6 +14,7 @@
   "dependencies": {
     "@interfere/landmines": "catalog:lint",
     "@tsconfig/strictest": "catalog:typescript",
+    "@turf-notes/oxlint-plugin": "workspace:*",
     "oxfmt": "catalog:lint",
     "oxlint": "catalog:lint",
     "ultracite": "catalog:lint"
