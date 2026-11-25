@@ -8,5 +8,11 @@ export default defineConfig({
     // 1つの DB を共有し、各テストの前にテーブルを空にする。並列だと消し合う。
     fileParallelism: false,
     include: ["src/**/*.test.ts"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "json-summary", "json"],
+      reportOnFailure: true,
+      exclude: ["src/test-db.ts", "src/test-global-setup.ts"],
+    },
   },
 });

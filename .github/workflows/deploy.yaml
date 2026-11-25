@@ -17,9 +17,17 @@ jobs:
     name: CI
     uses: ./.github/workflows/ci.yaml
 
+  test:
+    name: Test
+    permissions:
+      contents: read
+      # test.yaml の各テストジョブが PR にカバレッジをコメントするため workflow_call の権限検証を通す。
+      pull-requests: write
+    uses: ./.github/workflows/test.yaml
+
   deploy:
     name: Deploy
-    needs: ci
+    needs: [ci, test]
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     environment: production
