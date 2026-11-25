@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useRouterState } from "@tanstack/react-router";
-import type { TagWithCount } from "@turf-notes/api-contract/schemas";
-import { tagKinds } from "@turf-notes/domain";
 import { Home, SlidersHorizontal, Tag } from "lucide-react";
+import { useId, useRef } from "react";
 import type { ReactNode } from "react";
 import { css } from "styled-system/css";
 
-import { kindLabels, tagDotOf } from "../lib/tag-kind";
+import { selectSidebarTags } from "../lib/sidebar-tags";
 import { tagsQuery } from "../rpc/queries";
+import { TagKindIcon } from "./tag-kind-icon";
 
 const shell = css({
   display: "flex",
@@ -28,14 +28,38 @@ const sidebar = css({
   overflow: "auto",
   p: "22px 16px",
   width: "244px",
+  _pointerCoarse: { py: "16px" },
+});
+
+const skipLink = css({
+  alignItems: "center",
+  bg: "panel",
+  borderColor: "accent",
+  borderRadius: "8px",
+  borderStyle: "solid",
+  borderWidth: "2px",
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.12)",
+  color: "ink",
+  display: { base: "none", md: "inline-flex" },
+  fontSize: "13px",
+  fontWeight: 600,
+  left: "12px",
+  position: "fixed",
+  px: "14px",
+  py: "8px",
+  textDecoration: "none",
+  top: "12px",
+  zIndex: 50,
 });
 
 const brand = css({
   alignItems: "center",
+  color: "ink",
   display: "flex",
   gap: "9px",
   pb: "18px",
   px: "8px",
+  _pointerCoarse: { pb: "12px" },
 });
 
 const mark = css({
@@ -51,16 +75,27 @@ const mark = css({
   w: "22px",
 });
 
+const navList = css({
+  display: "flex",
+  flexDirection: "column",
+  gap: "2px",
+});
+
 const navItem = css({
   alignItems: "center",
   borderRadius: "6px",
   color: "muted",
   display: "flex",
   fontSize: "13px",
-  gap: "8px",
+  gap: "9px",
+  minH: "34px",
+  position: "relative",
   px: "9px",
   py: "7px",
   textDecoration: "none",
+  _hover: { bg: "bg", color: "ink" },
+  _currentPage: { bg: "accentWeak", color: "accent", fontWeight: 600 },
+  _pointerCoarse: { minH: "44px" },
 });
 
 const sideLabel = css({
@@ -70,6 +105,7 @@ const sideLabel = css({
   mt: "18px",
   mb: "6px",
   px: "9px",
+  _pointerCoarse: { mb: "4px", mt: "12px" },
 });
 
 const tagRow = css({
@@ -79,19 +115,32 @@ const tagRow = css({
   display: "flex",
   fontSize: "12.5px",
   gap: "8px",
+  minH: "28px",
+  position: "relative",
   px: "9px",
-  py: "5px",
+  py: "4px",
   textDecoration: "none",
+  _hover: { bg: "bg" },
+  _currentPage: { bg: "accentWeak", color: "accent", fontWeight: 600 },
+  _pointerCoarse: { minH: "44px" },
 });
 
-const dotBase = css({
-  borderRadius: "999px",
-  flex: "0 0 6px",
-  h: "6px",
-  w: "6px",
+const tagName = css({
+  flex: 1,
+  minWidth: 0,
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
 });
 
-const countStyle = css({ color: "faint", fontSize: "11px", ml: "auto" });
+const countStyle = css({
+  color: "faint",
+  flexShrink: 0,
+  fontSize: "11px",
+  fontVariantNumeric: "tabular-nums",
+  ml: "auto",
+  "a[aria-current=page] &": { color: "muted" },
+});
 
 const mainCol = css({
   bg: "bg",
@@ -106,49 +155,79 @@ const mainCol = css({
 const Sidebar = () => {
   // `/_app` の loader が温めている。ここは読むだけ。
   const tags = useQuery(tagsQuery);
+  const recentTagsId = useId();
 
-  const grouped: Record<string, TagWithCount[]> = {};
-
-  for (const tag of tags.data ?? []) {
-    const list = grouped[tag.kind] ?? [];
-    list.push(tag);
-    grouped[tag.kind] = list;
-  }
+  const allTags = tags.data ?? [];
+  const recentTags = selectSidebarTags(allTags);
 
   return (
-    <aside className={sidebar}>
-      <Link className={brand} to="/">
-        <span className={mark}>T</span>
+    <div className={sidebar}>
+      <div className={brand}>
+        <span aria-hidden="true" className={mark}>
+          T
+        </span>
         <span className={css({ fontSize: "13.5px", fontWeight: 600 })}>
           Turf Notes
         </span>
-      </Link>
-      <Link className={navItem} to="/">
-        ホーム
-      </Link>
-      <Link className={navItem} to="/settings">
-        設定
-      </Link>
-      {tagKinds.map((kind) =>
-        (grouped[kind] ?? []).length === 0 ? null : (
-          <div key={kind}>
-            <div className={sideLabel}>{kindLabels[kind]}</div>
-            {(grouped[kind] ?? []).map((tag) => (
-              <Link
-                className={tagRow}
-                key={tag.id}
-                params={{ tagId: String(tag.id) }}
-                to="/tags/$tagId"
-              >
-                <span className={`${dotBase} ${tagDotOf[kind]}`} />
-                {tag.name}
-                <span className={countStyle}>{tag.memoCount}</span>
-              </Link>
-            ))}
+      </div>
+      <nav aria-label="メイン">
+        <ul className={navList}>
+          <li>
+            <Link activeOptions={{ exact: true }} className={navItem} to="/">
+              <Home aria-hidden="true" size={15} />
+              ホーム
+            </Link>
+          </li>
+          <li>
+            <Link
+              activeOptions={{ exact: true }}
+              className={navItem}
+              to="/tags"
+            >
+              <Tag aria-hidden="true" size={15} />
+              タグ
+              {allTags.length > 0 ? (
+                <span className={countStyle}>
+                  <span aria-hidden="true">{allTags.length}</span>
+                  <span className="visually-hidden">{`${allTags.length}件`}</span>
+                </span>
+              ) : null}
+            </Link>
+          </li>
+          <li>
+            <Link className={navItem} to="/settings">
+              <SlidersHorizontal aria-hidden="true" size={15} />
+              設定
+            </Link>
+          </li>
+        </ul>
+      </nav>
+      {recentTags.length === 0 ? null : (
+        <nav aria-labelledby={recentTagsId}>
+          <div className={sideLabel} id={recentTagsId}>
+            最近のタグ
           </div>
-        )
+          <ol className={navList}>
+            {recentTags.map((tag) => (
+              <li key={tag.id}>
+                <Link
+                  className={tagRow}
+                  params={{ tagId: String(tag.id) }}
+                  to="/tags/$tagId"
+                >
+                  <TagKindIcon kind={tag.kind} />
+                  <span className={tagName}>{tag.name}</span>
+                  <span className={countStyle}>
+                    <span aria-hidden="true">{tag.memoCount}</span>
+                    <span className="visually-hidden">{`${tag.memoCount}件`}</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </nav>
       )}
-    </aside>
+    </div>
   );
 };
 
@@ -163,6 +242,17 @@ const tabBar = css({
   minH: "60px",
 });
 
+const tabList = css({
+  alignItems: "stretch",
+  display: "flex",
+  flex: 1,
+});
+
+const tabListItem = css({
+  display: "flex",
+  flex: 1,
+});
+
 const tab = css({
   alignItems: "center",
   color: "muted",
@@ -174,43 +264,38 @@ const tab = css({
   justifyContent: "center",
   letterSpacing: "0.02em",
   textDecoration: "none",
+  _currentPage: { color: "accent", fontWeight: 600 },
 });
 
-const tabActive = css({ color: "accent", fontWeight: 600 });
-
-const MobileTabs = ({ pathname }: { pathname: string }) => (
+const MobileTabs = () => (
   <nav
-    aria-label="メインナビゲーション"
+    aria-label="メイン"
     className={tabBar}
     style={{
       height: "calc(60px + env(safe-area-inset-bottom))",
       paddingBottom: "env(safe-area-inset-bottom)",
     }}
   >
-    <Link
-      aria-current={pathname === "/" ? "page" : undefined}
-      className={`${tab} ${pathname === "/" ? tabActive : ""}`}
-      to="/"
-    >
-      <Home size={20} />
-      ホーム
-    </Link>
-    <Link
-      aria-current={pathname === "/tags" ? "page" : undefined}
-      className={`${tab} ${pathname === "/tags" ? tabActive : ""}`}
-      to="/tags"
-    >
-      <Tag size={20} />
-      タグ
-    </Link>
-    <Link
-      aria-current={pathname === "/settings" ? "page" : undefined}
-      className={`${tab} ${pathname === "/settings" ? tabActive : ""}`}
-      to="/settings"
-    >
-      <SlidersHorizontal size={20} />
-      設定
-    </Link>
+    <ul className={tabList}>
+      <li className={tabListItem}>
+        <Link activeOptions={{ exact: true }} className={tab} to="/">
+          <Home aria-hidden="true" size={20} />
+          ホーム
+        </Link>
+      </li>
+      <li className={tabListItem}>
+        <Link activeOptions={{ exact: true }} className={tab} to="/tags">
+          <Tag aria-hidden="true" size={20} />
+          タグ
+        </Link>
+      </li>
+      <li className={tabListItem}>
+        <Link className={tab} to="/settings">
+          <SlidersHorizontal aria-hidden="true" size={20} />
+          設定
+        </Link>
+      </li>
+    </ul>
   </nav>
 );
 
@@ -219,14 +304,28 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
     select: (state) => state.location.pathname,
   });
 
+  const mainRef = useRef<HTMLElement>(null);
+
   const isTopLevel =
     pathname === "/" || pathname === "/tags" || pathname === "/settings";
 
   return (
     <div className={shell} style={{ paddingTop: "env(safe-area-inset-top)" }}>
+      <a
+        className={`${skipLink} visually-hidden`}
+        href="#main-content"
+        onClick={(event) => {
+          event.preventDefault();
+          mainRef.current?.focus();
+        }}
+      >
+        メインコンテンツへスキップ
+      </a>
       <Sidebar />
-      <main className={mainCol}>{children}</main>
-      {isTopLevel ? <MobileTabs pathname={pathname} /> : null}
+      <main className={mainCol} id="main-content" ref={mainRef} tabIndex={-1}>
+        {children}
+      </main>
+      {isTopLevel ? <MobileTabs /> : null}
     </div>
   );
 };

@@ -154,3 +154,30 @@ body {
     opacity: 0.45;
   }
 }
+
+/* 強制カラーモードでも現在地のリンクが背景色の喪失に埋もれないようにする */
+@layer base {
+  @media (forced-colors: active) {
+    a[aria-current="page"] {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  }
+}
+
+/* 視覚的に隠しつつスクリーンリーダーに伝える補助ラベル用 */
+@layer base {
+  .visually-hidden:where(:not(:focus-within, :active)) {
+    position: absolute !important;
+    clip-path: inset(50%) !important;
+    overflow: hidden !important;
+    width: 1px !important;
+    height: 1px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    white-space: nowrap !important;
+  }
+}

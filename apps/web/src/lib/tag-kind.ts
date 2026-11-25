@@ -8,9 +8,16 @@ export const kindLabels: Record<TagKind, string> = {
   theme: "主題",
 };
 
-/** 種類を色で見分けるための点。サイドバー・タグ一覧・チップで共有する。 */
+/** 種類を色で見分けるための点。タグ一覧・チップで共有する。 */
 export const tagDotOf = {
   horse: css({ bg: "horse" }),
   person: css({ bg: "person" }),
   theme: css({ bg: "theme" }),
+} as const;
+
+/** 種類をアイコンの色で見分けるためのスタイル。 */
+export const tagColorOf = {
+  horse: css({ color: "horse" }),
+  person: css({ color: "person" }),
+  theme: css({ color: "theme" }),
 } as const;
