@@ -10,7 +10,7 @@ import {
   tagSchema,
 } from "@turf-notes/domain";
 import type { TagKind, UserId } from "@turf-notes/domain";
-import { and, count, eq, isNull } from "drizzle-orm";
+import { and, count, eq, isNull, sql } from "drizzle-orm";
 import * as v from "valibot";
 
 export const listTags = async (
@@ -22,8 +22,11 @@ export const listTags = async (
       id: tags.id,
       name: tags.name,
       kind: tags.kind,
-      // 削除済みメモは結合で NULL になるので、件数は結合相手で数える。
+      // 削除済みメモは結合で NULL になるので、件数と最終利用日時は結合相手から取る。
       memoCount: count(memos.id),
+      // Drizzle の SQLiteTimestamp は max() に対して Date デコーダを噛ませない場合があるため、
+      // 数値の Unix ms として明示的にデコードする（未結合時は null）。
+      lastUsedAt: sql`max(${memos.createdAt})`.mapWith(Number).nullable(),
     })
     .from(tags)
     .leftJoin(memoTags, eq(memoTags.tagId, tags.id))
@@ -40,6 +43,7 @@ export const listTags = async (
     name: row.name,
     kind: row.kind,
     memoCount: row.memoCount,
+    lastUsedAt: row.lastUsedAt,
   }));
 };
 

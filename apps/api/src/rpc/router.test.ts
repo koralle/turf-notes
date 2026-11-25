@@ -1,6 +1,7 @@
 import { ORPCError, createRouterClient } from "@orpc/server";
-import { accounts, users } from "@turf-notes/db/schema";
+import { accounts, memos, users } from "@turf-notes/db/schema";
 import { hashPassword } from "better-auth/crypto";
+import { eq } from "drizzle-orm";
 import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 
 import { createAuth } from "../auth/create-auth";
@@ -208,6 +209,63 @@ describe("タグ", () => {
     await expect(countOf()).resolves.toBe(1);
     await client.memos.delete({ id });
     await expect(countOf()).resolves.toBe(0);
+  });
+
+  test("lastUsedAt は削除されていない最新メモの作成日時になり、0件なら null", async () => {
+    const client = await rpc(owner.email);
+    const tag = await client.tags.create({ kind: "horse", name: "ソダシ" });
+
+    const findTag = async () =>
+      (await client.tags.list()).find((item) => item.id === tag.id);
+
+    await expect(findTag()).resolves.toMatchObject({
+      lastUsedAt: null,
+      memoCount: 0,
+    });
+
+    const first = await client.memos.create({
+      body: "1つ目のメモ",
+      tagIds: [tag.id],
+    });
+
+    const firstDetail = await client.memos.detail({ id: first.id });
+
+    await expect(findTag()).resolves.toMatchObject({
+      lastUsedAt: firstDetail.createdAt,
+      memoCount: 1,
+    });
+
+    const olderCreatedAt = firstDetail.createdAt - 10_000;
+    await testDb
+      .update(memos)
+      .set({ createdAt: new Date(olderCreatedAt) })
+      .where(eq(memos.id, first.id));
+
+    const second = await client.memos.create({
+      body: "2つ目のメモ",
+      tagIds: [tag.id],
+    });
+
+    const secondDetail = await client.memos.detail({ id: second.id });
+
+    await expect(findTag()).resolves.toMatchObject({
+      lastUsedAt: secondDetail.createdAt,
+      memoCount: 2,
+    });
+
+    await client.memos.delete({ id: second.id });
+
+    await expect(findTag()).resolves.toMatchObject({
+      lastUsedAt: olderCreatedAt,
+      memoCount: 1,
+    });
+
+    await client.memos.delete({ id: first.id });
+
+    await expect(findTag()).resolves.toMatchObject({
+      lastUsedAt: null,
+      memoCount: 0,
+    });
   });
 
   test("他人のタグは付けられない（tag-not-found）", async () => {

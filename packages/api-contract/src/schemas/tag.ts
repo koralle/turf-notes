@@ -13,10 +13,11 @@ export const tagSummarySchema = v.object({
 
 export type TagSummary = v.InferOutput<typeof tagSummarySchema>;
 
-/** タグ一覧用。メモ件数を伴う。 */
+/** タグ一覧用。メモ件数と最後に使われた日時（Unix ms。未使用は null）を伴う。 */
 export const tagWithCountSchema = v.object({
   ...tagSummarySchema.entries,
   memoCount: v.number(),
+  lastUsedAt: v.nullable(v.number()),
 });
 
 export type TagWithCount = v.InferOutput<typeof tagWithCountSchema>;
