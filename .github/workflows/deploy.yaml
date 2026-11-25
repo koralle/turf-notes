@@ -15,6 +15,10 @@ permissions:
 jobs:
   ci:
     name: CI
+    permissions:
+      contents: read
+      # ci.yaml の test ジョブが PR にカバレッジをコメントするため workflow_call の権限検証を通す。
+      pull-requests: write
     uses: ./.github/workflows/ci.yaml
 
   deploy:

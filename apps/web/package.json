@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "storybook": "panda codegen && storybook dev -p 6006",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "typecheck": "panda codegen && tsrs"
   },
   "dependencies": {
@@ -49,6 +50,7 @@
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "@vitejs/plugin-react": "catalog:vite",
+    "@vitest/coverage-v8": "catalog:test",
     "eslint-plugin-storybook": "catalog:lint",
     "oxlint-plugin-react-doctor": "catalog:lint",
     "postcss": "catalog:ui",

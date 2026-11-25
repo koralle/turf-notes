@@ -45,10 +45,30 @@ jobs:
     name: Test
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/composite-actions/cache-and-install
-      - run: pnpm run test
+      - name: Test packages
+        run: pnpm --filter '!@turf-notes/web' --filter '!@turf-notes/api' -r run test
+      - name: Test apps/web
+        run: pnpm --filter @turf-notes/web run test:coverage
+      - name: Test apps/api
+        run: pnpm --filter @turf-notes/api run test:coverage
+      - name: Report coverage (apps/web)
+        if: (success() || failure()) && github.event_name == 'pull_request' && hashFiles('apps/web/coverage/coverage-summary.json') != ''
+        uses: davelosert/vitest-coverage-report-action@74c2d9210b4fc44c84d8213f61d7ec99837b7aa0 # v2.13.2
+        with:
+          working-directory: apps/web
+          vite-config-path: vitest.config.ts
+      - name: Report coverage (apps/api)
+        if: (success() || failure()) && github.event_name == 'pull_request' && hashFiles('apps/api/coverage/coverage-summary.json') != ''
+        uses: davelosert/vitest-coverage-report-action@74c2d9210b4fc44c84d8213f61d7ec99837b7aa0 # v2.13.2
+        with:
+          working-directory: apps/api
+          vite-config-path: vitest.config.ts
 
   knip:
     name: Unused dependencies and exports

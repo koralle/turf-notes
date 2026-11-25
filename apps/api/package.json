@@ -10,6 +10,7 @@
     "enable-password": "tsx scripts/enable-password.ts",
     "set-password": "tsx scripts/set-password.ts",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "typecheck": "tsrs"
   },
   "dependencies": {
@@ -30,6 +31,7 @@
     "@hono/cli": "catalog:tooling",
     "@turf-notes/forge": "workspace:*",
     "@types/node": "catalog:typescript",
+    "@vitest/coverage-v8": "catalog:test",
     "testcontainers": "catalog:test",
     "tsrs": "catalog:typescript",
     "tsx": "catalog:tooling",
