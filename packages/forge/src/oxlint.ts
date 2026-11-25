@@ -23,6 +23,9 @@ import vitest from "ultracite/oxlint/vitest";
  * - `require-to-throw-message`: 投げる値は valibot の ValiError。文言は valibot の版で
  *   変わるので、テストを文言に結び付けない。
  * - `expect-expect`: 表明を `expect*` で始まるヘルパーにまとめたテストを、表明なしと数えない。
+ * - `no-standalone-expect`: フィクスチャ付きの `test` を別ファイル（`*.fixture.ts`）から
+ *   import すると、ルールがそのファイルの `test` 呼び出しをテストブロックと見なさない。
+ *   名前で見るようにして、共有フィクスチャの形を許す（`test` 固定は上の `consistent-test-it`）。
  */
 const vitestPreset: OxlintConfig = {
   overrides: (vitest.overrides ?? []).map((override) => ({
@@ -34,6 +37,10 @@ const vitestPreset: OxlintConfig = {
         { fn: "test", withinDescribe: "test" },
       ],
       "vitest/expect-expect": ["error", { assertFunctionNames: ["expect*"] }],
+      "vitest/no-standalone-expect": [
+        "error",
+        { additionalTestBlockFunctions: ["test", "test.each", "test.for"] },
+      ],
       "vitest/prefer-import-in-mock": "off",
       "vitest/prefer-describe-function-title": "off",
       "vitest/prefer-to-be-falsy": "off",
@@ -72,8 +79,21 @@ const oxlintConfig = defineConfig({
   // anti-slop は、それとは別の角度から「分かったふり」を止めるプリセット（型の緩め方と
   // 読みにくい詰め込みを禁止する）。どちらも apps に閉じず、パッケージ全体に効かせる。
   extends: [core, vitestPreset, landmines, antiSlop],
-  jsPlugins: [...landmines.jsPlugins, ...antiSlop.jsPlugins],
+  jsPlugins: [
+    ...landmines.jsPlugins,
+    ...antiSlop.jsPlugins,
+    {
+      name: "turf-notes",
+      specifier: "@turf-notes/oxlint-plugin",
+    },
+  ],
   overrides: [
+    {
+      files: ["**/*.test.{ts,tsx}"],
+      rules: {
+        "turf-notes/no-for-in-test": "error",
+      },
+    },
     {
       files: testFiles,
       rules: {

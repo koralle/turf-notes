@@ -42,7 +42,10 @@ const config: KnipConfig = {
     "packages/forge": {
       // Oxlint の jsPlugin は specifier 文字列で読み、`ultracite/oxlint/landmines`
       // が組み立てる。knip はこの 1 段を追えないので、ここで依存として明示する。
-      ignoreDependencies: ["@interfere/landmines"],
+      ignoreDependencies: ["@interfere/landmines", "@turf-notes/oxlint-plugin"],
+    },
+    "packages/oxlint-plugin": {
+      vitest: { config: ["vitest.config.ts"] },
     },
     "apps/web": {
       // Storybook 専用の Vite 設定は main.ts からパス文字列で参照している

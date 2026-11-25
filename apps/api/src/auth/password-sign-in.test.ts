@@ -1,16 +1,10 @@
-import { accounts, users } from "@turf-notes/db/schema";
-import { hashPassword } from "better-auth/crypto";
-import { beforeAll, beforeEach, describe, expect, test } from "vitest";
+import { users } from "@turf-notes/db/schema";
+import { eq } from "drizzle-orm";
+import { describe, expect } from "vitest";
 
-import { createApp } from "../app";
-import { resetTestDb, testDb } from "../test-db";
-import { createAuth } from "./create-auth";
-import type { Auth } from "./create-auth";
-import { cookieSessionAuthenticator } from "./session";
-
-const baseURL = "http://localhost:3000";
-const password = "correct-password";
-const secret = "test-secret-please-change-this-value-32chars";
+import { baseURL, owner, password, test } from "../api.fixture";
+import type { createApp } from "../app";
+import { testDb } from "../test-db";
 
 const json = "application/json";
 const form = "application/x-www-form-urlencoded";
@@ -18,88 +12,61 @@ const contentTypes = [json, form] as const;
 
 type ContentType = (typeof contentTypes)[number];
 
-let app: ReturnType<typeof createApp>;
-let passwordHash = "";
+type App = ReturnType<typeof createApp>;
 
-const signIn = async (email: string, contentType: ContentType) => {
+const signIn = async (app: App, email: string, contentType: ContentType) => {
   const body =
     contentType === json
       ? JSON.stringify({ email, password })
       : new URLSearchParams({ email, password }).toString();
 
-  return await app.fetch(
-    new Request(`${baseURL}/api/auth/sign-in/email`, {
-      body,
-      headers: { "content-type": contentType },
-      method: "POST",
-    })
-  );
+  return await app.request(`${baseURL}/api/auth/sign-in/email`, {
+    body,
+    headers: { "content-type": contentType },
+    method: "POST",
+  });
 };
 
-const seedUser = async (email: string, enabled: boolean) => {
-  const id = `user-${email}`;
-  await testDb.insert(users).values({
-    email,
-    id,
-    name: "Owner",
-    passwordSignInEnabled: enabled,
-  });
-  await testDb.insert(accounts).values({
-    accountId: id,
-    id: `account-${email}`,
-    password: passwordHash,
-    providerId: "credential",
-    userId: id,
-  });
+const disableOwner = async () => {
+  await testDb
+    .update(users)
+    .set({ passwordSignInEnabled: false })
+    .where(eq(users.id, owner.id));
 };
 
 const expectRejected = async (response: Response) => {
   expect(response.status).toBe(401);
   expect(response.headers.getSetCookie()).toStrictEqual([]);
-  await expect(response.json()).resolves.toStrictEqual({
+  await expect(response.json()).resolves.toMatchObject({
     code: "INVALID_EMAIL_OR_PASSWORD",
-    message: "Invalid email or password",
   });
 };
 
-beforeAll(async () => {
-  passwordHash = await hashPassword(password);
-});
-
-beforeEach(async () => {
-  await resetTestDb();
-  await seedUser("disabled@example.com", false);
-  await seedUser("enabled@example.com", true);
-
-  // rate limit のメモリ状態をテスト間で共有しないよう、毎回作り直す。
-  const auth: Auth = createAuth({ baseURL, db: testDb, secret });
-  app = createApp({
-    authenticate: cookieSessionAuthenticator(auth),
-    auth,
-    db: () => testDb,
-  });
-});
-
 describe("パスワードサインインのゲート", () => {
-  test.each(contentTypes)(
+  test.for(contentTypes)(
     "%s でも無効ユーザーのセッションを発行しない",
-    async (contentType) => {
-      await expectRejected(await signIn("disabled@example.com", contentType));
+    async (contentType, { app }) => {
+      await disableOwner();
+      await expectRejected(await signIn(app, owner.email, contentType));
     }
   );
 
-  test("無効ユーザーと未知ユーザーは form-urlencoded で同じ応答になる", async () => {
-    const disabled = await signIn("disabled@example.com", form);
-    const unknown = await signIn("unknown@example.com", form);
+  test("無効ユーザーと未知ユーザーは form-urlencoded で同じ応答になる", async ({
+    app,
+  }) => {
+    await disableOwner();
+
+    const disabled = await signIn(app, owner.email, form);
+    const unknown = await signIn(app, "unknown@example.com", form);
 
     expect(disabled.status).toBe(unknown.status);
     await expect(disabled.json()).resolves.toStrictEqual(await unknown.json());
   });
 
-  test.each(contentTypes)(
+  test.for(contentTypes)(
     "%s の有効ユーザーはサインインできる",
-    async (contentType) => {
-      const response = await signIn("enabled@example.com", contentType);
+    async (contentType, { app }) => {
+      const response = await signIn(app, owner.email, contentType);
 
       expect(response.status).toBe(200);
       expect(

@@ -22,6 +22,7 @@ import {
   sql,
 } from "drizzle-orm";
 import type { SQL, SQLWrapper } from "drizzle-orm";
+import { alias } from "drizzle-orm/sqlite-core";
 import * as v from "valibot";
 
 import { toRace } from "../../lib/race";
@@ -111,11 +112,25 @@ const decorate = async (db: AppDb, rows: MemoRow[]): Promise<MemoSummary[]> => {
     tagsByMemo.set(row.memoId, list);
   }
 
+  // 両端が生きている参照だけを数える。片方の端だけ削除を無視すると、一覧は「参照 1」
+  // なのに詳細の links / backlinks が 0 件になり、数字が食い違う。
+  const fromMemo = alias(memos, "from_memo");
+  const toMemo = alias(memos, "to_memo");
+
   const linkRows = await db
     .select({ fromMemoId: memoLinks.fromMemoId, toMemoId: memoLinks.toMemoId })
     .from(memoLinks)
+    .innerJoin(fromMemo, eq(fromMemo.id, memoLinks.fromMemoId))
+    .innerJoin(toMemo, eq(toMemo.id, memoLinks.toMemoId))
     .where(
-      or(inArray(memoLinks.fromMemoId, ids), inArray(memoLinks.toMemoId, ids))
+      and(
+        or(
+          inArray(memoLinks.fromMemoId, ids),
+          inArray(memoLinks.toMemoId, ids)
+        ),
+        isNull(fromMemo.deletedAt),
+        isNull(toMemo.deletedAt)
+      )
     );
 
   const linkCounts = new Map<MemoId, number>();

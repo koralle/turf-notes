@@ -1,0 +1,21 @@
+{
+  "name": "@turf-notes/oxlint-plugin",
+  "private": true,
+  "description": "Custom Oxlint rules for turf-notes",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsrs"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:typescript",
+    "@vitest/coverage-v8": "catalog:test",
+    "oxlint": "catalog:lint",
+    "tsrs": "catalog:typescript",
+    "vitest": "catalog:test"
+  }
+}

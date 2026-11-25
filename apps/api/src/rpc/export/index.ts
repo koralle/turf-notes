@@ -1,5 +1,5 @@
-import { exportAll } from "../features/export/queries";
-import type { RouterKit } from "./base";
+import { exportAll } from "../../features/export/queries";
+import type { RouterKit } from "../base";
 
 export const createExportRouter = ({ impl, requireAuth }: RouterKit) => ({
   exportAll: impl.exportAll

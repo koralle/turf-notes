@@ -10,6 +10,7 @@ import {
   users,
   verifications,
 } from "@turf-notes/db/schema";
+import { getTableName } from "drizzle-orm";
 import { afterAll } from "vitest";
 
 /**
@@ -31,20 +32,26 @@ afterAll(() => {
 });
 
 /**
- * テーブルを空にする。子から先に消して外部キーの順序に依存しないようにする。
- * shortcut: 消すテーブルを手で並べている。スキーマにテーブルを足したらここにも足す
- * （忘れると前のテストの行が残り、別のテストが原因不明に落ちる）。
+ * `resetTestDb` が空にするテーブル。子から先に並べる（外部キーが有効なので順序が要る）。
+ * スキーマにテーブルを足したらここにも足す。忘れると `test-db.test.ts` が落ちる。
+ */
+export const testTables = [
+  memoLinks,
+  memoTags,
+  memos,
+  tags,
+  passkeys,
+  sessions,
+  verifications,
+  accounts,
+  users,
+] as const;
+
+/**
+ * テーブルを空にする。1 回の batch で順番どおりに消す（外部キーの都合で直列が要る）。
  */
 export const resetTestDb = async (): Promise<void> => {
-  await testDb.batch([
-    testDb.delete(memoLinks),
-    testDb.delete(memoTags),
-    testDb.delete(memos),
-    testDb.delete(tags),
-    testDb.delete(passkeys),
-    testDb.delete(sessions),
-    testDb.delete(verifications),
-    testDb.delete(accounts),
-    testDb.delete(users),
-  ]);
+  await testDb.$client.batch(
+    testTables.map((table) => `delete from ${getTableName(table)}`)
+  );
 };
