@@ -338,8 +338,8 @@ catalogs:
       specifier: 0.22.0-ts7.1.0-beta
       version: 0.22.0-ts7.1.0-beta
     type-fest:
-      specifier: 5.10.0
-      version: 5.10.0
+      specifier: 6.0.3
+      version: 6.0.3
   ui:
     '@fontsource/noto-sans-jp':
       specifier: 5.3.1
@@ -702,7 +702,7 @@ importers:
         version: 3.12.4
       type-fest:
         specifier: catalog:typescript
-        version: 5.10.0
+        version: 6.0.3
       valibot:
         specifier: catalog:validation
         version: 1.5.0(typescript@5.9.3)
@@ -6377,6 +6377,10 @@ packages:
     resolution: {integrity: sha512-NoSdpq/WEiAg5sjmBkmV/hfxv6HJH4NqPNrqjtSO5CwRmpsDfaf4begxW34KdJykH/l1yHtwBWQkCRdoXO8mPA==}
     engines: {node: '>=20'}
 
+  type-fest@6.0.3:
+    resolution: {integrity: sha512-MOJXegkac3h+sWdVb6VY/ACclsa71z3BprNpedGV8ljIzYCo+LRWgyIkWhidKNoiNJOb6kUds1pNCyzQ2p6hJQ==}
+    engines: {node: '>=22'}
+
   typescript@5.9.3:
     resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
     engines: {node: '>=14.17'}
@@ -11764,6 +11768,10 @@ snapshots:
       prelude-ls: 1.2.1
 
   type-fest@5.10.0:
+    dependencies:
+      tagged-tag: 1.0.0
+
+  type-fest@6.0.3:
     dependencies:
       tagged-tag: 1.0.0
 
