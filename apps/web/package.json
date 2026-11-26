@@ -9,7 +9,7 @@
     "dev": "panda codegen && vite dev",
     "panda:codegen": "panda codegen",
     "preview": "vite preview",
-    "storybook": "panda codegen && storybook dev -p 6006",
+    "storybook": "panda codegen && storybook dev -p $(node scripts/free-port.ts)",
     "test": "panda codegen && vitest run",
     "test:coverage": "panda codegen && vitest run --coverage",
     "typecheck": "panda codegen && tsrs"
