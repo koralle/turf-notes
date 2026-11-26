@@ -20,7 +20,7 @@
 
 ## 必要なもの
 
-- Node 24 以上（`devEngines` で担保）
+- Node 26.x（`devEngines` で担保）
 - pnpm 12.14.0
 - Docker（ローカルの libSQL サーバー用）
 - apm 0.35.0 以上（`.agents/skills` の取得用。アプリの開発自体には不要）
