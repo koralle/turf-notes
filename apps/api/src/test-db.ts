@@ -33,9 +33,9 @@ afterAll(() => {
 
 /**
  * `resetTestDb` が空にするテーブル。子から先に並べる（外部キーが有効なので順序が要る）。
- * スキーマにテーブルを足したらここにも足す。忘れると `test-db.test.ts` が落ちる。
+ * スキーマにテーブルを足したらここにも足す。
  */
-export const testTables = [
+const testTables = [
   memoLinks,
   memoTags,
   memos,
