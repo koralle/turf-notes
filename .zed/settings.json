@@ -1,6 +1,20 @@
 {
+  "lsp": {
+    "typescript-ls": {
+      "binary": {
+        "path": "./node_modules/.bin/tsrs",
+        "arguments": ["--lsp", "--stdio"]
+      }
+    }
+  },
   "languages": {
     "TypeScript": {
+      "language_servers": [
+        "typescript-ls",
+        "!vtsls",
+        "!typescript-language-server",
+        "..."
+      ],
       "format_on_save": "on",
       "formatter": {
         "external": {
@@ -10,6 +24,12 @@
       }
     },
     "TSX": {
+      "language_servers": [
+        "typescript-ls",
+        "!vtsls",
+        "!typescript-language-server",
+        "..."
+      ],
       "format_on_save": "on",
       "formatter": {
         "external": {
@@ -19,6 +39,12 @@
       }
     },
     "JavaScript": {
+      "language_servers": [
+        "typescript-ls",
+        "!vtsls",
+        "!typescript-language-server",
+        "..."
+      ],
       "format_on_save": "on",
       "formatter": {
         "external": {
