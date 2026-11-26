@@ -1,22 +1,37 @@
+import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import { createDb } from "@turf-notes/db";
+import { parseYAML } from "confbox";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import { GenericContainer, Wait } from "testcontainers";
 import type { StartedTestContainer } from "testcontainers";
+import * as v from "valibot";
+
+const composeSchema = v.object({
+  services: v.object({
+    turso: v.object({
+      image: v.pipe(v.string(), v.nonEmpty()),
+    }),
+  }),
+});
 
 /**
  * テスト用の libSQL を Testcontainers で立て、本番と同じマイグレーションを当てる
  * （要件 §9 品質基準の「DB 統合テスト」）。
- * イメージは `apps/api/compose.yaml` の開発用と同じもの。ダイジェストを上げるときは両方直す。
+ * イメージは `apps/api/compose.yaml` から読み、開発用と同じ版を 1 箇所で管理する。
  */
-const image =
-  "ghcr.io/tursodatabase/libsql-server@sha256:817fb6c6865d048a509f5c120905629fb9b5af20ad0c526cdc68a6d8793898ad";
+const readLibsqlImage = (): string => {
+  const composePath = path.join(import.meta.dirname, "../compose.yaml");
+  const parsed = parseYAML(readFileSync(composePath, "utf-8"));
+
+  return v.parse(composeSchema, parsed).services.turso.image;
+};
 
 let container: StartedTestContainer | undefined;
 
 export const setup = async (): Promise<void> => {
-  container = await new GenericContainer(image)
+  container = await new GenericContainer(readLibsqlImage())
     .withExposedPorts(8080)
     .withWaitStrategy(Wait.forHttp("/health", 8080))
     .start();
