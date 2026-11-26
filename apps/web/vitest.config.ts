@@ -7,18 +7,25 @@ import { msw } from "msw/vite";
 import { defineConfig } from "vitest/config";
 import type { BrowserConfigOptions } from "vitest/node";
 
-const chromiumBrowserOptions = {
-  enabled: true,
-  headless: true,
-  provider: playwright({
-    launchOptions: {
-      args: [
-        "--enable-features=DeferRendererTasksAfterInput:policy/minimal-types",
-      ],
-    },
-  }),
-  instances: [{ browser: "chromium" }],
-} as const satisfies BrowserConfigOptions;
+/**
+ * ブラウザプロジェクトが2つあるので instance 名を分ける。既定名だとどちらも
+ * `browser (chromium)` になり、Vitest が重複プロジェクトとして起動を拒否する。
+ */
+const chromiumBrowser = (name: string) =>
+  ({
+    enabled: true,
+    headless: true,
+    provider: playwright({
+      launchOptions: {
+        args: [
+          "--enable-features=DeferRendererTasksAfterInput:policy/minimal-types",
+        ],
+      },
+    }),
+    instances: [{ browser: "chromium", name }],
+  }) as const satisfies BrowserConfigOptions;
+
+const storybookConfigDir = path.join(import.meta.dirname, ".storybook");
 
 export default defineConfig({
   test: {
@@ -73,19 +80,21 @@ export default defineConfig({
           include: ["src/**/*.browser.test.{ts,tsx}"],
           setupFiles: ["src/test-browser-setup.ts"],
           passWithNoTests: true,
-          browser: chromiumBrowserOptions,
+          browser: chromiumBrowser("browser-chromium"),
         },
       },
       {
         extends: ".storybook/vite.config.ts",
         plugins: [
           storybookTest({
-            configDir: path.join(import.meta.dirname, ".storybook"),
+            configDir: storybookConfigDir,
           }),
         ],
         test: {
-          name: "storybook",
-          browser: chromiumBrowserOptions,
+          // addon は `storybook:<Storybook の configDir>` の名前でプロジェクトを引くので、
+          // ここで別名を付けると Storybook のテストパネルがプロジェクトを見つけられない。
+          name: `storybook:${storybookConfigDir}`,
+          browser: chromiumBrowser("storybook-chromium"),
         },
       },
     ],
