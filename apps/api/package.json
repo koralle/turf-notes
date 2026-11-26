@@ -32,6 +32,7 @@
     "@turf-notes/forge": "workspace:*",
     "@types/node": "catalog:typescript",
     "@vitest/coverage-v8": "catalog:test",
+    "confbox": "catalog:test",
     "testcontainers": "catalog:test",
     "tsrs": "catalog:typescript",
     "tsx": "catalog:tooling",

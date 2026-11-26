@@ -80,6 +80,7 @@ catalogs:
   test:
     "@vitest/browser-playwright": 5.1.0
     "@vitest/coverage-v8": 5.1.0
+    confbox: 0.3.2
     msw: 3.0.7
     playwright: 1.65.1
     testcontainers: 12.2.1
