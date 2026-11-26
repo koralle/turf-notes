@@ -2,6 +2,7 @@ import { implement } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { contract } from "@turf-notes/api-contract";
 import type {
+  MemoDetail,
   MemoSummary,
   TagWithCount,
 } from "@turf-notes/api-contract/schemas";
@@ -43,37 +44,46 @@ const defaultTags: TagWithCount[] = [
   },
 ];
 
-export const defaultMemos: MemoSummary[] = [
-  {
-    createdAt: DEFAULT_CREATED_AT,
-    excerpt: "道中で力みが出て、折り合いを欠いた。",
-    heading: "ソダシは道中で力みが出た",
-    id: memoId("01a175cd-b61e-7992-8d03-54303f56c654"),
-    linkCount: 2,
-    race: raceOf({
-      date: "2026-11-02",
-      name: "天皇賞(秋)",
-      number: 11,
-      venue: "東京",
-    }),
-    tags: [
-      { id: tagId(1), kind: "horse", name: "ソダシ" },
-      { id: tagId(3), kind: "theme", name: "展開" },
-    ],
-    title: "ソダシは道中で力みが出た",
-  },
-  {
-    createdAt: Date.parse("2026-10-26T09:00:00+09:00"),
-    excerpt:
-      "三連複の1点あたりの金額が多すぎる。的中率ではなく回収率で見るべき。",
-    heading: "三連複の1点あたりの金額が多すぎる",
-    id: memoId("01a175cd-b66d-7d8c-ab56-99e9e46cfefc"),
-    linkCount: 1,
-    race: null,
-    tags: [{ id: tagId(3), kind: "theme", name: "展開" }],
-    title: null,
-  },
-];
+export const sodashiMemo: MemoSummary = {
+  createdAt: DEFAULT_CREATED_AT,
+  excerpt: "道中で力みが出て、折り合いを欠いた。",
+  heading: "ソダシは道中で力みが出た",
+  id: memoId("01a175cd-b61e-7992-8d03-54303f56c654"),
+  linkCount: 2,
+  race: raceOf({
+    date: "2026-11-02",
+    name: "天皇賞(秋)",
+    number: 11,
+    venue: "東京",
+  }),
+  tags: [
+    { id: tagId(1), kind: "horse", name: "ソダシ" },
+    { id: tagId(3), kind: "theme", name: "展開" },
+  ],
+  title: "ソダシは道中で力みが出た",
+};
+
+const sanrenpukuMemo: MemoSummary = {
+  createdAt: Date.parse("2026-10-26T09:00:00+09:00"),
+  excerpt:
+    "三連複の1点あたりの金額が多すぎる。的中率ではなく回収率で見るべき。",
+  heading: "三連複の1点あたりの金額が多すぎる",
+  id: memoId("01a175cd-b66d-7d8c-ab56-99e9e46cfefc"),
+  linkCount: 1,
+  race: null,
+  tags: [{ id: tagId(3), kind: "theme", name: "展開" }],
+  title: null,
+};
+
+export const defaultMemos: MemoSummary[] = [sodashiMemo, sanrenpukuMemo];
+
+export const defaultMemoDetail: MemoDetail = {
+  ...sodashiMemo,
+  backlinks: [],
+  body: "道中で力みが出て、折り合いを欠いた。\n\n- 次走は距離短縮で見直し",
+  links: [{ heading: sanrenpukuMemo.heading, id: sanrenpukuMemo.id }],
+  version: 1,
+};
 
 const baseProcedures = {
   auth: {
@@ -95,7 +105,11 @@ const baseProcedures = {
       id: memoId("01a175cd-b61e-7992-8d03-54303f56c699"),
     })),
     delete: mockImpl.memos.delete.handler(() => ({ ok: true })),
-    detail: mockImpl.memos.detail.handler(({ errors }) => {
+    detail: mockImpl.memos.detail.handler(({ errors, input }) => {
+      if (input.id === defaultMemoDetail.id) {
+        return defaultMemoDetail;
+      }
+
       throw errors["memo-not-found"]();
     }),
     forRace: mockImpl.memos.forRace.handler(() => ({ items: [] })),

@@ -41,6 +41,16 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/composite-actions/cache-and-install
+      - name: Cache Playwright Chromium
+        id: playwright-cache
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+      - if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm --filter @turf-notes/web exec playwright install --with-deps chromium
+      - if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm --filter @turf-notes/web exec playwright install-deps chromium
       - run: pnpm --filter @turf-notes/web run test:coverage
       - name: Report coverage
         if: (success() || failure()) && github.event_name == 'pull_request' && hashFiles('apps/web/coverage/coverage-summary.json') != ''

@@ -9,9 +9,9 @@
     "dev": "panda codegen && vite dev",
     "panda:codegen": "panda codegen",
     "preview": "vite preview",
-    "storybook": "panda codegen && storybook dev -p 6006",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
+    "storybook": "panda codegen && storybook dev -p $(node scripts/free-port.ts)",
+    "test": "panda codegen && vitest run",
+    "test:coverage": "panda codegen && vitest run --coverage",
     "typecheck": "panda codegen && tsrs"
   },
   "dependencies": {
@@ -44,6 +44,7 @@
     "@pandacss/preset-base": "catalog:ui",
     "@pandacss/preset-panda": "catalog:ui",
     "@storybook/addon-docs": "catalog:storybook",
+    "@storybook/addon-vitest": "catalog:storybook",
     "@storybook/builder-vite": "catalog:storybook",
     "@storybook/tanstack-react": "catalog:storybook",
     "@turf-notes/forge": "workspace:*",
@@ -51,15 +52,18 @@
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "@vitejs/plugin-react": "catalog:vite",
+    "@vitest/browser-playwright": "catalog:test",
     "@vitest/coverage-v8": "catalog:test",
     "eslint-plugin-storybook": "catalog:lint",
     "msw": "catalog:test",
     "oxlint-plugin-react-doctor": "catalog:lint",
+    "playwright": "catalog:test",
     "postcss": "catalog:ui",
     "storybook": "catalog:storybook",
     "tsrs": "catalog:typescript",
     "vite": "catalog:vite",
     "vitest": "catalog:test",
+    "vitest-browser-react": "catalog:test",
     "wrangler": "catalog:cloudflare"
   }
 }
