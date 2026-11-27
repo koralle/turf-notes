@@ -98,7 +98,7 @@ catalogs:
     turbo: 2.11.13
 
   typescript:
-    "@tsconfig/strictest": 2.0.8
+    "@tsconfig/strictest": 2.0.9
     "@types/node": 26.6.6
     tsrs: 0.22.0-ts7.1.0-beta
     type-fest: 6.0.3
