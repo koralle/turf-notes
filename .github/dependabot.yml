@@ -9,8 +9,145 @@ updates:
       timezone: "Asia/Tokyo"
     cooldown:
       default-days: 3
+    open-pull-requests-limit: 15
     groups:
-      minor-and-patch:
+      # React 本体と型はバージョン同期が必須のため major もまとめて揃える
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+
+      # Router / Start / SSR-Query / Query が相互に peer 結合（@tanstack/intent は CLI のため除外）
+      tanstack:
+        patterns:
+          - "@tanstack/react-*"
+
+      # client / contract / react-query / server は同一バージョン同期が必須
+      orpc:
+        patterns:
+          - "@orpc/*"
+
+      hono:
+        patterns:
+          - "hono"
+          - "@hono/*"
+        update-types:
+          - "minor"
+          - "patch"
+
+      # 本体・drizzle-adapter・passkey は同一バージョン同期が必須
+      better-auth:
+        patterns:
+          - "better-auth"
+          - "@better-auth/*"
+
+      # drizzle-orm / drizzle-kit のバージョン同期と peer の libSQL ドライバ
+      db:
+        patterns:
+          - "drizzle-*"
+          - "@libsql/client"
+
+      # @cloudflare/vite-plugin が vite と wrangler の両方を peer に持つビルド・Workers 基盤
+      vite-and-cloudflare:
+        patterns:
+          - "vite"
+          - "@vitejs/*"
+          - "@cloudflare/*"
+          - "wrangler"
+        update-types:
+          - "minor"
+          - "patch"
+
+      # Panda CSS 一式のバージョン同期と peer の PostCSS
+      pandacss:
+        patterns:
+          - "@pandacss/*"
+          - "postcss"
+
+      # React Aria と同エコシステムの @internationalized/* を含む UI 層
+      ui:
+        patterns:
+          - "react-aria-components"
+          - "@internationalized/*"
+          - "@suspensive/react"
+          - "kiso.css"
+          - "@fontsource/*"
+          - "lucide-react"
+          - "markdown-it"
+        update-types:
+          - "minor"
+          - "patch"
+
+      # ドメイン・API 契約・フォームを横断するバリデーション層
+      validation:
+        patterns:
+          - "valibot"
+          - "@conform-to/*"
+        update-types:
+          - "minor"
+          - "patch"
+
+      # Storybook 本体・アドオンと同系列リリースの eslint-plugin-storybook
+      storybook:
+        patterns:
+          - "storybook"
+          - "@storybook/*"
+          - "eslint-plugin-storybook"
+
+      # Vitest 本体の同期と Browser Mode の peer である Playwright
+      vitest:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
+          - "vitest-*"
+          - "playwright"
+
+      # Vitest 以外のテスト専用基盤（モック・コンテナ・テスト設定パーサ）
+      test-tools:
+        patterns:
+          - "msw"
+          - "testcontainers"
+          - "confbox"
+        update-types:
+          - "minor"
+          - "patch"
+
+      # Oxc / Ultracite / landmines の peer 結合と react-doctor / oxlint-plugin-react-doctor の同期
+      lint:
+        patterns:
+          - "oxlint"
+          - "oxlint-*"
+          - "oxfmt"
+          - "ultracite"
+          - "@interfere/landmines"
+          - "react-doctor"
+
+      typescript:
+        patterns:
+          - "tsrs"
+          - "@tsconfig/*"
+          - "@types/node"
+          - "type-fest"
+        update-types:
+          - "minor"
+          - "patch"
+
+      # アプリ実行に非依存の開発・エージェント用 CLI ツール
+      tooling:
+        patterns:
+          - "@tanstack/intent"
+          - "chrome-devtools-mcp"
+          - "knip"
+          - "lefthook"
+          - "tsx"
+        update-types:
+          - "minor"
+          - "patch"
+
+      # 上記以外（uuidv7 や将来追加されるパッケージ）のフォールバック
+      other-minor-and-patch:
         patterns:
           - "*"
         update-types:
