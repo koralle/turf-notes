@@ -24,9 +24,9 @@ skills:
 
 catalogs:
   auth:
-    "@better-auth/drizzle-adapter": 1.7.18
-    "@better-auth/passkey": 1.7.18
-    better-auth: 1.7.18
+    "@better-auth/drizzle-adapter": 1.7.28
+    "@better-auth/passkey": 1.7.28
+    better-auth: 1.7.28
 
   cloudflare:
     "@cloudflare/vite-plugin": 1.67.0
