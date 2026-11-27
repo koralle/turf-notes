@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/composite-actions/cache-and-install
-      - run: pnpm --filter @turf-notes/domain run test:coverage
+      - run: pnpm turbo run test:coverage --filter=@turf-notes/domain
       - name: Report coverage
         if: (success() || failure()) && github.event_name == 'pull_request' && hashFiles('packages/domain/coverage/coverage-summary.json') != ''
         uses: davelosert/vitest-coverage-report-action@74c2d9210b4fc44c84d8213f61d7ec99837b7aa0 # v2.13.2
@@ -51,7 +51,7 @@ jobs:
         run: pnpm --filter @turf-notes/web exec playwright install --with-deps chromium
       - if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: pnpm --filter @turf-notes/web exec playwright install-deps chromium
-      - run: pnpm --filter @turf-notes/web run test:coverage
+      - run: pnpm turbo run test:coverage --filter=@turf-notes/web
       - name: Report coverage
         if: (success() || failure()) && github.event_name == 'pull_request' && hashFiles('apps/web/coverage/coverage-summary.json') != ''
         uses: davelosert/vitest-coverage-report-action@74c2d9210b4fc44c84d8213f61d7ec99837b7aa0 # v2.13.2
@@ -69,7 +69,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/composite-actions/cache-and-install
-      - run: pnpm --filter @turf-notes/api run test:coverage
+      - run: pnpm turbo run test:coverage --filter=@turf-notes/api
       - name: Report coverage
         if: (success() || failure()) && github.event_name == 'pull_request' && hashFiles('apps/api/coverage/coverage-summary.json') != ''
         uses: davelosert/vitest-coverage-report-action@74c2d9210b4fc44c84d8213f61d7ec99837b7aa0 # v2.13.2
@@ -87,7 +87,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/composite-actions/cache-and-install
-      - run: pnpm --filter @turf-notes/oxlint-plugin run test:coverage
+      - run: pnpm turbo run test:coverage --filter=@turf-notes/oxlint-plugin
       - name: Report coverage
         if: (success() || failure()) && github.event_name == 'pull_request' && hashFiles('packages/oxlint-plugin/coverage/coverage-summary.json') != ''
         uses: davelosert/vitest-coverage-report-action@74c2d9210b4fc44c84d8213f61d7ec99837b7aa0 # v2.13.2

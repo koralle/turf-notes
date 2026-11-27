@@ -1,0 +1,86 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "cacheMaxAge": "7d",
+  "cacheMaxSize": "1GB",
+  "globalPassThroughEnv": ["XDG_CONFIG_HOME"],
+  "tasks": {
+    "panda:codegen": {
+      "inputs": ["panda.config.ts", "src/**/*.{ts,tsx}", "package.json"],
+      "outputs": ["styled-system/**"]
+    },
+    "build": {
+      "dependsOn": ["^build", "panda:codegen"],
+      "outputs": ["dist/**"]
+    },
+    "build-storybook": {
+      "dependsOn": ["^build", "panda:codegen"],
+      "outputs": ["storybook-static/**"]
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck", "panda:codegen"],
+      "outputs": []
+    },
+    "//#typecheck:root": {
+      "dependsOn": ["@turf-notes/forge#typecheck"],
+      "inputs": ["*.ts", "tsconfig.json", "package.json"],
+      "outputs": []
+    },
+    "//#check:ultracite": {
+      "dependsOn": ["@turf-notes/web#panda:codegen"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "apps/**",
+        "packages/**",
+        "!**/node_modules/**",
+        "!**/dist/**",
+        "!**/coverage/**",
+        "!**/storybook-static/**",
+        "!**/styled-system/**",
+        "!**/.turbo/**",
+        "!**/.wrangler/**",
+        "!**/.tanstack/**"
+      ],
+      "outputs": []
+    },
+    "//#knip:run": {
+      "dependsOn": ["@turf-notes/web#panda:codegen"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "apps/**",
+        "packages/**",
+        "!**/node_modules/**",
+        "!**/dist/**",
+        "!**/coverage/**",
+        "!**/storybook-static/**",
+        "!**/styled-system/**",
+        "!**/.turbo/**",
+        "!**/.wrangler/**",
+        "!**/.tanstack/**"
+      ],
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^build", "panda:codegen"],
+      "passThroughEnv": [
+        "DOCKER_HOST",
+        "TESTCONTAINERS_*",
+        "PLAYWRIGHT_BROWSERS_PATH"
+      ],
+      "outputs": []
+    },
+    "test:coverage": {
+      "dependsOn": ["^build", "panda:codegen"],
+      "passThroughEnv": [
+        "DOCKER_HOST",
+        "TESTCONTAINERS_*",
+        "PLAYWRIGHT_BROWSERS_PATH"
+      ],
+      "outputs": ["coverage/**"]
+    },
+    "dev": {
+      "dependsOn": ["panda:codegen"],
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

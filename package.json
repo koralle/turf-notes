@@ -3,17 +3,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "pnpm -r run build",
-    "check": "pnpm --filter @turf-notes/web run panda:codegen && ultracite check --type-aware --deny-warnings --report-unused-disable-directives",
+    "build": "turbo run build",
+    "check": "turbo run //#check:ultracite",
+    "check:ultracite": "ultracite check --type-aware --deny-warnings --report-unused-disable-directives",
     "deploy": "pnpm --filter @turf-notes/api run deploy && pnpm --filter @turf-notes/web run deploy",
     "deploy:api": "pnpm --filter @turf-notes/api run deploy",
     "deploy:web": "pnpm --filter @turf-notes/web run deploy",
-    "dev": "pnpm --filter @turf-notes/web run dev",
+    "dev": "turbo run dev --filter=@turf-notes/web",
     "doctor": "react-doctor --no-telemetry",
-    "fix": "pnpm --filter @turf-notes/web run panda:codegen && ultracite fix --type-aware --no-error-on-unmatched-pattern",
-    "knip": "knip",
-    "test": "pnpm -r run test",
-    "typecheck": "tsrs && pnpm -r run typecheck"
+    "fix": "turbo run panda:codegen && ultracite fix --type-aware --no-error-on-unmatched-pattern",
+    "knip": "turbo run //#knip:run",
+    "knip:run": "knip",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck //#typecheck:root",
+    "typecheck:root": "tsrs"
   },
   "devDependencies": {
     "@tanstack/intent": "catalog:tooling",
@@ -26,6 +29,7 @@
     "oxlint-tsgolint": "catalog:lint",
     "react-doctor": "catalog:tooling",
     "tsrs": "catalog:typescript",
+    "turbo": "catalog:tooling",
     "ultracite": "catalog:lint"
   },
   "devEngines": {

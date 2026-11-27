@@ -3,16 +3,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "panda codegen && vite build",
-    "build-storybook": "panda codegen && storybook build",
+    "build": "vite build",
+    "build-storybook": "storybook build",
     "deploy": "vite build && wrangler deploy",
-    "dev": "panda codegen && vite dev",
+    "dev": "vite dev",
     "panda:codegen": "panda codegen",
     "preview": "vite preview",
     "storybook": "panda codegen && storybook dev -p $(node scripts/free-port.ts)",
-    "test": "panda codegen && vitest run",
-    "test:coverage": "panda codegen && vitest run --coverage",
-    "typecheck": "panda codegen && tsrs"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsrs"
   },
   "dependencies": {
     "@better-auth/passkey": "catalog:auth",
