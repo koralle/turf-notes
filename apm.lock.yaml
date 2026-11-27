@@ -951,6 +951,21 @@ dependencies:
   - react-best-practices
   - react-view-transitions
   - web-design-guidelines
+- repo_url: vercel/turborepo
+  name: turborepo
+  host: github.com
+  resolved_commit: 51d6ddfcbb35d7cc264ee9b6e0ef8f4f82fc23d1
+  resolved_ref: 51d6ddfcbb35d7cc264ee9b6e0ef8f4f82fc23d1
+  version: unknown
+  package_type: skill_bundle
+  deployed_files:
+  - .agents/skills/turborepo
+  - .agents/skills/turborepo/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/turborepo/SKILL.md: sha256:e475e520f1822f0de4ca5fbbfd37906949db67d35b038f2b8a76ef4c95c13c53
+  content_hash: sha256:7b5cfda0579b3f7d0601ef0ff4a275b8000fd49569f09896ada2a27ccab5afa3
+  skill_subset:
+  - turborepo
 deployments:
 - kind: project-relative
   target: agent-skills
@@ -4390,6 +4405,24 @@ deployments:
   - chromedevtools/chrome-devtools-mcp/skills/troubleshooting
   active_owner: chromedevtools/chrome-devtools-mcp/skills/troubleshooting
   content_hash: sha256:80357d865f9604c12403b9754c1a513d4ee8afcfda84423c7a0e62a246c472f7
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/turborepo
+  runtime: null
+  scope: project
+  owners:
+  - vercel/turborepo
+  active_owner: vercel/turborepo
+  content_hash: null
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/turborepo/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - vercel/turborepo
+  active_owner: vercel/turborepo
+  content_hash: sha256:e475e520f1822f0de4ca5fbbfd37906949db67d35b038f2b8a76ef4c95c13c53
 - kind: project-relative
   target: agent-skills
   value: .agents/skills/valibot
