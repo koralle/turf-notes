@@ -105,13 +105,13 @@ catalogs:
 
   ui:
     "@fontsource/noto-sans-jp": 5.3.1
-    "@pandacss/dev": 2.5.0
-    "@pandacss/preset-base": 2.5.0
-    "@pandacss/preset-panda": 2.5.0
+    "@pandacss/dev": 2.6.0
+    "@pandacss/preset-base": 2.6.0
+    "@pandacss/preset-panda": 2.6.0
     kiso.css: 1.2.4
     lucide-react: 1.79.0
     markdown-it: 15.0.3
-    postcss: 8.5.32
+    postcss: 8.5.33
     react-aria-components: 1.22.1
 
   validation:
