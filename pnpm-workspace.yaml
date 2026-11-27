@@ -29,8 +29,8 @@ catalogs:
     better-auth: 1.7.28
 
   cloudflare:
-    "@cloudflare/vite-plugin": 1.67.0
-    wrangler: 4.158.0
+    "@cloudflare/vite-plugin": 1.70.1
+    wrangler: 4.168.0
 
   date:
     "@internationalized/date": 3.12.4
@@ -119,8 +119,8 @@ catalogs:
     valibot: 1.5.0
 
   vite:
-    "@vitejs/plugin-react": 6.2.1
-    vite: 8.3.6
+    "@vitejs/plugin-react": 6.3.0
+    vite: 8.3.8
 
 # リリース直後のパッケージは pnpm の minimumReleaseAge の対象から明示的に除外する
 # （CI の `pnpm install --frozen-lockfile` を supply-chain policy で失敗させないため）。
