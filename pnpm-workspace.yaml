@@ -62,7 +62,7 @@ catalogs:
     "@orpc/contract": 1.16.5
     "@orpc/react-query": 1.16.5
     "@orpc/server": 1.16.5
-    hono: 4.13.16
+    hono: 4.13.21
 
   storybook:
     "@storybook/addon-docs": 10.6.8
