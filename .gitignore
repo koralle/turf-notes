@@ -54,3 +54,6 @@ storybook-static
 
 # APM の取得キャッシュ（apm install が .agents/skills に配置する）
 apm_modules/
+
+# Turborepo
+.turbo
