@@ -65,11 +65,11 @@ catalogs:
     hono: 4.13.16
 
   storybook:
-    "@storybook/addon-docs": 10.6.6
-    "@storybook/addon-vitest": 10.6.6
-    "@storybook/builder-vite": 10.6.6
-    "@storybook/tanstack-react": 10.6.6
-    storybook: 10.6.6
+    "@storybook/addon-docs": 10.6.8
+    "@storybook/addon-vitest": 10.6.8
+    "@storybook/builder-vite": 10.6.8
+    "@storybook/tanstack-react": 10.6.8
+    storybook: 10.6.8
 
   tanstack:
     "@tanstack/react-query": 5.106.1
