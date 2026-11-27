@@ -58,10 +58,10 @@ catalogs:
     react-dom: 19.3.1
 
   rpc:
-    "@orpc/client": 1.16.2
-    "@orpc/contract": 1.16.2
-    "@orpc/react-query": 1.16.2
-    "@orpc/server": 1.16.2
+    "@orpc/client": 1.16.5
+    "@orpc/contract": 1.16.5
+    "@orpc/react-query": 1.16.5
+    "@orpc/server": 1.16.5
     hono: 4.13.16
 
   storybook:
